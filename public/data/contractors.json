@@ -1,0 +1,222 @@
+[
+  {
+    "id": 1,
+    "name": "Vikas Sharma",
+    "type": "Building Contractor",
+    "location": "Lucknow, UP",
+    "projects": 12,
+    "specialization": ["Residential", "Commercial"],
+    "phone": "9123456780",
+    "email": "vikas.sharma@contractors.com",
+    "rating": 4.7,
+    "languages": ["Hindi", "English"],
+    "available": true,
+    "profilePic": "/images/contractors/vikas.jpg",
+    "bio": "Experienced building contractor with a focus on quality and timely delivery.",
+    "verified": true,
+    "workTypes": ["New Construction", "Renovation", "Supervision"],
+    "workStyle": "Quality-focused, Timely Delivery",
+    "feedback": [
+      { "from": "Ramesh Kumar", "role": "Labour", "comment": "Very professional and supportive.", "rating": 5 },
+      { "from": "Client A", "role": "Client", "comment": "Project delivered on time.", "rating": 4.5 }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Manoj Gupta",
+    "type": "Electrical Contractor",
+    "location": "Kanpur, UP",
+    "projects": 8,
+    "specialization": ["Industrial", "Maintenance"],
+    "phone": "9123456781",
+    "email": "manoj.gupta@contractors.com",
+    "rating": 4.5,
+    "languages": ["Hindi"],
+    "available": false,
+    "profilePic": "/images/contractors/manoj.jpg",
+    "bio": "Expert in industrial and commercial electrical projects.",
+    "verified": true,
+    "workTypes": ["Industrial Wiring", "Maintenance", "Emergency Repairs"],
+    "workStyle": "Strict, Safety First",
+    "feedback": [
+      { "from": "Amit Singh", "role": "Labour", "comment": "Good safety practices.", "rating": 4 },
+      { "from": "Client B", "role": "Client", "comment": "Quick response for repairs.", "rating": 4.5 }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Sunil Verma",
+    "type": "Plumbing Contractor",
+    "location": "Varanasi, UP",
+    "projects": 10,
+    "specialization": ["Water Supply", "Sanitation"],
+    "phone": "9123456782",
+    "email": "sunil.verma@contractors.com",
+    "rating": 4.2,
+    "languages": ["Hindi", "Bhojpuri"],
+    "available": true,
+    "profilePic": "/images/contractors/sunil.jpg",
+    "bio": "Reliable plumbing contractor for all types of water and sanitation work.",
+    "verified": false,
+    "workTypes": ["Water Supply", "Sanitation", "Repairs"],
+    "workStyle": "Reliable, Affordable",
+    "feedback": [
+      { "from": "Suresh Yadav", "role": "Labour", "comment": "Pays on time.", "rating": 4 },
+      { "from": "Client C", "role": "Client", "comment": "Solved all plumbing issues.", "rating": 4.2 }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Priya Singh",
+    "type": "Interior Contractor",
+    "location": "Prayagraj, UP",
+    "projects": 15,
+    "specialization": ["Home Interiors", "Office Interiors"],
+    "phone": "9123456783",
+    "email": "priya.singh@contractors.com",
+    "rating": 4.9,
+    "languages": ["Hindi", "English"],
+    "available": true,
+    "profilePic": "/images/contractors/priya.jpg",
+    "bio": "Creative interior contractor with a passion for modern design.",
+    "verified": true,
+    "workTypes": ["Home Interiors", "Office Interiors", "Modular Kitchen"],
+    "workStyle": "Creative, Modern Design",
+    "feedback": [
+      { "from": "Labour D", "role": "Labour", "comment": "Very creative and friendly.", "rating": 5 },
+      { "from": "Client D", "role": "Client", "comment": "Transformed our home beautifully.", "rating": 5 }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Amit Tiwari",
+    "type": "Painting Contractor",
+    "location": "Gorakhpur, UP",
+    "projects": 7,
+    "specialization": ["Residential Painting", "Commercial Painting"],
+    "phone": "9123456784",
+    "email": "amit.tiwari@contractors.com",
+    "rating": 4.3,
+    "languages": ["Hindi"],
+    "available": false,
+    "profilePic": "/images/contractors/amit.jpg",
+    "bio": "Professional painting contractor for homes and offices.",
+    "verified": false,
+    "workTypes": ["Residential Painting", "Commercial Painting", "Texture Work"],
+    "workStyle": "Neat, Fast Work",
+    "feedback": [
+      { "from": "Labour E", "role": "Labour", "comment": "Pays well and on time.", "rating": 4.5 },
+      { "from": "Client E", "role": "Client", "comment": "Great finish and quick work.", "rating": 4.3 }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Farhan Ali",
+    "type": "Civil Contractor",
+    "location": "Agra, UP",
+    "projects": 20,
+    "specialization": ["Road Construction", "Bridges"],
+    "phone": "9123456785",
+    "email": "farhan.ali@contractors.com",
+    "rating": 4.8,
+    "languages": ["Hindi", "Urdu"],
+    "available": true,
+    "profilePic": "/images/contractors/farhan.jpg",
+    "bio": "Civil contractor with expertise in large infrastructure projects.",
+    "verified": true,
+    "workTypes": ["Road Construction", "Bridge Building", "Site Management"],
+    "workStyle": "Disciplined, Large Projects",
+    "feedback": [
+      { "from": "Labour F", "role": "Labour", "comment": "Manages big teams well.", "rating": 5 },
+      { "from": "Client F", "role": "Client", "comment": "Handled our bridge project efficiently.", "rating": 4.8 }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Rakesh Sharma",
+    "type": "Carpentry Contractor",
+    "location": "Lucknow, UP",
+    "projects": 18,
+    "specialization": ["Wooden Furniture", "Custom Designs"],
+    "phone": "9123456786",
+    "email": "rakesh.sharma@contractors.com",
+    "rating": 4.8,
+    "languages": ["Hindi", "English"],
+    "available": true,
+    "profilePic": "/images/contractors/rakesh.jpg",
+    "bio": "Expert carpentry contractor specializing in custom wooden designs and furniture.",
+    "verified": true,
+    "workTypes": ["Custom Furniture", "Doors", "Frames"],
+    "workStyle": "Artistic, Precision",
+    "feedback": [
+      { "from": "Vikram Singh", "role": "Labour", "comment": "Great contractor to work with.", "rating": 5 },
+      { "from": "Client G", "role": "Client", "comment": "Beautiful craftsmanship.", "rating": 4.9 }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Suresh Verma",
+    "type": "Welding Contractor",
+    "location": "Kanpur, UP",
+    "projects": 14,
+    "specialization": ["Steel Fabrication", "Iron Gates"],
+    "phone": "9123456787",
+    "email": "suresh.verma@contractors.com",
+    "rating": 4.6,
+    "languages": ["Hindi"],
+    "available": false,
+    "profilePic": "/images/contractors/suresh.jpg",
+    "bio": "Experienced welding contractor for industrial and residential projects.",
+    "verified": true,
+    "workTypes": ["Iron Work", "Steel Gates", "Railings"],
+    "workStyle": "Strong, Durable",
+    "feedback": [
+      { "from": "Rajesh Kumar", "role": "Labour", "comment": "Good leadership and planning.", "rating": 4.7 },
+      { "from": "Client H", "role": "Client", "comment": "Sturdy welding work.", "rating": 4.5 }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Pavan Kumar",
+    "type": "Tiling & Flooring Contractor",
+    "location": "Varanasi, UP",
+    "projects": 11,
+    "specialization": ["Tiles", "Marble", "Flooring"],
+    "phone": "9123456788",
+    "email": "pavan.kumar@contractors.com",
+    "rating": 4.7,
+    "languages": ["Hindi"],
+    "available": true,
+    "profilePic": "/images/contractors/pavan.jpg",
+    "bio": "Professional tiling and flooring contractor with expertise in various materials.",
+    "verified": false,
+    "workTypes": ["Floor Tiles", "Wall Tiles", "Marble Work"],
+    "workStyle": "Neat, Detail-oriented",
+    "feedback": [
+      { "from": "Mohan Lal", "role": "Labour", "comment": "Fair payment and timely.", "rating": 4.5 },
+      { "from": "Client I", "role": "Client", "comment": "Excellent tile alignment.", "rating": 4.8 }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Anil Kumar",
+    "type": "Concrete & Foundation Contractor",
+    "location": "Agra, UP",
+    "projects": 16,
+    "specialization": ["Foundation Work", "RCC Structures"],
+    "phone": "9123456789",
+    "email": "anil.kumar@contractors.com",
+    "rating": 4.9,
+    "languages": ["Hindi", "English"],
+    "available": true,
+    "profilePic": "/images/contractors/anil.jpg",
+    "bio": "Reliable foundation and concrete contractor with expertise in RCC structures.",
+    "verified": true,
+    "workTypes": ["Foundation", "Concrete Pouring", "RCC Work"],
+    "workStyle": "Strong, Disciplined",
+    "feedback": [
+      { "from": "Anuj Yadav", "role": "Labour", "comment": "Excellent project management.", "rating": 4.9 },
+      { "from": "Client J", "role": "Client", "comment": "Very professional and reliable.", "rating": 4.8 }
+    ]
+  }
+]

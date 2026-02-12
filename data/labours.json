@@ -1,0 +1,73 @@
+[
+  {
+    "id": 1,
+    "name": "Ramesh Kumar",
+    "trade": "Mason",
+    "location": "Lucknow, UP",
+    "experience": 5,
+    "skills": ["Brickwork", "Plastering", "Tile Work"],
+    "phone": "9876543210",
+    "email": "ramesh.kumar@labours.com",
+    "languages": ["Hindi"],
+    "profilePic": "/images/labours/ramesh.jpg",
+    "verified": true,
+    "workNature": "Hardworking, Team Player",
+    "feedback": [
+      { "from": "Vikas Sharma", "role": "Contractor", "comment": "Excellent mason, always on time.", "rating": 5 },
+      { "from": "Client X", "role": "Client", "comment": "Quality work and polite.", "rating": 4.8 }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Suresh Yadav",
+    "trade": "Electrician",
+    "location": "Kanpur, UP",
+    "experience": 3,
+    "skills": ["Wiring", "Lighting", "Repairs"],
+    "phone": "9876543211",
+    "email": "suresh.yadav@labours.com",
+    "languages": ["Hindi", "English"],
+    "profilePic": "/images/labours/suresh.jpg",
+    "verified": false,
+    "workNature": "Quick Learner, Safety First",
+    "feedback": [
+      { "from": "Manoj Gupta", "role": "Contractor", "comment": "Good with electrical repairs.", "rating": 4.2 },
+      { "from": "Client Y", "role": "Client", "comment": "Fixed all wiring issues.", "rating": 4.5 }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Amit Singh",
+    "trade": "Plumber",
+    "location": "Varanasi, UP",
+    "experience": 4,
+    "skills": ["Pipe Fitting", "Sanitation", "Water Supply"],
+    "phone": "9876543212",
+    "email": "amit.singh@labours.com",
+    "languages": ["Hindi", "Bhojpuri"],
+    "profilePic": "/images/labours/amit.jpg",
+    "verified": true,
+    "workNature": "Reliable, Honest",
+    "feedback": [
+      { "from": "Sunil Verma", "role": "Contractor", "comment": "Handles sanitation work well.", "rating": 4.6 },
+      { "from": "Client Z", "role": "Client", "comment": "Very helpful and skilled.", "rating": 4.7 }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Deepak Mishra",
+    "trade": "Painter",
+    "location": "Prayagraj, UP",
+    "experience": 2,
+    "skills": ["Wall Painting", "Texture Work"],
+    "phone": "9876543213",
+    "email": "deepak.mishra@labours.com",
+    "languages": ["Hindi"],
+    "profilePic": "/images/labours/deepak.jpg",
+    "verified": false,
+    "workNature": "Creative, Fast",
+    "feedback": [
+      { "from": "Amit Tiwari", "role": "Contractor", "comment": "Good finish and neat work.", "rating": 4.3 }
+    ]
+  }
+]
