@@ -28,7 +28,7 @@ export default function MainNav() {
       </ul>
       {/* Mobile menu */}
       {open && (
-        <ul className="absolute top-full left-0 w-full bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-900 dark:to-blue-700 flex flex-col gap-4 py-6 px-6 text-white font-semibold md:hidden animate-fade-in z-50 shadow-lg">
+        <ul className="absolute top-full left-0 w-full bg-linear-to-r from-blue-600 to-blue-400 dark:from-blue-900 dark:to-blue-700 flex flex-col gap-4 py-6 px-6 text-white font-semibold md:hidden animate-fade-in z-50 shadow-lg">
           <li><a href="/" className="hover:underline block py-2" onClick={() => setOpen(false)}>Home</a></li>
           <li><a href="/labours/all" className="hover:underline block py-2" onClick={() => setOpen(false)}>Labours</a></li>
           <li><a href="/contractors/all" className="hover:underline block py-2" onClick={() => setOpen(false)}>Contractors</a></li>

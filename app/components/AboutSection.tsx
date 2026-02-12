@@ -33,7 +33,7 @@ export default function AboutSection() {
               { title: "Secure Platform", desc: "Your data is protected with industry-standard security measures" }
             ].map((item, idx) => (
               <li key={idx} className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">✓</div>
+                <div className="shrink-0 w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">✓</div>
                 <div>
                   <div className="font-bold text-gray-800 dark:text-white">{item.title}</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">{item.desc}</div>
@@ -105,7 +105,7 @@ export default function AboutSection() {
       </div>
 
       {/* CTA Section */}
-      <div className="mt-16 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-800 dark:to-blue-600 rounded-xl p-8 text-center text-white">
+      <div className="mt-16 bg-linear-to-r from-blue-600 to-blue-400 dark:from-blue-800 dark:to-blue-600 rounded-xl p-8 text-center text-white">
         <h3 className="text-2xl font-bold mb-4">Ready to Get Started?</h3>
         <p className="mb-6 text-blue-100">Join thousands of professionals already using LabourSampark to grow their careers and businesses</p>
         <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-blue-50 transition shadow-lg">

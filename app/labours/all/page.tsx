@@ -58,15 +58,15 @@ export default function AllLaboursPage() {
                 {/* Aadhar-style Card */}
                 <div className="w-full bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-blue-200 sm:border-2 dark:border-blue-700 h-full flex flex-col">
                   {/* Header Bar */}
-                  <div className="h-1 sm:h-2 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+                  <div className="h-1 sm:h-2 bg-linear-to-r from-blue-600 to-blue-400"></div>
                   
                   {/* Card Content */}
                   <div className="p-3 sm:p-6 flex flex-col h-full">
                     {/* Top Section - Avatar and Main Info */}
                     <div className="flex gap-3 sm:gap-5 mb-3 sm:mb-5">
                       {/* Avatar */}
-                      <div className="flex-shrink-0">
-                        <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-blue-300 sm:border-2 shadow-md">
+                      <div className="shrink-0">
+                        <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-blue-300 sm:border-2 shadow-md">
                           {l.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </div>
                       </div>
@@ -75,7 +75,7 @@ export default function AllLaboursPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
                           <h3 className="text-sm sm:text-lg font-bold text-gray-800 dark:text-white truncate">{l.name}</h3>
-                          {l.verified && <span title="Verified" className="text-green-500 text-sm sm:text-lg flex-shrink-0">✔️</span>}
+                          {l.verified && <span title="Verified" className="text-green-500 text-sm sm:text-lg shrink-0">✔️</span>}
                         </div>
                         <div className="text-blue-700 dark:text-blue-300 font-semibold text-xs sm:text-sm mb-0.5 truncate">{l.trade}</div>
                         <div className="text-gray-500 dark:text-gray-400 text-xs truncate">{l.location}</div>

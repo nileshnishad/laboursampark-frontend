@@ -70,15 +70,15 @@ export default function ContractorsSection() {
               {/* Aadhar-style Card */}
               <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg sm:shadow-2xl overflow-hidden border border-green-200 sm:border-2 dark:border-green-700">
                 {/* Header Bar */}
-                <div className="h-1 sm:h-2 bg-gradient-to-r from-green-600 to-green-400"></div>
+                <div className="h-1 sm:h-2 bg-linear-to-r from-green-600 to-green-400"></div>
                 
                 {/* Card Content */}
                 <div className="p-3 sm:p-6">
                   {/* Top Section - Avatar and Main Info */}
                   <div className="flex gap-3 sm:gap-5 mb-3 sm:mb-5">
                     {/* Avatar */}
-                    <div className="flex-shrink-0">
-                      <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-green-300 sm:border-2 shadow-md">
+                    <div className="shrink-0">
+                      <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-linear-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-green-300 sm:border-2 shadow-md">
                         {c.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                       </div>
                     </div>
@@ -87,7 +87,7 @@ export default function ContractorsSection() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
                         <h3 className="text-sm sm:text-lg font-bold text-gray-800 dark:text-white truncate">{c.name}</h3>
-                        {c.verified && <span title="Verified" className="text-green-500 text-sm sm:text-lg flex-shrink-0">✔️</span>}
+                        {c.verified && <span title="Verified" className="text-green-500 text-sm sm:text-lg shrink-0">✔️</span>}
                       </div>
                       <div className="text-green-700 dark:text-green-300 font-semibold text-xs sm:text-sm mb-0.5 truncate">{c.type}</div>
                       <div className="text-gray-500 dark:text-gray-400 text-xs truncate">{c.location}</div>

@@ -149,7 +149,7 @@ export default function ContactSection() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold hover:from-blue-700 hover:to-blue-600 transition shadow-lg hover:shadow-xl"
+              className="w-full px-6 py-3 bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold hover:from-blue-700 hover:to-blue-600 transition shadow-lg hover:shadow-xl"
             >
               Send Message
             </button>
@@ -186,7 +186,7 @@ export default function ContactSection() {
           </div>
 
           {/* Response Time */}
-          <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-6 border border-green-200 dark:border-green-700">
+          <div className="mt-8 bg-linear-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-6 border border-green-200 dark:border-green-700">
             <h4 className="font-bold text-gray-800 dark:text-white mb-2">⏱️ Response Time</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">We typically respond to all inquiries within <strong>24 hours</strong>. For urgent matters, please call us directly.</p>
           </div>
