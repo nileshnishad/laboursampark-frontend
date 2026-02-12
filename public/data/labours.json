@@ -9,7 +9,7 @@
     "phone": "9876543210",
     "email": "ramesh.kumar@labours.com",
     "languages": ["Hindi"],
-    "profilePic": "/images/labours/ramesh.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Ramesh+Kumar&background=2563eb&color=fff&bold=true",
     "verified": true,
     "workNature": "Hardworking, Team Player",
     "feedback": [
@@ -27,7 +27,7 @@
     "phone": "9876543211",
     "email": "suresh.yadav@labours.com",
     "languages": ["Hindi", "English"],
-    "profilePic": "/images/labours/suresh.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Suresh+Yadav&background=2563eb&color=fff&bold=true",
     "verified": false,
     "workNature": "Quick Learner, Safety First",
     "feedback": [
@@ -45,7 +45,7 @@
     "phone": "9876543212",
     "email": "amit.singh@labours.com",
     "languages": ["Hindi", "Bhojpuri"],
-    "profilePic": "/images/labours/amit.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Amit+Singh&background=2563eb&color=fff&bold=true",
     "verified": true,
     "workNature": "Reliable, Honest",
     "feedback": [
@@ -63,7 +63,7 @@
     "phone": "9876543213",
     "email": "deepak.mishra@labours.com",
     "languages": ["Hindi"],
-    "profilePic": "/images/labours/deepak.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Deepak+Mishra&background=2563eb&color=fff&bold=true",
     "verified": false,
     "workNature": "Creative, Fast",
     "feedback": [
@@ -80,7 +80,7 @@
     "phone": "9876543214",
     "email": "vikram.singh@labours.com",
     "languages": ["Hindi"],
-    "profilePic": "/images/labours/vikram.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Vikram+Singh&background=2563eb&color=fff&bold=true",
     "verified": true,
     "workNature": "Skilled, Perfectionist",
     "feedback": [
@@ -98,7 +98,7 @@
     "phone": "9876543215",
     "email": "rajesh.kumar@labours.com",
     "languages": ["Hindi"],
-    "profilePic": "/images/labours/rajesh.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Rajesh+Kumar&background=2563eb&color=fff&bold=true",
     "verified": true,
     "workNature": "Hardworking, Reliable",
     "feedback": [
@@ -116,7 +116,7 @@
     "phone": "9876543216",
     "email": "mohan.lal@labours.com",
     "languages": ["Hindi", "Punjabi"],
-    "profilePic": "/images/labours/mohan.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Mohan+Lal&background=2563eb&color=fff&bold=true",
     "verified": false,
     "workNature": "Neat, Attention to Detail",
     "feedback": [
@@ -133,7 +133,7 @@
     "phone": "9876543217",
     "email": "anuj.yadav@labours.com",
     "languages": ["Hindi", "English"],
-    "profilePic": "/images/labours/anuj.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Anuj+Yadav&background=2563eb&color=fff&bold=true",
     "verified": true,
     "workNature": "Strong, Disciplined",
     "feedback": [
@@ -151,7 +151,7 @@
     "phone": "9876543218",
     "email": "sandeep.singh@labours.com",
     "languages": ["Hindi", "Punjabi"],
-    "profilePic": "/images/labours/sandeep.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Sandeep+Singh&background=2563eb&color=fff&bold=true",
     "verified": true,
     "workNature": "Artistic, Experienced",
     "feedback": [
@@ -169,7 +169,7 @@
     "phone": "9876543219",
     "email": "harish.patel@labours.com",
     "languages": ["Hindi", "Gujarati"],
-    "profilePic": "/images/labours/harish.jpg",
+    "profilePic": "https://ui-avatars.com/api/?name=Harish+Patel&background=2563eb&color=fff&bold=true",
     "verified": false,
     "workNature": "Technical, Efficient",
     "feedback": [
