@@ -20,6 +20,7 @@ export function SEOHead({
   keywords = [],
   ogImage = "https://laboursampark.com/images/logo.jpg",
   ogUrl = "https://laboursampark.com",
+  twitterHandle,
   canonicalUrl,
   structuredData,
 }: SEOProps) {
