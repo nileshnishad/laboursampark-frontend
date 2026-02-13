@@ -1,4 +1,3 @@
-"use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -58,18 +57,10 @@ export default function LabourRegisterForm() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 py-8 px-4">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div
-            className="flex items-center justify-center w-16 h-16 rounded-full mx-auto mb-3"
-            style={{
-              background:
-                "linear-gradient(to right, rgb(59, 130, 246), rgb(37, 99, 235))",
-            }}
-          >
-            <span className="text-4xl">👷</span>
-          </div>
+        <div className="text-center mb-4">
+          
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
             Join as Labour
           </h1>
@@ -333,7 +324,10 @@ export default function LabourRegisterForm() {
         <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg text-center">
           <p className="text-xs text-gray-700 dark:text-gray-300">
             Already have an account?{" "}
-            <button className="text-blue-600 dark:text-blue-300 font-bold hover:underline">
+            <button
+              onClick={() => router.push("/login?type=labour")}
+              className="text-blue-600 dark:text-blue-300 font-bold hover:underline"
+            >
               Sign in here
             </button>
           </p>

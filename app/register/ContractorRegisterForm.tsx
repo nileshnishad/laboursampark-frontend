@@ -79,18 +79,10 @@ export default function ContractorRegisterForm() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 py-8 px-4">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div
-            className="flex items-center justify-center w-16 h-16 rounded-full mx-auto mb-3"
-            style={{
-              background:
-                "linear-gradient(to right, rgb(99, 102, 241), rgb(79, 70, 229))",
-            }}
-          >
-            <span className="text-4xl">🏢</span>
-          </div>
+        <div className="text-center mb-4">
+          
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
             Register Your Business
           </h1>
@@ -373,7 +365,10 @@ export default function ContractorRegisterForm() {
         <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900 rounded-lg text-center">
           <p className="text-xs text-gray-700 dark:text-gray-300">
             Already have an account?{" "}
-            <button className="text-indigo-600 dark:text-indigo-300 font-bold hover:underline">
+            <button
+              onClick={() => router.push("/login?type=contractor")}
+              className="text-indigo-600 dark:text-indigo-300 font-bold hover:underline"
+            >
               Sign in here
             </button>
           </p>
