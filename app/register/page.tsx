@@ -1,10 +1,10 @@
 "use client";
-import React, { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import React, { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import LabourRegisterForm from "./LabourRegisterForm";
 import ContractorRegisterForm from "./ContractorRegisterForm";
 
-export default function RegisterPage() {
+function RegisterContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const userType = searchParams.get("type") as "labour" | "contractor" | null;
@@ -26,4 +26,12 @@ export default function RegisterPage() {
   }
 
   return userType === "labour" ? <LabourRegisterForm /> : <ContractorRegisterForm />;
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 flex items-center justify-center"><div className="text-gray-900 dark:text-white">Loading...</div></div>}>
+      <RegisterContent />
+    </Suspense>
+  );
 }
