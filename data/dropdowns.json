@@ -1,0 +1,90 @@
+{
+  "contractor": {
+    "businessTypes": [
+      "Construction",
+      "Renovation",
+      "Plumbing",
+      "Electrical",
+      "Painting",
+      "Carpentry",
+      "Landscaping",
+      "HVAC",
+      "Roofing",
+      "General Contracting"
+    ],
+    "servicesOffered": [
+      "Residential",
+      "Commercial",
+      "Industrial",
+      "Maintenance",
+      "Installation",
+      "Repair",
+      "Demolition",
+      "Finishing"
+    ],
+    "teamSize": [
+      "Solo (Just Me)",
+      "2-5 workers",
+      "6-10 workers",
+      "11-20 workers",
+      "20+ workers"
+    ],
+    "experienceRange": [
+      "0-1 year",
+      "1-3 years",
+      "3-5 years",
+      "5-10 years",
+      "10+ years"
+    ],
+    "coverageArea": [
+      "Local Only",
+      "Within City",
+      "Multi-City",
+      "State Wide",
+      "Pan India"
+    ]
+  },
+  "labour": {
+    "skills": [
+      "Plumbing",
+      "Electrical Work",
+      "Carpentry",
+      "Painting",
+      "Masonry",
+      "Welding",
+      "HVAC",
+      "Roofing",
+      "Tiling",
+      "Scaffolding"
+    ],
+    "workType": [
+      "Full-time",
+      "Part-time",
+      "Contract",
+      "Project-based"
+    ],
+    "workingHours": [
+      "8 AM - 5 PM",
+      "9 AM - 6 PM",
+      "10 AM - 7 PM",
+      "Flexible",
+      "Night Shift"
+    ],
+    "experienceRange": [
+      "0-1 year",
+      "1-3 years",
+      "3-5 years",
+      "5-10 years",
+      "10+ years"
+    ]
+  },
+  "common": {
+    "experienceRange": [
+      "0-1 year",
+      "1-3 years",
+      "3-5 years",
+      "5-10 years",
+      "10+ years"
+    ]
+  }
+}

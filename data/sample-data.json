@@ -1,0 +1,326 @@
+{
+  "contractors": [
+    {
+      "id": "contractor_001",
+      "userType": "contractor",
+      "fullName": "Rajesh Kumar",
+      "businessName": "Kumar Construction Services",
+      "registrationNumber": "REG-2024-001",
+      "mobile": "9876543210",
+      "email": "rajesh@kumarservices.com",
+      "location": "Mumbai, Maharashtra",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [72.8479, 19.0760]
+      },
+      "businessTypes": ["Construction", "Renovation"],
+      "experienceRange": "10+ years",
+      "teamSize": "11-20 workers",
+      "servicesOffered": ["Residential", "Commercial", "Maintenance"],
+      "coverageArea": ["Mumbai", "Thane", "Pune"],
+      "about": "Experienced construction contractor with 15+ years of expertise in residential and commercial projects.",
+      "businessLicenseUrl": "https://sample-s3.com/licenses/contractor_001_license.pdf",
+      "companyLogoUrl": "https://sample-s3.com/logos/contractor_001_logo.png",
+      "rating": 4.8,
+      "completedJobs": 127,
+      "isVerified": true,
+      "status": "active"
+    },
+    {
+      "id": "contractor_002",
+      "userType": "contractor",
+      "fullName": "Priya Sharma",
+      "businessName": "Sharma Electrical Solutions",
+      "registrationNumber": "REG-2024-002",
+      "mobile": "9876543211",
+      "email": "priya@sharmaelectric.com",
+      "location": "Delhi, India",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.2090, 28.6139]
+      },
+      "businessTypes": ["Electrical"],
+      "experienceRange": "5-10 years",
+      "teamSize": "6-10 workers",
+      "servicesOffered": ["Installation", "Repair", "Maintenance"],
+      "coverageArea": ["Delhi", "Noida", "Gurgaon"],
+      "about": "Professional electrical contractor specializing in residential and commercial installations.",
+      "businessLicenseUrl": "https://sample-s3.com/licenses/contractor_002_license.pdf",
+      "companyLogoUrl": "https://sample-s3.com/logos/contractor_002_logo.png",
+      "rating": 4.6,
+      "completedJobs": 89,
+      "isVerified": true,
+      "status": "active"
+    },
+    {
+      "id": "contractor_003",
+      "userType": "contractor",
+      "fullName": "Amit Patel",
+      "businessName": "Patel Plumbing & Maintenance",
+      "registrationNumber": "REG-2024-003",
+      "mobile": "9876543212",
+      "email": "amit@patelplumbing.com",
+      "location": "Ahmedabad, Gujarat",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [72.5428, 23.0225]
+      },
+      "businessTypes": ["Plumbing"],
+      "experienceRange": "3-5 years",
+      "teamSize": "2-5 workers",
+      "servicesOffered": ["Repair", "Installation", "Maintenance"],
+      "coverageArea": ["Ahmedabad", "Gandhinagar"],
+      "about": "Reliable plumbing services with quick response time and quality work.",
+      "businessLicenseUrl": "https://sample-s3.com/licenses/contractor_003_license.pdf",
+      "companyLogoUrl": "https://sample-s3.com/logos/contractor_003_logo.png",
+      "rating": 4.5,
+      "completedJobs": 56,
+      "isVerified": true,
+      "status": "active"
+    },
+    {
+      "id": "contractor_004",
+      "userType": "contractor",
+      "fullName": "Suresh Singh",
+      "businessName": "Singh Carpentry Works",
+      "registrationNumber": "REG-2024-004",
+      "mobile": "9876543213",
+      "email": "suresh@singhcarpentry.com",
+      "location": "Bangalore, Karnataka",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.5946, 12.9716]
+      },
+      "businessTypes": ["Carpentry", "Painting"],
+      "experienceRange": "5-10 years",
+      "teamSize": "2-5 workers",
+      "servicesOffered": ["Finishing", "Installation", "Repair"],
+      "coverageArea": ["Bangalore", "Whitefield"],
+      "about": "Expert carpentry and painting contractor with attention to detail.",
+      "businessLicenseUrl": "https://sample-s3.com/licenses/contractor_004_license.pdf",
+      "companyLogoUrl": "https://sample-s3.com/logos/contractor_004_logo.png",
+      "rating": 4.7,
+      "completedJobs": 72,
+      "isVerified": true,
+      "status": "connected"
+    },
+    {
+      "id": "contractor_005",
+      "userType": "contractor",
+      "fullName": "Vikram Desai",
+      "businessName": "Desai HVAC Services",
+      "registrationNumber": "REG-2024-005",
+      "mobile": "9876543214",
+      "email": "vikram@desaihvac.com",
+      "location": "Pune, Maharashtra",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [73.8355, 18.5204]
+      },
+      "businessTypes": ["HVAC"],
+      "experienceRange": "5-10 years",
+      "teamSize": "6-10 workers",
+      "servicesOffered": ["Installation", "Maintenance", "Repair"],
+      "coverageArea": ["Pune", "PCMC"],
+      "about": "Specialized HVAC installation and maintenance services.",
+      "businessLicenseUrl": "https://sample-s3.com/licenses/contractor_005_license.pdf",
+      "companyLogoUrl": "https://sample-s3.com/logos/contractor_005_logo.png",
+      "rating": 4.4,
+      "completedJobs": 43,
+      "isVerified": false,
+      "status": "pending"
+    },
+    {
+      "id": "contractor_006",
+      "userType": "contractor",
+      "fullName": "Arun Verma",
+      "businessName": "Verma General Contracting",
+      "registrationNumber": "REG-2024-006",
+      "mobile": "9876543215",
+      "email": "arun@vgcontracting.com",
+      "location": "Jaipur, Rajasthan",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [75.7873, 26.9124]
+      },
+      "businessTypes": ["General Contracting", "Renovation"],
+      "experienceRange": "10+ years",
+      "teamSize": "11-20 workers",
+      "servicesOffered": ["Residential", "Commercial", "Demolition"],
+      "coverageArea": ["Jaipur"],
+      "about": "Full-service contracting for all your construction needs.",
+      "businessLicenseUrl": "https://sample-s3.com/licenses/contractor_006_license.pdf",
+      "companyLogoUrl": "https://sample-s3.com/logos/contractor_006_logo.png",
+      "rating": 3.8,
+      "completedJobs": 34,
+      "isVerified": false,
+      "status": "miscalls"
+    }
+  ],
+  "labours": [
+    {
+      "id": "labour_001",
+      "userType": "labour",
+      "fullName": "Mohan Kumar",
+      "age": 32,
+      "mobile": "9123456789",
+      "email": "mohan.labour@email.com",
+      "location": "Mumbai, Andheri",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [72.8261, 19.1136]
+      },
+      "experience": "5-10 years",
+      "skills": ["Plumbing", "Electrical Work", "Carpentry"],
+      "workTypes": ["Commercial", "Industrial", "Residential"],
+      "preferredWorkingHours": "Full-time",
+      "bio": "Experienced multi-skilled labourer with expertise in construction and maintenance work.",
+      "profilePhotoUrl": "https://sample-s3.com/profiles/labour_001_photo.jpg",
+      "rating": 4.7,
+      "completedJobs": 94,
+      "isVerified": true,
+      "status": "active"
+    },
+    {
+      "id": "labour_002",
+      "userType": "labour",
+      "fullName": "Ramesh Singh",
+      "age": 28,
+      "mobile": "9123456790",
+      "email": "ramesh.worker@email.com",
+      "location": "Delhi, South Delhi",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.2245, 28.5244]
+      },
+      "experience": "3-5 years",
+      "skills": ["Electrical Work", "Painting"],
+      "workTypes": ["Residential", "Commercial"],
+      "preferredWorkingHours": "Part-time",
+      "bio": "Skilled painter and electrical assistant with attention to quality.",
+      "profilePhotoUrl": "https://sample-s3.com/profiles/labour_002_photo.jpg",
+      "rating": 4.5,
+      "completedJobs": 56,
+      "isVerified": true,
+      "status": "active"
+    },
+    {
+      "id": "labour_003",
+      "userType": "labour",
+      "fullName": "Pradeep Gupta",
+      "age": 35,
+      "mobile": "9123456791",
+      "email": "pradeep.construction@email.com",
+      "location": "Bangalore, Whitefield",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.6562, 12.9698]
+      },
+      "experience": "10+ years",
+      "skills": ["Masonry", "Carpentry", "Plumbing"],
+      "workTypes": ["Commercial", "Residential", "Industrial"],
+      "preferredWorkingHours": "Full-time",
+      "bio": "Highly experienced construction labourer specializing in large projects.",
+      "profilePhotoUrl": "https://sample-s3.com/profiles/labour_003_photo.jpg",
+      "rating": 4.9,
+      "completedJobs": 156,
+      "isVerified": true,
+      "status": "active"
+    },
+    {
+      "id": "labour_004",
+      "userType": "labour",
+      "fullName": "Ajay Kumar",
+      "age": 26,
+      "mobile": "9123456792",
+      "email": "ajay.helper@email.com",
+      "location": "Pune, Camp",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [73.8479, 18.5333]
+      },
+      "experience": "1-3 years",
+      "skills": ["Painting", "General Labour"],
+      "workTypes": ["Residential"],
+      "preferredWorkingHours": "Full-time",
+      "bio": "Dedicated worker looking for consistent projects.",
+      "profilePhotoUrl": "https://sample-s3.com/profiles/labour_004_photo.jpg",
+      "rating": 4.2,
+      "completedJobs": 28,
+      "isVerified": false,
+      "status": "pending"
+    },
+    {
+      "id": "labour_005",
+      "userType": "labour",
+      "fullName": "Sanjay Patel",
+      "age": 45,
+      "mobile": "9123456793",
+      "email": "sanjay.tech@email.com",
+      "location": "Ahmedabad, Vastrapur",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [72.5301, 23.0331]
+      },
+      "experience": "10+ years",
+      "skills": ["Electrical Work", "HVAC Installation", "Maintenance"],
+      "workTypes": ["Commercial", "Industrial", "Residential"],
+      "preferredWorkingHours": "Full-time",
+      "bio": "Expert technician with deep knowledge of electrical and HVAC systems.",
+      "profilePhotoUrl": "https://sample-s3.com/profiles/labour_005_photo.jpg",
+      "rating": 4.8,
+      "completedJobs": 142,
+      "isVerified": true,
+      "status": "connected"
+    },
+    {
+      "id": "labour_006",
+      "userType": "labour",
+      "fullName": "Vikram Sharma",
+      "age": 30,
+      "mobile": "9123456794",
+      "email": "vikram.general@email.com",
+      "location": "Jaipur, C-Scheme",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [75.8127, 26.9023]
+      },
+      "experience": "3-5 years",
+      "skills": ["General Labour", "Carpentry"],
+      "workTypes": ["Construction"],
+      "preferredWorkingHours": "Part-time",
+      "bio": "Hardworking labourer with basic construction skills.",
+      "profilePhotoUrl": "https://sample-s3.com/profiles/labour_006_photo.jpg",
+      "rating": 3.5,
+      "completedJobs": 19,
+      "isVerified": false,
+      "status": "miscalls"
+    }
+  ],
+  "filters": [
+    {
+      "id": "active",
+      "label": "Active",
+      "contractorLabel": "Active Contractors",
+      "labourLabel": "Active Labourers"
+    },
+    {
+      "id": "pending",
+      "label": "Pending",
+      "contractorLabel": "Pending Contractors",
+      "labourLabel": "Pending Labourers"
+    },
+    {
+      "id": "connected",
+      "label": "Connected",
+      "contractorLabel": "Connected Contractors",
+      "labourLabel": "Connected Labourers"
+    },
+    {
+      "id": "miscalls",
+      "label": "Miscalls",
+      "contractorLabel": "Miscalled Contractors",
+      "labourLabel": "Miscalled Labourers"
+    }
+  ]
+}

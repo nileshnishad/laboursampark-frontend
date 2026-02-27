@@ -19,7 +19,6 @@ export default function ContactSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission here
-    console.log("Form submitted:", formData);
     setSubmitted(true);
     setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
     setTimeout(() => setSubmitted(false), 5000);

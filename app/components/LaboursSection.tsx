@@ -27,7 +27,6 @@ export default function LaboursSection() {
     fetch("/data/labours.json")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Labours data:", data);
         setLabours(data);
       })
       .catch((err) => console.error("Error fetching labours:", err));
