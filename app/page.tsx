@@ -5,8 +5,8 @@ import ContractorsSection from "./components/ContractorsSection";
 import AboutSection from "./components/AboutSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
-import SEOHead from "./components/SEOHead";
 import { primaryKeywords, secondaryKeywords, metaDescriptions } from "@/lib/seo-config";
+import SEOHead from "./components/SEOHead";
 
 export default function Home() {
   // Combine primary and secondary keywords for maximum coverage
