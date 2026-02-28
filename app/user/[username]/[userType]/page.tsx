@@ -4,15 +4,15 @@ import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
-import PersonalDetails from "./components/PersonalDetails";
 import ContractorCard from "./components/ContractorCard";
 import LabourCard from "./components/LabourCard";
 import FilterMenu from "./components/FilterMenu";
+import UserProfile from "./components/UserProfile";
 import sampleData from "@/data/sample-data.json";
 import type { AppDispatch, RootState } from "@/store/store";
 
 type UserType = "labour" | "contractor";
-type FilterType = "active" | "pending" | "miscalls" | "connected";
+type FilterType = "active" | "pending" | "miscalls" | "connected" | "profile";
 
 export default function UserDashboardPage() {
   const router = useRouter();
@@ -60,6 +60,7 @@ export default function UserDashboardPage() {
   }
 
   const isLabour = userType === "labour";
+  const isProfileView = activeFilter === "profile";
   const filteredData = isLabour ? getFilteredLabourers() : getFilteredContractors();
 
   return (
@@ -170,20 +171,15 @@ export default function UserDashboardPage() {
           userType={userType}
         />
 
-        {/* Responsive Layout: Stack on Mobile, Side-by-Side on Desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Left Column: Personal Details */}
-          <div className="lg:col-span-1 order-2 lg:order-1">
-            <PersonalDetails user={user} userType={userType} />
+        {isProfileView ? (
+          <div className="max-w-7xl mx-auto">
+            <UserProfile user={user} userType={userType} />
           </div>
-
-          {/* Right Column: Browse Contractors/Labourers */}
-          <div className="lg:col-span-2 order-1 lg:order-2">
-            {/* Cards Grid */}
+        ) : (
+          <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {filteredData.length > 0 ? (
                 isLabour ? (
-                  // Labour viewing contractors
                   filteredData.map((contractor: any) => (
                     <ContractorCard
                       key={contractor.id}
@@ -192,7 +188,6 @@ export default function UserDashboardPage() {
                     />
                   ))
                 ) : (
-                  // Contractor viewing labourers
                   filteredData.map((labour: any) => (
                     <LabourCard key={labour.id} labour={labour} onConnect={handleConnect} />
                   ))
@@ -206,7 +201,7 @@ export default function UserDashboardPage() {
               )}
             </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );

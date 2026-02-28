@@ -2,7 +2,7 @@
 
 import React from "react";
 
-type FilterType = "active" | "pending" | "miscalls" | "connected";
+type FilterType = "active" | "pending" | "miscalls" | "connected" | "profile";
 
 interface FilterMenuProps {
   activeFilter: FilterType;
@@ -18,6 +18,7 @@ export default function FilterMenu({ activeFilter, onFilterChange, userType }: F
     { type: "pending", label: "Pending Requests" },
     { type: "connected", label: "Connected" },
     { type: "miscalls", label: "Miscalls" },
+    { type: "profile", label: "Profile" },
   ];
 
   return (
