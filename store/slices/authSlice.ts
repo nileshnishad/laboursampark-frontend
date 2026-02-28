@@ -5,7 +5,40 @@ import {
   showErrorToast,
   dismissToast,
 } from '@/lib/toast-utils';
-import { apiPost, setToken as saveToken, clearToken as removeToken } from '@/lib/api-service';
+import { apiGet, apiPost, setToken as saveToken, clearToken as removeToken } from '@/lib/api-service';
+
+const USER_KEY = 'authUser';
+
+const getStoredUser = (): any | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storedUser = localStorage.getItem(USER_KEY);
+  if (!storedUser) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedUser);
+  } catch {
+    localStorage.removeItem(USER_KEY);
+    return null;
+  }
+};
+
+const saveUser = (user: any | null) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (!user) {
+    localStorage.removeItem(USER_KEY);
+    return;
+  }
+
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+};
 
 export interface ContractorRegisterPayload {
   userType: string;
@@ -54,8 +87,10 @@ export interface LoginPayload {
 
 export interface AuthState {
   loading: boolean;
+  profileLoading: boolean;
   success: boolean;
   error: string | null;
+  profileError: string | null;
   message: string | null;
   user: any | null;
   token: string | null;
@@ -63,11 +98,29 @@ export interface AuthState {
 
 const initialState: AuthState = {
   loading: false,
+  profileLoading: false,
   success: false,
   error: null,
+  profileError: null,
   message: null,
-  user: null,
+  user: getStoredUser(),
   token: null,
+};
+
+const extractProfileData = (payload: any): any | null => {
+  if (!payload) {
+    return null;
+  }
+
+  const profile = payload.data && typeof payload.data === 'object' ? payload.data : payload;
+  if (!profile || typeof profile !== 'object') {
+    return null;
+  }
+
+  return {
+    ...profile,
+    preferredWorkingHours: profile.preferredWorkingHours || profile.workingHours,
+  };
 };
 
 /**
@@ -159,6 +212,34 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+/**
+ * Async thunk for fetching current logged-in user profile
+ */
+export const fetchUserProfile = createAsyncThunk(
+  'auth/fetchUserProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await apiGet('/api/users/profile');
+
+      if (!response.success) {
+        return rejectWithValue(response.error || 'Failed to fetch profile');
+      }
+
+      const profile = extractProfileData(response.data);
+      if (!profile) {
+        return rejectWithValue('Invalid profile response');
+      }
+
+      return {
+        user: profile,
+        message: response.data?.message || 'User profile retrieved successfully',
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch profile');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -178,6 +259,7 @@ const authSlice = createSlice({
      */
     clearError: (state) => {
       state.error = null;
+      state.profileError = null;
     },
 
     /**
@@ -186,7 +268,9 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.profileError = null;
       removeToken();
+      saveUser(null);
     },
 
     /**
@@ -195,6 +279,11 @@ const authSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
       saveToken(action.payload);
+    },
+
+    setUser: (state, action: PayloadAction<any | null>) => {
+      state.user = action.payload;
+      saveUser(action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -213,6 +302,7 @@ const authSlice = createSlice({
         state.success = true;
         state.user = action.payload?.user || null;
         state.token = action.payload?.token || null;
+        saveUser(action.payload?.user || null);
         state.message = action.payload?.message || 'Registration successful!';
         dismissToast();
         showSuccessToast(
@@ -245,6 +335,7 @@ const authSlice = createSlice({
         state.success = true;
         state.user = action.payload?.user || null;
         state.token = action.payload?.token || null;
+        saveUser(action.payload?.user || null);
         state.message = action.payload?.message || 'Registration successful!';
         dismissToast();
         showSuccessToast(
@@ -277,6 +368,7 @@ const authSlice = createSlice({
         state.success = true;
         state.user = action.payload?.user || null;
         state.token = action.payload?.token || null;
+        saveUser(action.payload?.user || null);
         state.message = action.payload?.message || 'Login successful!';
         dismissToast();
         showSuccessToast(
@@ -292,9 +384,32 @@ const authSlice = createSlice({
         showErrorToast(
           action.payload as string || 'Login failed!'
         );
+      })
+
+      /**
+       * Fetch User Profile
+       */
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.profileLoading = true;
+        state.profileError = null;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = null;
+        const mergedUser = {
+          ...(state.user || {}),
+          ...(action.payload?.user || {}),
+        };
+        state.user = mergedUser;
+        saveUser(mergedUser);
+        state.message = action.payload?.message || state.message;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = action.payload as string;
       });
   },
 });
 
-export const { resetAuthState, clearError, logout, setToken } = authSlice.actions;
+export const { resetAuthState, clearError, logout, setToken, setUser } = authSlice.actions;
 export default authSlice.reducer;

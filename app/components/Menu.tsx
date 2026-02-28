@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
+import { buildUserDashboardPath } from "@/lib/user-route";
 
 const sections = [
   { id: "hero", label: "Home" },
@@ -87,7 +88,7 @@ export default function Menu() {
         {/* Login / Dashboard Button */}
         {user ? (
           <button
-            onClick={() => router.push(`/user/${user.username}/${user.userType}`)}
+            onClick={() => router.push(buildUserDashboardPath(user))}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
           >
             Dashboard
@@ -128,7 +129,7 @@ export default function Menu() {
             {user ? (
               <button
                 onClick={() => {
-                  router.push(`/user/${user.username}/${user.userType}`);
+                  router.push(buildUserDashboardPath(user));
                   setOpen(false);
                 }}
                 className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors"

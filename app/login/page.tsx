@@ -1,13 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, resetAuthState } from "@/store/slices/authSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import type { LoginPayload } from "@/store/slices/authSlice";
+import { buildUserDashboardPath } from "@/lib/user-route";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, success, user } = useSelector((state: RootState) => state.auth);
 
@@ -67,13 +69,13 @@ export default function LoginPage() {
   // Handle successful login
   useEffect(() => {
     if (success && user) {
-      const encodedUsername = user.fullName.toLowerCase().replace(/\s+/g, '-');
-      router.push(`/user/${encodedUsername}/${user.userType}`);
+      const redirectPath = searchParams.get('redirect');
+      router.push(redirectPath || buildUserDashboardPath(user, userType));
       setTimeout(() => {
         dispatch(resetAuthState());
       }, 500);
     }
-  }, [success, user, dispatch, router]);
+  }, [success, user, dispatch, router, searchParams, userType]);
 
   return (
     <div className="min-h-screen relative py-12 px-4" style={{

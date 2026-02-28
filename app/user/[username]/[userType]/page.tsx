@@ -47,6 +47,10 @@ export default function UserDashboardPage() {
     // await dispatch(sendConnectionRequest(userId));
   };
 
+  const handleGoToPayment = () => {
+    router.push(`/user/${username}/${userType}/payment`);
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -144,6 +148,12 @@ export default function UserDashboardPage() {
                   <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">
                     Make payment to make your profile visible and start receiving connections.
                   </p>
+                  <button
+                    onClick={handleGoToPayment}
+                    className="mt-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition-colors"
+                  >
+                    Pay Now
+                  </button>
                 </div>
               )}
             </div>

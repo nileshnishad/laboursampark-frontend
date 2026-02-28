@@ -6,6 +6,7 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000';
 const DEFAULT_TIMEOUT = 10000;
+const TOKEN_KEY = 'authToken';
 
 // ============= Types =============
 
@@ -25,22 +26,38 @@ export interface ApiResponse<T = any> {
 
 // ============= Token Management =============
 
+const getTokenFromCookie = (): string | null => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
+  const cookies = document.cookie.split('; ');
+  const tokenCookie = cookies.find((cookie) => cookie.startsWith(`${TOKEN_KEY}=`));
+  if (!tokenCookie) {
+    return null;
+  }
+
+  return decodeURIComponent(tokenCookie.split('=')[1]);
+};
+
 export const getToken = (): string | null => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('authToken') || null;
+    return localStorage.getItem(TOKEN_KEY) || getTokenFromCookie() || null;
   }
   return null;
 };
 
 export const setToken = (token: string): void => {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem(TOKEN_KEY, token);
+    document.cookie = `${TOKEN_KEY}=${encodeURIComponent(token)}; path=/; max-age=2592000; samesite=lax`;
   }
 };
 
 export const clearToken = (): void => {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(TOKEN_KEY);
+    document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
   }
 };
 
@@ -210,6 +227,14 @@ const request = async <T = any>(
         data,
         status: response.status,
       };
+    }
+
+    if (response.status === 401 && options.includeToken !== false) {
+      clearToken();
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        const redirectPath = `${window.location.pathname}${window.location.search}`;
+        window.location.href = `/login?redirect=${encodeURIComponent(redirectPath)}`;
+      }
     }
 
     return {

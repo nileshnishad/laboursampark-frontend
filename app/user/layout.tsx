@@ -1,21 +1,45 @@
 "use client";
 
-import { ReactNode } from "react";
-import { useSelector } from "react-redux";
+import { ReactNode, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import type { RootState } from "@/store/store";
+import type { AppDispatch, RootState } from "@/store/store";
+import { fetchUserProfile, setToken } from "@/store/slices/authSlice";
+import { getToken as getStoredToken } from "@/lib/api-service";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const { token } = useSelector((state: RootState) => state.auth);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (token) {
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    const persistedToken = getStoredToken();
+    if (persistedToken) {
+      dispatch(setToken(persistedToken));
+    } else {
+      router.replace("/login");
+    }
+
+    setIsCheckingAuth(false);
+  }, [token, dispatch, router]);
+
   useEffect(() => {
     if (!token) {
-      router.push("/login");
+      return;
     }
-  }, [token, router]);
+
+    dispatch(fetchUserProfile());
+  }, [token, dispatch]);
+
+  if (isCheckingAuth) {
+    return null;
+  }
 
   if (!token) {
     return null;
