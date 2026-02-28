@@ -88,6 +88,17 @@ export default function LoginPage() {
       {/* Content Wrapper */}
       <div className="relative z-10">
       <div className="max-w-md mx-auto">
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => router.push("/")}
+            className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold text-sm transition-colors group"
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">←</span>
+            Back to Home
+          </button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">

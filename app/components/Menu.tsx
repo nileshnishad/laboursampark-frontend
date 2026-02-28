@@ -1,5 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 const sections = [
   { id: "hero", label: "Home" },
@@ -10,6 +13,8 @@ const sections = [
 ];
 
 export default function Menu() {
+  const router = useRouter();
+  const { user } = useSelector((state: RootState) => state.auth);
   const [active, setActive] = useState("hero");
   const [open, setOpen] = useState(false);
 
@@ -61,22 +66,41 @@ export default function Menu() {
         <span className={`block w-6 h-0.5 bg-blue-700 transition-all ${open ? '-rotate-45 -translate-y-2' : ''}`}></span>
       </button>
       {/* Desktop menu */}
-      <ul className="hidden md:flex gap-8 text-gray-700 dark:text-gray-200 font-medium">
-        {sections.map((section) => (
-          <li key={section.id}>
-            <a
-              href={`#${section.id}`}
-              className={
-                active === section.id
-                  ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1"
-                  : "hover:text-blue-600 dark:hover:text-blue-300"
-              }
-            >
-              {section.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div className="hidden md:flex gap-8 items-center">
+        <ul className="flex gap-8 text-gray-700 dark:text-gray-200 font-medium">
+          {sections.map((section) => (
+            <li key={section.id}>
+              <a
+                href={`#${section.id}`}
+                className={
+                  active === section.id
+                    ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1"
+                    : "hover:text-blue-600 dark:hover:text-blue-300"
+                }
+              >
+                {section.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        
+        {/* Login / Dashboard Button */}
+        {user ? (
+          <button
+            onClick={() => router.push(`/user/${user.username}/${user.userType}`)}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
+          >
+            Dashboard
+          </button>
+        ) : (
+          <button
+            onClick={() => router.push("/login")}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
+          >
+            Login
+          </button>
+        )}
+      </div>
       {/* Mobile menu overlay for better UX */}
       {open && (
         <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setOpen(false)}></div>
@@ -99,6 +123,30 @@ export default function Menu() {
               </a>
             </li>
           ))}
+          {/* Mobile Login Button */}
+          <li className="border-t border-gray-300 dark:border-gray-700 pt-4 mt-2">
+            {user ? (
+              <button
+                onClick={() => {
+                  router.push(`/user/${user.username}/${user.userType}`);
+                  setOpen(false);
+                }}
+                className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors"
+              >
+                Dashboard
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  router.push("/login");
+                  setOpen(false);
+                }}
+                className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors"
+              >
+                Login / Register
+              </button>
+            )}
+          </li>
         </ul>
       )}
     </nav>
