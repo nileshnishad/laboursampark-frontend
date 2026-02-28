@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { registerContractor, resetAuthState } from "@/store/slices/authSlice";
 import { uploadFile } from "@/lib/s3-client";
+import ImageCropperModal from "@/app/components/ImageCropperModal";
 import dropdownsData from "@/data/dropdowns.json";
 
 const {
@@ -69,6 +70,11 @@ export default function ContractorRegisterForm() {
     businessLicense: "",
     companyLogo: "",
   });
+
+  // Company Logo Cropper States
+  const [showLogoCropper, setShowLogoCropper] = useState<boolean>(false);
+  const [tempLogoSrc, setTempLogoSrc] = useState<string>("");
+  const [companyLogoPreview, setCompanyLogoPreview] = useState<string>("");
 
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
@@ -137,38 +143,76 @@ export default function ContractorRegisterForm() {
     }
   };
 
-  // Handle Company Logo Upload
+  // Handle Company Logo Upload - Show Cropper Instead
   const handleCompanyLogoUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
       setUploadErrors((prev) => ({
         ...prev,
-        companyLogo: "File size must be less than 5MB",
+        companyLogo: "Please select a valid image file",
       }));
       return;
     }
 
-    setUploadStatus((prev) => ({ ...prev, companyLogo: "uploading" }));
-    setUploadErrors((prev) => ({ ...prev, companyLogo: "" }));
+    // Validate file size (max 10MB for original)
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadErrors((prev) => ({
+        ...prev,
+        companyLogo: "File size must be less than 10MB",
+      }));
+      return;
+    }
 
+    // Create preview URL and show cropper
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      setTempLogoSrc(result);
+      setShowLogoCropper(true);
+      setUploadErrors((prev) => ({ ...prev, companyLogo: "" }));
+    };
+    reader.readAsDataURL(file);
+
+    // Reset file input
+    e.target.value = "";
+  };
+
+  // Handle company logo crop completion - Upload cropped image
+  const handleLogoCropComplete = async (croppedImage: File) => {
     try {
+      // Create preview immediately before uploading
+      const previewUrl = URL.createObjectURL(croppedImage);
+
+      // Wait a bit to ensure URL is ready
+      setTimeout(() => {
+        setCompanyLogoPreview(previewUrl);
+      }, 10);
+
+      setUploadStatus((prev) => ({ ...prev, companyLogo: "uploading" }));
+      setUploadErrors((prev) => ({ ...prev, companyLogo: "" }));
+
       const fileUrl = await uploadFile(
         `company-logo-${Date.now()}`,
-        file,
+        croppedImage,
         "contractor",
       );
       setCompanyLogo(fileUrl);
+
       setUploadStatus((prev) => ({ ...prev, companyLogo: "success" }));
+      setShowLogoCropper(false);
+      setTempLogoSrc("");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Upload failed";
       setUploadErrors((prev) => ({ ...prev, companyLogo: errorMessage }));
       setUploadStatus((prev) => ({ ...prev, companyLogo: "error" }));
+      // Clear preview on error
+      setCompanyLogoPreview("");
     }
   };
 
@@ -716,32 +760,67 @@ export default function ContractorRegisterForm() {
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   Company Logo / Photo
                 </label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleCompanyLogoUpload}
-                    disabled={
-                      loading || uploadStatus.companyLogo === "uploading"
-                    }
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white disabled:opacity-50"
-                  />
-                  {uploadStatus.companyLogo === "uploading" && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <span className="inline-block w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></span>
+                <div className="flex gap-4 items-start">
+                  {/* Upload Section */}
+                  <div className="flex-1">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCompanyLogoUpload}
+                        disabled={
+                          loading || uploadStatus.companyLogo === "uploading"
+                        }
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white disabled:opacity-50 cursor-pointer"
+                      />
+                      {uploadStatus.companyLogo === "uploading" && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <span className="inline-block w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></span>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Click to select image • Crop and resize • Max 10MB
+                    </p>
+                  </div>
+
+                  {/* Preview Section */}
+                  {companyLogoPreview && (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="border-2 border-green-400 rounded-lg p-1 bg-white dark:bg-gray-700 flex items-center justify-center">
+                        <img
+                          src={companyLogoPreview}
+                          alt="Logo Preview"
+                          className="w-24 h-24 object-cover rounded"
+                          onError={(e) => {
+                            console.error("Preview image failed to load:", companyLogoPreview);
+                            e.currentTarget.style.display = "none";
+                          }}
+                          onLoad={() => {
+                            console.log("Preview image loaded successfully");
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs font-semibold text-green-600 dark:text-green-400">
+                        ✓ Uploaded
+                      </p>
                     </div>
                   )}
                 </div>
-                {uploadStatus.companyLogo === "success" && (
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                    ✓ File uploaded successfully
-                  </p>
-                )}
-                {uploadErrors.companyLogo && (
-                  <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-                    ✗ {uploadErrors.companyLogo}
-                  </p>
-                )}
+
+                {/* Feedback Messages */}
+                <div className="mt-2 space-y-1">
+                  {uploadStatus.companyLogo === "success" && (
+                    <p className="text-xs text-green-600 dark:text-green-400">
+                      ✓ Logo uploaded successfully
+                    </p>
+                  )}
+                  {uploadErrors.companyLogo && (
+                    <p className="text-xs text-red-600 dark:text-red-400">
+                      ✗ {uploadErrors.companyLogo}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -802,6 +881,19 @@ export default function ContractorRegisterForm() {
             </button>
           </p>
         </div>
+
+        {/* Company Logo Cropper Modal */}
+        {showLogoCropper && tempLogoSrc && (
+          <ImageCropperModal
+            imageSrc={tempLogoSrc}
+            onCropComplete={handleLogoCropComplete}
+            onCancel={() => {
+              setShowLogoCropper(false);
+              setTempLogoSrc("");
+              setUploadErrors((prev) => ({ ...prev, companyLogo: "" }));
+            }}
+          />
+        )}
       </div>
     </div>
   );
