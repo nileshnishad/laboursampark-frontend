@@ -33,29 +33,13 @@ export default function Footer() {
         <div>
           <div className="font-semibold text-gray-900 dark:text-white mb-2">Contact Us</div>
           <ul className="text-gray-700 dark:text-gray-300 text-sm flex flex-col gap-2">
-            <li>Email: <a href="mailto:info@laboursampark.com" className="hover:underline">info@laboursampark.com</a></li>
+            <li>Email: <a href="mailto:laboursampark@gmail.com" className="hover:underline">laboursampark@gmail.com</a></li>
             <li>Phone: <a href="tel:+911234567890" className="hover:underline">+91 12345 67890</a></li>
             <li>Address: 123, Main Road, City, India</li>
           </ul>
         </div>
         {/* Newsletter */}
-        <div>
-          <div className="font-semibold text-gray-900 dark:text-white mb-2">Newsletter</div>
-          <form className="flex flex-col gap-2">
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="px-3 py-2 rounded border border-gray-300 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-400 outline-none text-sm"
-              required
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition text-sm"
-            >
-              Subscribe
-            </button>
-          </form>
-        </div>
+        
       </div>
       <div className="max-w-6xl mx-auto px-4 mt-8 border-t border-gray-200 dark:border-gray-800 pt-4 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 dark:text-gray-400">
         <div>© {new Date().getFullYear()} LabourSampark. All rights reserved.</div>

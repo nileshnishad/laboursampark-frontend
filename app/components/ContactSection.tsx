@@ -1,7 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { submitInquiry, resetInquiryState } from "@/store/slices/inquirySlice";
+import { showSuccessToast, showErrorToast, showWarningToast } from "@/lib/toast-utils";
+import type { AppDispatch, RootState } from "@/store/store";
 
 export default function ContactSection() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, success, error } = useSelector(
+    (state: RootState) => state.inquiry
+  );
+  const formRef = useRef<HTMLFormElement>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -9,19 +19,133 @@ export default function ContactSection() {
     subject: "",
     message: ""
   });
-  const [submitted, setSubmitted] = useState(false);
+
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
+
+  // Validation functions
+  const validateMobile = (mobile: string): boolean => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(mobile);
+  };
+
+  const validateMessage = (message: string): boolean => {
+    return message.trim().length >= 50;
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Phone number: only allow digits and max 10 characters
+    if (name === "phone") {
+      const phoneValue = value.replace(/\D/g, "").slice(0, 10);
+      setFormData(prev => ({ ...prev, [name]: phoneValue }));
+      
+      // Clear error when user corrects the field
+      if (phoneValue.length === 10) {
+        setValidationErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.phone;
+          return newErrors;
+        });
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+      
+      // Clear field-specific errors as user types
+      if (validationErrors[name]) {
+        setValidationErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors[name];
+          return newErrors;
+        });
+      }
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    setSubmitted(true);
+  const validateForm = (): boolean => {
+    const errors: { [key: string]: string } = {};
+
+    if (!formData.name.trim()) {
+      errors.name = "Full name is required";
+    }
+
+    if (!formData.email) {
+      errors.email = "Email is required";
+    } else if (!validateEmail(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    if (formData.phone && !validateMobile(formData.phone)) {
+      errors.phone = "Phone number must be exactly 10 digits";
+    }
+
+    if (!formData.subject) {
+      errors.subject = "Please select a subject";
+    }
+
+    if (!formData.message.trim()) {
+      errors.message = "Message is required";
+    } else if (!validateMessage(formData.message)) {
+      errors.message = `Message must be at least 50 characters (currently ${formData.message.trim().length})`;
+    }
+
+    setValidationErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      // Show first error as toast
+      const firstError = Object.values(errors)[0];
+      showErrorToast(firstError);
+      return false;
+    }
+
+    return true;
+  };
+
+  const resetForm = () => {
     setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
-    setTimeout(() => setSubmitted(false), 5000);
+    setValidationErrors({});
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate form data
+    if (!validateForm()) {
+      return;
+    }
+
+    // Prepare data for API
+    const inquiryData = {
+      fullName: formData.name,
+      email: formData.email,
+      mobile: formData.phone || "",
+      subject: formData.subject,
+      message: formData.message,
+    };
+
+    // Submit inquiry
+    const result = await dispatch(submitInquiry(inquiryData));
+
+    // Check if submission was successful
+    if (submitInquiry.fulfilled.match(result)) {
+      showSuccessToast("Thank you! Your inquiry has been submitted successfully. We'll get back to you soon.");
+      resetForm();
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        dispatch(resetInquiryState());
+      }, 5000);
+    }
   };
 
   return (
@@ -49,7 +173,7 @@ export default function ContactSection() {
           {
             icon: "✉️",
             title: "Email",
-            content: "support@laboursampark.com"
+            content: "laboursampark@gmail.com"
           }
         ].map((item, idx) => (
           <div key={idx} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition text-center">
@@ -65,12 +189,8 @@ export default function ContactSection() {
         {/* Form */}
         <div>
           <h3 className="text-2xl font-bold text-blue-900 dark:text-white mb-6">Send us a Message</h3>
-          {submitted && (
-            <div className="mb-4 p-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg border border-green-400">
-              ✓ Thank you! Your message has been sent successfully.
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-5">
+
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
@@ -80,9 +200,16 @@ export default function ContactSection() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="John Doe"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className={`w-full px-4 py-3 rounded-lg border dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
+                  validationErrors.name
+                    ? "border-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
                 required
               />
+              {validationErrors.name && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
+              )}
             </div>
 
             {/* Email */}
@@ -94,22 +221,39 @@ export default function ContactSection() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="john@example.com"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className={`w-full px-4 py-3 rounded-lg border dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
+                  validationErrors.email
+                    ? "border-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
                 required
               />
+              {validationErrors.email && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+              )}
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number (10 digits)</label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="+91 9876543210"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                placeholder="9876543210"
+                maxLength={10}
+                className={`w-full px-4 py-3 rounded-lg border dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
+                  validationErrors.phone
+                    ? "border-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
               />
+              {validationErrors.phone ? (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
+              ) : formData.phone && (
+                <p className="text-gray-500 text-sm mt-1">{formData.phone.length}/10 digits</p>
+              )}
             </div>
 
             {/* Subject */}
@@ -119,7 +263,11 @@ export default function ContactSection() {
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className={`w-full px-4 py-3 rounded-lg border dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
+                  validationErrors.subject
+                    ? "border-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
                 required
               >
                 <option value="">Select a subject</option>
@@ -129,28 +277,59 @@ export default function ContactSection() {
                 <option value="feedback">Feedback & Suggestions</option>
                 <option value="other">Other</option>
               </select>
+              {validationErrors.subject && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.subject}</p>
+              )}
             </div>
 
             {/* Message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Message (minimum 50 characters)</label>
+                <span className={`text-sm font-medium ${
+                  formData.message.trim().length >= 50
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}>
+                  {formData.message.trim().length}/50
+                </span>
+              </div>
               <textarea
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Tell us what's on your mind..."
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
+                placeholder="Tell us what's on your mind... (at least 50 characters)"
+                className={`w-full px-4 py-3 rounded-lg border dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none ${
+                  validationErrors.message
+                    ? "border-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
                 rows={5}
                 required
               />
+              {validationErrors.message && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.message}</p>
+              )}
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full px-6 py-3 bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-lg font-bold hover:from-blue-700 hover:to-blue-600 transition shadow-lg hover:shadow-xl"
+              disabled={loading}
+              className={`w-full px-6 py-3 rounded-lg font-bold transition shadow-lg ${
+                loading
+                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  : "bg-linear-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 hover:shadow-xl"
+              }`}
             >
-              Send Message
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  Submitting...
+                </span>
+              ) : (
+                "Send Message"
+              )}
             </button>
           </form>
         </div>
