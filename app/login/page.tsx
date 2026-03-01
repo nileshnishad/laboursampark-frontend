@@ -50,7 +50,7 @@ function LoginContent() {
     };
 
     if (isEmail(contact)) {
-      payload.email = contact;
+      payload.email = contact.toLowerCase();
     } else if (isMobile(contact)) {
       payload.mobile = contact;
     } else {
