@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://laboursampark.com"),
   title: "LabourSampark - Connect Labourers & Contractors | India",
   description: "Bridging the gap between skilled labourers and trusted contractors across India. Find verified labourers and contractors for your projects.",
   keywords: ["labourers", "contractors", "labour platform", "construction workers", "India", "skilled workers"],

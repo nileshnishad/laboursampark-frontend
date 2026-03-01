@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, resetAuthState } from "@/store/slices/authSlice";
@@ -7,7 +7,7 @@ import type { AppDispatch, RootState } from "@/store/store";
 import type { LoginPayload } from "@/store/slices/authSlice";
 import { buildUserDashboardPath } from "@/lib/user-route";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
@@ -277,5 +277,19 @@ export default function LoginPage() {
       </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <p className="text-sm text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }
