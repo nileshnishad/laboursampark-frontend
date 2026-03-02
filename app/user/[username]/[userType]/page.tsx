@@ -67,7 +67,7 @@ export default function UserDashboardPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-2">
           <div className="flex justify-between items-start sm:items-center gap-2 sm:gap-3">
             {/* Avatar & Text Content */}
             <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
@@ -76,7 +76,7 @@ export default function UserDashboardPage() {
                 <img
                   src={user?.companyLogoUrl || user?.profilePhotoUrl || `https://ui-avatars.com/api/?name=${username}&background=random&rounded=true`}
                   alt={username}
-                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-600 dark:border-blue-400 shadow-md"
+                  className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-blue-600 dark:border-blue-400 shadow-md"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${username}&background=random&rounded=true`;
                   }}
@@ -85,21 +85,21 @@ export default function UserDashboardPage() {
 
               {/* Text Content Column */}
               <div className="flex-1 min-w-0">
-                <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate leading-tight">
+                <h1 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate leading-tight">
                   {userType === "labour" ? "Labour" : "Contractor"} Dashboard
                 </h1>
                 <div className="flex items-center justify-between gap-2 mt-0.5">
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 capitalize truncate leading-tight">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 capitalize truncate leading-tight">
                     Welcome, {username.replace(/-/g, " ")}
                   </p>
                   
                 </div>
 
                 {/* Account Status & Work Availability */}
-                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5">
+                <div className="flex items-center gap-1.5 sm:gap-2 mt-1.5">
                   {/* Account Status */}
                   <div className="flex items-center gap-0.5 sm:gap-1" title="Your account status with the platform">
-                    <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase hidden sm:inline">Acc:</span>
+                    <span className="text-xs font-semibold text-gray-600 dark:text-gray-400   sm:inline">Account:</span>
                     <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-semibold cursor-help ${
                       user?.isBlocked !== true
                         ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
@@ -110,6 +110,20 @@ export default function UserDashboardPage() {
                       }`}></span>
                       <span className="hidden sm:inline">{user?.isBlocked !== true ? "Active" : "Blocked"}</span>
                       <span className="sm:hidden">{user?.isBlocked !== true ? "Active" : "B"}</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-0.5 sm:gap-1" title="Your account status with the platform">
+                    <span className="text-xs font-semibold text-gray-600 dark:text-gray-400   sm:inline">Profile:</span>
+                    <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-semibold cursor-help ${
+                      user?.isBlocked !== true
+                        ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                        : "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+                    }`}>
+                      <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1 ${
+                        user?.isBlocked !== true ? "bg-blue-600 dark:bg-blue-400" : "bg-gray-600 dark:bg-gray-500"
+                      }`}></span>
+                      <span className="hidden sm:inline">{user?.display === true ? "Visible" : "Hidden"}</span>
+                      <span className="sm:hidden">{user?.display === true ? "Visible" : "Hidden"}</span>
                     </span>
                   </div>
 
@@ -127,43 +141,32 @@ export default function UserDashboardPage() {
       </header>
 
       {/* Profile Visibility Banner - After Header */}
-      {user?.display !== undefined && (
-        <div className={`sticky top-16 z-40 px-3 sm:px-6 lg:px-8 py-3 sm:py-4 border-b-2 ${
-          user?.display === true
-            ? "bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700"
-            : "bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700"
-        }`}>
+      {user?.display === false && (
+        <div className="sticky top-16 z-40 px-3 sm:px-6 lg:px-8 py-3 sm:py-4 border-b-2 bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700">
           <div className="max-w-7xl mx-auto flex items-start sm:items-center gap-2 sm:gap-3">
-            <span className="text-lg sm:text-xl shrink-0">{user?.display === true ? "✓" : "⚠️"}</span>
+            <span className="text-lg sm:text-xl shrink-0">⚠️</span>
             <div className="flex-1">
-              {user?.display === true && (
-                <p className="text-xs sm:text-sm text-green-800 dark:text-green-200 font-semibold">
-                  Your profile is <span className="font-bold">visible to {isLabour ? "Contractors" : "Labourers"}</span>. Others can find and connect with you!
+              <div>
+                <p className="text-xs sm:text-sm text-orange-800 dark:text-orange-200 font-semibold">
+                  Your profile is <span className="font-bold">hidden from {isLabour ? "Contractors" : "Labourers"}</span>.
                 </p>
-              )}
-              {user?.display === false && (
-                <div>
-                  <p className="text-xs sm:text-sm text-orange-800 dark:text-orange-200 font-semibold">
-                    Your profile is <span className="font-bold">hidden from {isLabour ? "Contractors" : "Labourers"}</span>.
-                  </p>
-                  <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">
-                    Make payment to make your profile visible and start receiving connections.
-                  </p>
-                  <button
-                    onClick={handleGoToPayment}
-                    className="mt-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition-colors"
-                  >
-                    Pay Now
-                  </button>
-                </div>
-              )}
+                <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">
+                  Make payment to make your profile visible and start receiving connections.
+                </p>
+                <button
+                  onClick={handleGoToPayment}
+                  className="mt-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition-colors"
+                >
+                  Pay Now
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* Main Content */}
-      <main className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
+      <main className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-6">
         {/* Filter Menu - Visible at Top on Mobile */}
         <FilterMenu
           activeFilter={activeFilter}
