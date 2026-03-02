@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
+import { fetchVisibleUsers } from "@/store/slices/visibleUsersSlice";
 import ContractorCard from "./components/ContractorCard";
 import LabourCard from "./components/LabourCard";
 import FilterMenu from "./components/FilterMenu";
 import UserProfile from "./components/UserProfile";
-import sampleData from "@/data/sample-data.json";
 import type { AppDispatch, RootState } from "@/store/store";
 
 type UserType = "labour" | "contractor";
@@ -19,23 +19,13 @@ export default function UserDashboardPage() {
   const params = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { users: visibleUsers, loading: usersLoading, error: usersError } = useSelector(
+    (state: RootState) => state.visibleUsers
+  );
 
   const username = params.username as string;
   const userType = params.userType as UserType;
   const [activeFilter, setActiveFilter] = useState<FilterType>("active");
-
-  // Get filtered contractors or labourers based on status
-  const getFilteredContractors = () => {
-    return sampleData.contractors.filter(
-      (contractor) => contractor.status === activeFilter
-    );
-  };
-
-  const getFilteredLabourers = () => {
-    return sampleData.labours.filter(
-      (labour) => labour.status === activeFilter
-    );
-  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -51,6 +41,10 @@ export default function UserDashboardPage() {
     router.push(`/user/${username}/${userType}/payment`);
   };
 
+  useEffect(() => {
+    dispatch(fetchVisibleUsers());
+  }, [dispatch]);
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -61,14 +55,14 @@ export default function UserDashboardPage() {
 
   const isLabour = userType === "labour";
   const isProfileView = activeFilter === "profile";
-  const filteredData = isLabour ? getFilteredLabourers() : getFilteredContractors();
+  const filteredData = visibleUsers.filter((item) => item.status === activeFilter);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-2">
-          <div className="flex justify-between items-start sm:items-center gap-2 sm:gap-3">
+      <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-50 py-2">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20">
+          <div className="flex h-full justify-between items-start sm:items-center gap-2 sm:gap-3">
             {/* Avatar & Text Content */}
             <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
               {/* Avatar Column */}
@@ -140,9 +134,17 @@ export default function UserDashboardPage() {
         </div>
       </header>
 
+      <div className="sticky shadow-lg top-20 sm:top-22 z-40 w-full px-3 sm:px-12 lg:px-8 py-2 sm:py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <FilterMenu
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          userType={userType}
+        />
+      </div>
+
       {/* Profile Visibility Banner - After Header */}
       {user?.display === false && (
-        <div className="sticky top-16 z-40 px-3 sm:px-6 lg:px-8 py-3 sm:py-4 border-b-2 bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700">
+        <div className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4 border-b-2 bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700">
           <div className="max-w-7xl mx-auto flex items-start sm:items-center gap-2 sm:gap-3">
             <span className="text-lg sm:text-xl shrink-0">⚠️</span>
             <div className="flex-1">
@@ -166,20 +168,22 @@ export default function UserDashboardPage() {
       )}
 
       {/* Main Content */}
-      <main className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-6">
-        {/* Filter Menu - Visible at Top on Mobile */}
-        <FilterMenu
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          userType={userType}
-        />
-
+      <main className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-5 pb-6">
         {isProfileView ? (
           <div className="max-w-7xl mx-auto">
-            <UserProfile user={user} userType={userType} />
+            <UserProfile />
           </div>
         ) : (
           <div className="max-w-7xl mx-auto">
+            {usersLoading ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600 dark:text-gray-400 text-lg">Loading users...</p>
+              </div>
+            ) : usersError ? (
+              <div className="text-center py-12">
+                <p className="text-red-600 dark:text-red-400 text-lg">{usersError}</p>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {filteredData.length > 0 ? (
                 isLabour ? (
@@ -203,6 +207,7 @@ export default function UserDashboardPage() {
                 </div>
               )}
             </div>
+            )}
           </div>
         )}
       </main>

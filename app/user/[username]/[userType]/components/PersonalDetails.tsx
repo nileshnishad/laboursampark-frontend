@@ -1,13 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { useParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import UpdateProfileModal from "./UpdateProfileModal";
+import type { RootState } from "@/store/store";
 
 type UserType = "labour" | "contractor";
-
-interface PersonalDetailsProps {
-  user: any;
-  userType: UserType;
-}
 
 type DetailItem = {
   label: string;
@@ -36,29 +35,59 @@ const formatLocation = (location: any): string => {
   return "Not specified";
 };
 
-const DetailGrid = ({ title, items }: { title: string; items: DetailItem[] }) => (
-  <div className="mt-4 sm:mt-5">
-    <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2.5">{title}</h4>
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5 sm:gap-3">
-      {items.map((item) => (
-        <div key={item.label} className="rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2">
-          <p className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{item.label}</p>
-          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white mt-0.5 wrap-break-word">
-            {formatValue(item.value)}
-          </p>
-        </div>
-      ))}
-    </div>
+const CompactGrid = ({ items }: { items: DetailItem[] }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+    {items.map((item) => (
+      <div key={item.label} className="px-1 py-1.5">
+        <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{item.label}</p>
+        <p className="text-xs font-medium text-gray-900 dark:text-white mt-0.5 wrap-break-word">
+          {formatValue(item.value)}
+        </p>
+      </div>
+    ))}
   </div>
 );
 
-export default function PersonalDetails({ user, userType }: PersonalDetailsProps) {
-  const contactDetails: DetailItem[] = [
+const CompactSection = ({
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) => (
+  <details
+    open={defaultOpen}
+    className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-900/40"
+  >
+    <summary className="cursor-pointer list-none px-3 py-2.5 text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 flex items-center justify-between">
+      <span>{title}</span>
+      <span className="text-gray-400">▾</span>
+    </summary>
+    <div className="px-3 pb-3">{children}</div>
+  </details>
+);
+
+export default function PersonalDetails() {
+  const params = useParams();
+  const { user } = useSelector((state: RootState) => state.auth);
+  const userType = params.userType as UserType;
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  if (!user) {
+    return null;
+  }
+
+  const basicDetails: DetailItem[] = [
     { label: "Full Name", value: user.fullName },
     { label: "Email", value: user.email },
     { label: "Mobile", value: user.mobile },
-    { label: "Location", value: formatLocation(user.location) },
     { label: "Age", value: user.age },
+  ];
+
+  const otherDetails: DetailItem[] = [
+    { label: "Address", value: formatLocation(user.location) },
     { label: "Status", value: user.status },
     { label: "Profile Visible", value: user.display },
     { label: "Available", value: user.availability },
@@ -110,28 +139,72 @@ export default function PersonalDetails({ user, userType }: PersonalDetailsProps
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6">
-      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-        Personal Information
-      </h3>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-3 sm:p-4 space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+          Personal Information
+        </h3>
+        <button
+          onClick={() => setIsEditOpen(true)}
+          className="px-2.5 py-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors"
+        >
+          Update Profile
+        </button>
+      </div>
 
-      <DetailGrid title="Contact" items={contactDetails} />
-      <DetailGrid title="Professional" items={userType === "labour" ? labourDetails : contractorDetails} />
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 space-y-3">
+        <div className="flex items-start gap-3">
+          <img
+            src={user.profilePhotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || "User")}&background=random&rounded=true`}
+            alt="Profile Picture"
+            className="w-16 h-16 rounded-full object-cover border border-gray-200 dark:border-gray-700 shrink-0"
+          />
+          <div className="flex-1">
+            <CompactGrid items={basicDetails} />
+          </div>
+        </div>
+      </div>
+
+      <CompactSection title={userType === "contractor" ? "Company & Professional" : "Professional"} defaultOpen>
+        {userType === "contractor" && user.companyLogoUrl && (
+          <div className="mb-2 rounded-md border border-gray-200 dark:border-gray-700 p-2 inline-block">
+            <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">Company Logo</p>
+            <img
+              src={user.companyLogoUrl}
+              alt="Company Logo"
+              className="w-14 h-14 rounded-md object-cover border border-gray-200 dark:border-gray-700"
+            />
+          </div>
+        )}
+        <CompactGrid items={userType === "labour" ? labourDetails : contractorDetails} />
+      </CompactSection>
+
+      <CompactSection title="Other Details" defaultOpen>
+        <CompactGrid items={otherDetails} />
+      </CompactSection>
 
       {(user.bio || user.about) && (
-        <div className="mt-4 sm:mt-5">
-          <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2.5">
+        <CompactSection title={userType === "labour" ? "Bio" : "About"}>
+          <p className="rounded-md border border-gray-200 dark:border-gray-700 px-2.5 py-2 text-xs text-gray-800 dark:text-gray-200 whitespace-pre-line">
             {userType === "labour" ? "Bio" : "About"}
-          </h4>
-          <p className="rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-xs sm:text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">
-            {(userType === "labour" ? user.bio : user.about) || "Not specified"}
+            {": " + ((userType === "labour" ? user.bio : user.about) || "Not specified")}
           </p>
-        </div>
+        </CompactSection>
       )}
 
-      <DetailGrid title="Verification" items={verificationDetails} />
-      <DetailGrid title="Account Stats" items={accountStats} />
-      <DetailGrid title="Activity" items={activityDetails} />
+      <CompactSection title="Verification">
+        <CompactGrid items={verificationDetails} />
+      </CompactSection>
+
+      <CompactSection title="Account Stats">
+        <CompactGrid items={accountStats} />
+      </CompactSection>
+
+      <CompactSection title="Activity">
+        <CompactGrid items={activityDetails} />
+      </CompactSection>
+
+      <UpdateProfileModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} />
     </div>
   );
 }

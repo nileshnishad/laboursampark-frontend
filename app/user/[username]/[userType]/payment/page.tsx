@@ -93,7 +93,7 @@ export default function PaymentPage() {
           </p>
 
           <div className="mt-5 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-            <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Amount</p>
+            <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Amount / (3 Months)</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">₹{payableAmount}</p>
           </div>
 

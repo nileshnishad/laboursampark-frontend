@@ -5,7 +5,7 @@ import {
   showErrorToast,
   dismissToast,
 } from '@/lib/toast-utils';
-import { apiGet, apiPost, setToken as saveToken, clearToken as removeToken } from '@/lib/api-service';
+import { apiGet, apiPost, apiPut, setToken as saveToken, clearToken as removeToken } from '@/lib/api-service';
 
 const USER_KEY = 'authUser';
 
@@ -88,9 +88,11 @@ export interface LoginPayload {
 export interface AuthState {
   loading: boolean;
   profileLoading: boolean;
+  updatingProfile: boolean;
   success: boolean;
   error: string | null;
   profileError: string | null;
+  updateProfileError: string | null;
   message: string | null;
   user: any | null;
   token: string | null;
@@ -99,9 +101,11 @@ export interface AuthState {
 const initialState: AuthState = {
   loading: false,
   profileLoading: false,
+  updatingProfile: false,
   success: false,
   error: null,
   profileError: null,
+  updateProfileError: null,
   message: null,
   user: getStoredUser(),
   token: null,
@@ -240,6 +244,34 @@ export const fetchUserProfile = createAsyncThunk(
   }
 );
 
+/**
+ * Async thunk for updating current logged-in user profile
+ */
+export const updateUserProfile = createAsyncThunk(
+  'auth/updateUserProfile',
+  async (payload: Record<string, any>, { rejectWithValue }) => {
+    try {
+      let response = await apiPut('/api/users/profile', payload);
+
+      if (!response.success && (response.status === 404 || response.status === 405)) {
+        response = await apiPost('/api/users/profile', payload);
+      }
+
+      if (!response.success) {
+        return rejectWithValue(response.error || 'Failed to update profile');
+      }
+
+      const profile = extractProfileData(response.data);
+      return {
+        user: profile || payload,
+        message: response.data?.message || 'Profile updated successfully',
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update profile');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -260,6 +292,7 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
       state.profileError = null;
+      state.updateProfileError = null;
     },
 
     /**
@@ -269,6 +302,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.profileError = null;
+      state.updateProfileError = null;
       removeToken();
       saveUser(null);
     },
@@ -407,6 +441,36 @@ const authSlice = createSlice({
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.profileLoading = false;
         state.profileError = action.payload as string;
+      })
+
+      /**
+       * Update User Profile
+       */
+      .addCase(updateUserProfile.pending, (state) => {
+        state.updatingProfile = true;
+        state.updateProfileError = null;
+        showLoadingToast('Updating profile...');
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.updatingProfile = false;
+        state.updateProfileError = null;
+        const mergedUser = {
+          ...(state.user || {}),
+          ...(action.payload?.user || {}),
+        };
+        state.user = mergedUser;
+        saveUser(mergedUser);
+        state.message = action.payload?.message || state.message;
+        dismissToast();
+        showSuccessToast(action.payload?.message || 'Profile updated successfully!', {
+          autoClose: 2500,
+        });
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.updatingProfile = false;
+        state.updateProfileError = action.payload as string;
+        dismissToast();
+        showErrorToast((action.payload as string) || 'Profile update failed!');
       });
   },
 });
