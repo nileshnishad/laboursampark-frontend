@@ -1,42 +1,63 @@
 "use client";
 import { useEffect, useState } from "react";
 import AadharContractorCard from "@/app/components/AadharContractorCard";
+import { contractorApi } from "@/lib/api-endpoints";
 
 type Contractor = {
-  id: number;
-  name: string;
-  type: string;
-  location: string;
-  projects: number;
-  specialization: string[];
-  phone: string;
+  _id: string;
+  fullName: string;
   email: string;
+  userType: string;
+  companyLogoUrl: string;
   rating: number;
-  languages: string[];
-  available: boolean;
-  profilePic: string;
-  bio: string;
-  verified: boolean;
-  workTypes: string[];
-  workStyle: string;
-  feedback: { from: string; role: string; comment: string; rating: number }[];
+  totalReviews: number;
+  completedJobs: number;
+  experienceRange: string;
+  availability: boolean;
+  serviceCategories: string[];
+  coverageArea: string[];
+  certifications: string[];
+  mobile: string;
+  workTypes?: string[];
+  location?: {
+    coordinates?: {
+      coordinates?: [number, number];
+      type?: string;
+    };
+  };
+  skills?: string[];
 };
 
 export default function AllContractorsPage() {
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/data/contractors.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setContractors(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+    const fetchContractors = async () => {
+      try {
+        setLoading(true);
+        const response = await contractorApi.getAll();
+        
+        if (response.success && response.data) {
+          // Extract contractors from nested response structure
+          const contractors = response.data?.data?.users || response.data?.users || (Array.isArray(response.data) ? response.data : []);
+          setContractors(Array.isArray(contractors) ? contractors : []);
+          setError(null);
+        } else {
+          setError(response.error || "Failed to fetch contractors");
+          setContractors([]);
+        }
+      } catch (err) {
         console.error("Error fetching contractors:", err);
+        setError("Error fetching contractors");
+        setContractors([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchContractors();
   }, []);
 
   return (
@@ -55,11 +76,18 @@ export default function AllContractorsPage() {
           </div>
         )}
 
+        {/* Error State */}
+        {error && !loading && (
+          <div className="flex justify-center items-center py-20">
+            <div className="text-red-600 dark:text-red-400">Error: {error}</div>
+          </div>
+        )}
+
         {/* Contractors Grid */}
-        {!loading && contractors.length > 0 && (
+        {!loading && !error && contractors.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {contractors.map((c) => (
-              <div key={c.id} className="h-full">
+              <div key={c._id} className="h-full">
                 <AadharContractorCard contractor={c} />
               </div>
             ))}
@@ -67,7 +95,7 @@ export default function AllContractorsPage() {
         )}
 
         {/* Empty State */}
-        {!loading && contractors.length === 0 && (
+        {!loading && !error && contractors.length === 0 && (
           <div className="text-center py-20">
             <p className="text-gray-600 dark:text-gray-300">No contractors found.</p>
           </div>

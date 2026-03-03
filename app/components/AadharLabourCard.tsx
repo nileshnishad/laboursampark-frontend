@@ -17,8 +17,8 @@ export default function AadharLabourCard({ labour }: AadharLabourCardProps) {
   const completedJobs = labour.completedJobs || labour.projects || 0;
   const skills = labour.skills || [];
   const workTypes = labour.workTypes || labour.workType || [];
-  const available = labour.available !== undefined ? labour.available : true;
-  const verified = labour.verified || false;
+  const available = labour.availability !== undefined ? labour.availability : (labour.available !== undefined ? labour.available : true);
+  const verified = labour.aadharVerified || labour.verified || false;
   const profilePic = labour.profilePic || labour.profilePhotoUrl || "";
   const feedback = labour.feedback || [];
   const bio = labour.bio || "";
@@ -34,7 +34,7 @@ export default function AadharLabourCard({ labour }: AadharLabourCardProps) {
   return (
     <div className="w-full bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-blue-200 sm:border-2 dark:border-blue-700 h-full flex flex-col">
       {/* Header Bar */}
-      <div className="h-1 sm:h-2 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+      <div className="h-1 sm:h-2 bg-linear-to-r from-blue-600 to-blue-400"></div>
 
       {/* Card Content */}
       <div className="p-3 sm:p-6 flex flex-col h-full">
@@ -49,7 +49,7 @@ export default function AadharLabourCard({ labour }: AadharLabourCardProps) {
                 className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg object-cover border border-blue-300 sm:border-2 shadow-md"
               />
             ) : (
-              <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-blue-300 sm:border-2 shadow-md">
+              <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-blue-300 sm:border-2 shadow-md">
                 {getInitials(name)}
               </div>
             )}

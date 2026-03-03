@@ -35,8 +35,8 @@ export default function LabourCard({
   const completedJobs = labour.completedJobs || labour.projects || 0;
   const skills = labour.skills || [];
   const workTypes = labour.workTypes || labour.workType || [];
-  const available = labour.available !== undefined ? labour.available : true;
-  const verified = labour.verified || false;
+  const available = labour.availability !== undefined ? labour.availability : (labour.available !== undefined ? labour.available : true);
+  const verified = labour.aadharVerified || labour.verified || false;
   const profilePic = labour.profilePic || labour.profilePhotoUrl || "";
   const feedback = labour.feedback || [];
   const bio = labour.bio || "";
@@ -44,7 +44,7 @@ export default function LabourCard({
   const handleConnect = async () => {
     if (onConnect) {
       setSending(true);
-      await onConnect(labour.id);
+      await onConnect(labour._id || labour.id);
       setSending(false);
     }
   };

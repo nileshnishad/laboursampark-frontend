@@ -1,38 +1,56 @@
 "use client";
 import { useEffect, useState } from "react";
 import AadharLabourCard from "@/app/components/AadharLabourCard";
+import { labourApi } from "@/lib/api-endpoints";
 
 type Labour = {
-  id: number;
-  name: string;
-  trade: string;
-  location: string;
-  experience: number;
-  skills: string[];
-  phone: string;
+  _id: string;
+  fullName: string;
   email: string;
-  languages: string[];
-  profilePic: string;
-  verified: boolean;
-  workNature: string;
-  feedback: { from: string; role: string; comment: string; rating: number }[];
+  userType: string;
+  profilePhotoUrl: string;
+  bio: string;
+  skills: string[];
+  mobile: string;
+  rating: number;
+  totalReviews: number;
+  completedJobs: number;
+  experience: string;
+  availability: boolean;
+  workTypes: string[];
+  aadharVerified: boolean;
 };
 
 export default function AllLaboursPage() {
   const [labours, setLabours] = useState<Labour[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/data/labours.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setLabours(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+    const fetchLabours = async () => {
+      try {
+        setLoading(true);
+        const response = await labourApi.getAll();
+        
+        if (response.success && response.data) {
+          // Extract users from nested response structure
+          const users = response.data?.data?.users || response.data?.users || (Array.isArray(response.data) ? response.data : []);
+          setLabours(Array.isArray(users) ? users : []);
+          setError(null);
+        } else {
+          setError(response.error || "Failed to fetch labours");
+          setLabours([]);
+        }
+      } catch (err) {
         console.error("Error fetching labours:", err);
+        setError("Error fetching labours");
+        setLabours([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchLabours();
   }, []);
 
   return (
@@ -51,11 +69,18 @@ export default function AllLaboursPage() {
           </div>
         )}
 
+        {/* Error State */}
+        {error && !loading && (
+          <div className="flex justify-center items-center py-20">
+            <div className="text-red-600 dark:text-red-400">Error: {error}</div>
+          </div>
+        )}
+
         {/* Labours Grid */}
-        {!loading && labours.length > 0 && (
+        {!loading && !error && labours.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {labours.map((l) => (
-              <div key={l.id} className="h-full">
+              <div key={l._id} className="h-full">
                 <AadharLabourCard labour={l} />
               </div>
             ))}
@@ -63,7 +88,7 @@ export default function AllLaboursPage() {
         )}
 
         {/* Empty State */}
-        {!loading && labours.length === 0 && (
+        {!loading && !error && labours.length === 0 && (
           <div className="text-center py-20">
             <p className="text-gray-600 dark:text-gray-300">No labours found.</p>
           </div>

@@ -21,25 +21,25 @@ export default function ContractorCard({
   const isActuallyConnected = contractor.status === "connected";
   const isActuallyPending = contractor.status === "pending";
 
-  const name = contractor.businessName || contractor.name || "Business";
-  const type = contractor.type || "Contractor";
-  const location = contractor.location || "";
-  const rating = contractor.rating || 4.8;
+  const name = contractor.fullName || contractor.businessName || contractor.name || "Business";
+  const type = contractor.userType || contractor.type || "Contractor";
+  const location = typeof contractor.location === "string" ? contractor.location : "Not specified";
+  const rating = contractor.rating || 0;
   const projects = contractor.completedJobs || contractor.projects || 0;
   const phone = contractor.mobile || contractor.phone || "N/A";
   const email = contractor.email || "N/A";
-  const available = contractor.available !== undefined ? contractor.available : true;
-  const verified = contractor.verified || false;
-  const profilePic = contractor.profilePic || contractor.companyLogoUrl || "";
-  const specialization = contractor.servicesOffered || contractor.specialization || [];
+  const available = contractor.availability !== undefined ? contractor.availability : (contractor.available !== undefined ? contractor.available : true);
+  const verified = contractor.certifications && contractor.certifications.length > 0;
+  const profilePic = contractor.companyLogoUrl || contractor.profilePic || "";
+  const specialization = contractor.serviceCategories || contractor.servicesOffered || contractor.specialization || [];
   const workTypes = contractor.workTypes || [];
   const feedback = contractor.feedback || [];
-  const bio = contractor.bio || "";
+  const bio = contractor.bio || contractor.experienceRange || "";
 
   const handleConnect = async () => {
     if (onConnect) {
       setSending(true);
-      await onConnect(contractor.id);
+      await onConnect(contractor._id || contractor.id);
       setSending(false);
     }
   };
@@ -52,7 +52,7 @@ export default function ContractorCard({
       .toUpperCase();
   };
 
-  console.log("Rendering ContractorCard for:", contractor, "Status:", contractor.status);
+
 
   return (
     <div className="w-full bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-green-200 sm:border-2 dark:border-green-700 h-full flex flex-col">

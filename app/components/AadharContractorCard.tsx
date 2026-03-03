@@ -7,21 +7,21 @@ interface AadharContractorCardProps {
 }
 
 export default function AadharContractorCard({ contractor }: AadharContractorCardProps) {
-  const name = contractor.businessName || contractor.name || "Business";
-  const type = contractor.type || "Contractor";
-  const location = contractor.location || "";
-  const rating = contractor.rating || 4.8;
+  const name = contractor.fullName || contractor.businessName || contractor.name || "Business";
+  const type = contractor.userType || contractor.type || "Contractor";
+  const location = typeof contractor.location === "string" ? contractor.location : "Not specified";
+  const rating = contractor.rating || 0;
   const projects = contractor.completedJobs || contractor.projects || 0;
   const phone = contractor.mobile || contractor.phone || "N/A";
   const email = contractor.email || "N/A";
-  const available = contractor.available !== undefined ? contractor.available : true;
-  const verified = contractor.verified || false;
-  const profilePic = contractor.profilePic || contractor.companyLogoUrl || "";
-  const specialization = contractor.servicesOffered || contractor.specialization || [];
+  const available = contractor.availability !== undefined ? contractor.availability : (contractor.available !== undefined ? contractor.available : true);
+  const verified = contractor.certifications && contractor.certifications.length > 0;
+  const profilePic = contractor.companyLogoUrl || contractor.profilePic || "";
+  const specialization = contractor.serviceCategories || contractor.servicesOffered || contractor.specialization || [];
   const workTypes = contractor.workTypes || [];
   const workStyle = contractor.workStyle || "";
   const feedback = contractor.feedback || [];
-  const bio = contractor.bio || "";
+  const bio = contractor.bio || contractor.experienceRange || "";
 
   const getInitials = (fullName: string) => {
     return fullName

@@ -37,3 +37,25 @@ export const inquiryApi = {
   delete: (id: string) => apiService.delete(`/inquiries/${id}`),
 };
 
+/**
+ * Contractor APIs - Browse contractors (public)
+ */
+export const contractorApi = {
+  // Get all contractors (public)
+  getAll: () => apiService.get('/api/users/contractors', { includeToken: false }),
+
+  // Get single contractor by ID (public)
+  getById: (id: string) => apiService.get(`/api/users/contractors/${id}`, { includeToken: false }),
+};
+
+/**
+ * Labour APIs - Browse labours (public)
+ */
+export const labourApi = {
+  // Get all labours (public)
+  getAll: () => apiService.get('/api/users/labours', { includeToken: false }),
+
+  // Get single labour by ID (public)
+  getById: (id: string) => apiService.get(`/api/users/labours/${id}`, { includeToken: false }),
+};
+
