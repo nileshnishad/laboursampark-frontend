@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import AadharLabourCard from "@/app/components/AadharLabourCard";
 import { labourApi } from "@/lib/api-endpoints";
+import Slider from "react-slick";
+import Skeleton from "@/app/components/Skeleton";
 
 type Labour = {
   _id: string;
@@ -62,12 +64,15 @@ export default function AllLaboursPage() {
           <p className="text-gray-700 dark:text-gray-300 max-w-2xl">Browse all available skilled labourers in our network. Find verified professionals for your project needs.</p>
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="flex justify-center items-center py-20">
-            <div className="text-gray-600 dark:text-gray-300">Loading labours...</div>
-          </div>
-        )}
+       {loading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, index) => (
+            <div key={index} className="h-full">
+              <Skeleton type="card" />
+            </div>
+          ))}
+        </div>
+      )}
 
         {/* Error State */}
         {error && !loading && (

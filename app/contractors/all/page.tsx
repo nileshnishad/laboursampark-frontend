@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import AadharContractorCard from "@/app/components/AadharContractorCard";
 import { contractorApi } from "@/lib/api-endpoints";
+import Skeleton from "@/app/components/Skeleton";
 
 type Contractor = {
   _id: string;
@@ -71,8 +72,12 @@ export default function AllContractorsPage() {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex justify-center items-center py-20">
-            <div className="text-gray-600 dark:text-gray-300">Loading contractors...</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="h-full">
+                <Skeleton type="card" />
+              </div>
+            ))}
           </div>
         )}
 

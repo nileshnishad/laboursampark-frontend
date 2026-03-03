@@ -4,6 +4,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { contractorApi } from "@/lib/api-endpoints";
+import Skeleton from "./Skeleton";
 
 type Contractor = {
   _id: string;
@@ -93,11 +94,13 @@ export default function ContractorsSection() {
         </a>
       </div>
       
-      {/* Loading State */}
+      {/* Loading State - Show Skeleton Carousel */}
       {loading && (
-        <div className="flex justify-center items-center py-20">
-          <div className="text-gray-600 dark:text-gray-300">Loading contractors...</div>
-        </div>
+        <Slider {...slickSettings}>
+          {[...Array(3)].map((_, index) => (
+            <Skeleton key={index} type="card" />
+          ))}
+        </Slider>
       )}
       
       {/* Error State */}
