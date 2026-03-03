@@ -184,7 +184,7 @@ export default function UserDashboardPage() {
                 <p className="text-red-600 dark:text-red-400 text-lg">{usersError}</p>
               </div>
             ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {filteredData.length > 0 ? (
                 isLabour ? (
                   filteredData.map((contractor: any) => (

@@ -70,7 +70,7 @@ export default function ContractorsSection() {
               {/* Aadhar-style Card */}
               <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg sm:shadow-2xl overflow-hidden border border-green-200 sm:border-2 dark:border-green-700">
                 {/* Header Bar */}
-                <div className="h-1 sm:h-2 bg-linear-to-r from-green-600 to-green-400"></div>
+                <div className="h-1 sm:h-2 bg-gradient-to-r from-green-600 to-green-400"></div>
                 
                 {/* Card Content */}
                 <div className="p-3 sm:p-6">
@@ -78,7 +78,7 @@ export default function ContractorsSection() {
                   <div className="flex gap-3 sm:gap-5 mb-3 sm:mb-5">
                     {/* Avatar */}
                     <div className="shrink-0">
-                      <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-linear-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-green-300 sm:border-2 shadow-md">
+                      <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-green-300 sm:border-2 shadow-md">
                         {c.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                       </div>
                     </div>
@@ -161,7 +161,6 @@ export default function ContractorsSection() {
               </div>
             </div>
           ))}
-       
         </Slider>
       ) : (
         <p className="text-gray-500">Loading contractors...</p>

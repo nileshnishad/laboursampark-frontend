@@ -2,25 +2,11 @@
 
 import React from "react";
 
-interface ContractorCardProps {
+interface AadharContractorCardProps {
   contractor: any;
-  isConnected?: boolean;
-  isPending?: boolean;
-  onConnect?: (contractorId: string) => void;
 }
 
-export default function ContractorCard({
-  contractor,
-  isConnected = false,
-  isPending = false,
-  onConnect,
-}: ContractorCardProps) {
-  const [sending, setSending] = React.useState(false);
-
-  // Determine connection status based on contractor.status
-  const isActuallyConnected = contractor.status === "connected";
-  const isActuallyPending = contractor.status === "pending";
-
+export default function AadharContractorCard({ contractor }: AadharContractorCardProps) {
   const name = contractor.businessName || contractor.name || "Business";
   const type = contractor.type || "Contractor";
   const location = contractor.location || "";
@@ -33,16 +19,9 @@ export default function ContractorCard({
   const profilePic = contractor.profilePic || contractor.companyLogoUrl || "";
   const specialization = contractor.servicesOffered || contractor.specialization || [];
   const workTypes = contractor.workTypes || [];
+  const workStyle = contractor.workStyle || "";
   const feedback = contractor.feedback || [];
   const bio = contractor.bio || "";
-
-  const handleConnect = async () => {
-    if (onConnect) {
-      setSending(true);
-      await onConnect(contractor.id);
-      setSending(false);
-    }
-  };
 
   const getInitials = (fullName: string) => {
     return fullName
@@ -51,8 +30,6 @@ export default function ContractorCard({
       .join("")
       .toUpperCase();
   };
-
-  console.log("Rendering ContractorCard for:", contractor, "Status:", contractor.status);
 
   return (
     <div className="w-full bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-green-200 sm:border-2 dark:border-green-700 h-full flex flex-col">
@@ -196,7 +173,7 @@ export default function ContractorCard({
 
         {/* Feedback */}
         {feedback.length > 0 && (
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 sm:p-3 mb-3 sm:mb-4">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 sm:p-3 mt-auto">
             <div className="text-xs font-bold text-green-700 dark:text-green-300 mb-1">
               Recent Feedback
             </div>
@@ -208,33 +185,6 @@ export default function ContractorCard({
             </div>
           </div>
         )}
-
-        {/* Action Button */}
-        <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
-          {isActuallyConnected ? (
-            <button
-              disabled
-              className="w-full px-3 sm:px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg font-semibold text-xs sm:text-sm cursor-default transition-all"
-            >
-              ✓ Connected
-            </button>
-          ) : isActuallyPending ? (
-            <button
-              disabled
-              className="w-full px-3 sm:px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg font-semibold text-xs sm:text-sm cursor-default transition-all"
-            >
-              ⏳ Pending
-            </button>
-          ) : (
-            <button
-              onClick={handleConnect}
-              disabled={sending}
-              className="w-full px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {sending ? "Sending..." : "Connect"}
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );

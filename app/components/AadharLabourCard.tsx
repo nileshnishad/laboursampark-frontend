@@ -1,31 +1,13 @@
 "use client";
 
 import React from "react";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/store/store";
 
-interface LabourCardProps {
+interface AadharLabourCardProps {
   labour: any;
-  isConnected?: boolean;
-  isPending?: boolean;
-  onConnect?: (labourId: string) => void;
 }
 
-export default function LabourCard({
-  labour,
-  isConnected = false,
-  isPending = false,
-  onConnect,
-}: LabourCardProps) {
-  const [sending, setSending] = React.useState(false);
-
-  // Determine connection status based on labour.status
-  const isActuallyConnected = labour.status === "connected";
-  const isActuallyPending = labour.status === "pending";
-
+export default function AadharLabourCard({ labour }: AadharLabourCardProps) {
   const name = labour.fullName || labour.name || "Labour";
-  const userType = labour.userType || "Not specified";
-
   const experience = labour.experience || labour.experienceRange || "Not specified";
   const phone = labour.mobile || labour.phone || "N/A";
   const email = labour.email || "N/A";
@@ -41,14 +23,6 @@ export default function LabourCard({
   const feedback = labour.feedback || [];
   const bio = labour.bio || "";
 
-  const handleConnect = async () => {
-    if (onConnect) {
-      setSending(true);
-      await onConnect(labour.id);
-      setSending(false);
-    }
-  };
-
   const getInitials = (fullName: string) => {
     return fullName
       .split(" ")
@@ -60,7 +34,7 @@ export default function LabourCard({
   return (
     <div className="w-full bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-blue-200 sm:border-2 dark:border-blue-700 h-full flex flex-col">
       {/* Header Bar */}
-      <div className="h-1 sm:h-2 bg-linear-to-r from-blue-600 to-blue-400"></div>
+      <div className="h-1 sm:h-2 bg-gradient-to-r from-blue-600 to-blue-400"></div>
 
       {/* Card Content */}
       <div className="p-3 sm:p-6 flex flex-col h-full">
@@ -75,7 +49,7 @@ export default function LabourCard({
                 className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg object-cover border border-blue-300 sm:border-2 shadow-md"
               />
             ) : (
-              <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-blue-300 sm:border-2 shadow-md">
+              <div className="w-14 sm:w-20 h-14 sm:h-20 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border border-blue-300 sm:border-2 shadow-md">
                 {getInitials(name)}
               </div>
             )}
@@ -96,11 +70,11 @@ export default function LabourCard({
             <div className="text-blue-700 dark:text-blue-300 font-semibold text-xs sm:text-sm mb-0.5 truncate">
               {experience}
             </div>
-            
-
-            <div className="text-blue-700 dark:text-green-300 font-semibold text-xs sm:text-sm mb-0.5 truncate">
-              {userType}
-            </div>
+            {location && (
+              <div className="text-gray-500 dark:text-gray-400 text-xs truncate">
+                {location}
+              </div>
+            )}
           </div>
         </div>
 
@@ -219,33 +193,6 @@ export default function LabourCard({
             </div>
           </div>
         )}
-
-        {/* Action Button */}
-        <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
-          {isActuallyConnected ? (
-            <button
-              disabled
-              className="w-full px-3 sm:px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg font-semibold text-xs sm:text-sm cursor-default transition-all"
-            >
-              ✓ Connected
-            </button>
-          ) : isActuallyPending ? (
-            <button
-              disabled
-              className="w-full px-3 sm:px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg font-semibold text-xs sm:text-sm cursor-default transition-all"
-            >
-              ⏳ Pending
-            </button>
-          ) : (
-            <button
-              onClick={handleConnect}
-              disabled={sending}
-              className="w-full px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {sending ? "Sending..." : "Connect"}
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );
