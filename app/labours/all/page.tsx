@@ -60,7 +60,7 @@ export default function AllLaboursPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-900 dark:text-white mb-3">All Labours</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-900 dark:text-white mb-3">All Labours</h1>
           <p className="text-gray-700 dark:text-gray-300 max-w-2xl">Browse all available skilled labourers in our network. Find verified professionals for your project needs.</p>
         </div>
 

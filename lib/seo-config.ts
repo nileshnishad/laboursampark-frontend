@@ -110,6 +110,8 @@ export const metaDescriptions = {
   contractors: "Connect with trusted contractors for construction, renovation, electrical, plumbing and other services. Find verified and experienced contractors near you.",
   about: "About LabourSampark - India's leading labour platform connecting skilled workers with contractors. Transparent, secure, and verified professional network.",
   contact: "Contact LabourSampark team for support, partnerships, or queries. Get in touch with us for labour hiring solutions.",
+  privacy: "Our privacy policy explains how LabourSampark collects, uses, and protects your personal information.",
+  terms: "Read our Terms of Service to understand the rules and conditions for using LabourSampark platform.",
 };
 
 // Open Graph & Social Media Optimization

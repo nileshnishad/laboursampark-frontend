@@ -25,8 +25,8 @@ export default function Footer() {
             <li><a href="#contractors" className="hover:underline">Contractors</a></li>
             <li><a href="#about" className="hover:underline">About</a></li>
             <li><a href="#contact" className="hover:underline">Contact</a></li>
-            <li><a href="#" className="hover:underline">Privacy Policy</a></li>
-            <li><a href="#" className="hover:underline">Terms of Service</a></li>
+            <li><a href="/privacy-policy" className="hover:underline">Privacy Policy</a></li>
+            <li><a href="/terms-of-service" className="hover:underline">Terms of Service</a></li>
           </ul>
         </div>
         {/* Contact Info */}
@@ -44,8 +44,8 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-4 mt-8 border-t border-gray-200 dark:border-gray-800 pt-4 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 dark:text-gray-400">
         <div>© {new Date().getFullYear()} LabourSampark. All rights reserved.</div>
         <div className="flex gap-4 mt-2 md:mt-0">
-          <a href="#" className="hover:underline">Privacy Policy</a>
-          <a href="#" className="hover:underline">Terms of Service</a>
+          <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
+          <a href="/terms-of-service" className="hover:underline">Terms of Service</a>
         </div>
       </div>
     </footer>

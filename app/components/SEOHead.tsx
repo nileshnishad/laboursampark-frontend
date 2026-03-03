@@ -24,7 +24,7 @@ interface SEOProps {
   twitterHandle?: string;
   canonicalUrl?: string;
   structuredData?: any;
-  section?: "home" | "labours" | "contractors" | "about" | "contact";
+  section?: "home" | "labours" | "contractors" | "about" | "contact" | "privacy" | "terms";
 }
 
 export default function SEOHead({

@@ -66,7 +66,7 @@ export default function AllContractorsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-900 dark:text-white mb-3">All Contractors</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-green-900 dark:text-white mb-3">All Contractors</h1>
           <p className="text-gray-700 dark:text-gray-300 max-w-2xl">Browse all available contractors in our network. Find verified professionals for your construction and project needs.</p>
         </div>
 

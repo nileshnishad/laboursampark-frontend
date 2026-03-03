@@ -1,26 +1,30 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { buildUserDashboardPath } from "@/lib/user-route";
 
 const sections = [
-  { id: "hero", label: "Home" },
-  { id: "labours", label: "Labours" },
-  { id: "contractors", label: "Contractors" },
-  { id: "about", label: "About" },
-  { id: "contact", label: "Contact" },
+  { id: "hero", label: "Home", path: "/" },
+  { id: "labours", label: "Labours", path: "#labours" },
+  { id: "contractors", label: "Contractors", path: "#contractors" },
+  { id: "about", label: "About", path: "#about" },
+  { id: "contact", label: "Contact", path: "#contact" },
 ];
 
 export default function Menu() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useSelector((state: RootState) => state.auth);
   const [active, setActive] = useState("hero");
   const [open, setOpen] = useState(false);
+  const isHomePage = pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => {
+      if (!isHomePage) return; // Only track scroll on home page
+      
       let current = "hero";
       for (const section of sections) {
         const el = document.getElementById(section.id);
@@ -33,10 +37,14 @@ export default function Menu() {
       }
       setActive(current);
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+
+    if (isHomePage) {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      handleScroll();
+    }
+    
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHomePage]);
 
   // Prevent background scroll when mobile menu is open
   useEffect(() => {
@@ -50,10 +58,25 @@ export default function Menu() {
     };
   }, [open]);
 
+  const handleNavClick = (section: typeof sections[0]) => {
+    if (isHomePage) {
+      // If on home page, scroll to section
+      const element = document.getElementById(section.id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        setActive(section.id);
+      }
+    } else {
+      // If not on home page, redirect to home page with hash
+      router.push(section.id === "hero" ? "/" : `/${section.id === "labours" ? "labours/all" : section.id === "contractors" ? "contractors/all" : ""}`);
+    }
+    setOpen(false);
+  };
+
   return (
     <nav className="fixed top-0 left-0 w-full bg-white/80 dark:bg-black/80 shadow z-50 backdrop-blur flex items-center justify-between px-4 md:px-8 py-3">
       {/* Logo */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/")}>
         <img src="/images/logo.jpg" alt="LabourSampark" className="w-35 h-10 rounded-lg" />
       </div>
       {/* Hamburger for mobile */}
@@ -71,16 +94,16 @@ export default function Menu() {
         <ul className="flex gap-8 text-gray-700 dark:text-gray-200 font-medium">
           {sections.map((section) => (
             <li key={section.id}>
-              <a
-                href={`#${section.id}`}
+              <button
+                onClick={() => handleNavClick(section)}
                 className={
-                  active === section.id
-                    ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1"
-                    : "hover:text-blue-600 dark:hover:text-blue-300"
+                  active === section.id && isHomePage
+                    ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1 cursor-pointer"
+                    : "hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer"
                 }
               >
                 {section.label}
-              </a>
+              </button>
             </li>
           ))}
         </ul>
@@ -111,17 +134,16 @@ export default function Menu() {
         <ul className="absolute top-full left-0 w-full bg-white/95 dark:bg-black/95 flex flex-col gap-4 py-6 px-6 text-blue-700 dark:text-blue-200 font-medium md:hidden animate-fade-in z-50 shadow-lg">
           {sections.map((section) => (
             <li key={section.id}>
-              <a
-                href={`#${section.id}`}
+              <button
+                onClick={() => handleNavClick(section)}
                 className={
-                  active === section.id
-                    ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1"
-                    : "hover:text-blue-600 dark:hover:text-blue-300"
+                  active === section.id && isHomePage
+                    ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1 text-left w-full cursor-pointer"
+                    : "hover:text-blue-600 dark:hover:text-blue-300 text-left w-full cursor-pointer"
                 }
-                onClick={() => setOpen(false)}
               >
                 {section.label}
-              </a>
+              </button>
             </li>
           ))}
           {/* Mobile Login Button */}
