@@ -40,6 +40,18 @@ const saveUser = (user: any | null) => {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
+export interface LocationPayload {
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+  address: string;
+  coordinates: {
+    type: string;
+    coordinates: [number, number]; // [longitude, latitude]
+  };
+}
+
 export interface ContractorRegisterPayload {
   userType: string;
   fullName: string;
@@ -47,7 +59,7 @@ export interface ContractorRegisterPayload {
   mobile: string;
   email: string;
   password: string;
-  location: string;
+  location: LocationPayload | string;
   registrationNumber?: string;
   businessTypes: string[];
   experienceRange: string;
@@ -67,7 +79,7 @@ export interface LabourRegisterPayload {
   mobile: string;
   email: string;
   password: string;
-  location: string;
+  location: LocationPayload | string;
   experience: string;
   skills: string[];
   workTypes: string[];

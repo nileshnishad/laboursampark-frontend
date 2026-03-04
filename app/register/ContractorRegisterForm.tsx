@@ -5,6 +5,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { registerContractor, resetAuthState } from "@/store/slices/authSlice";
 import { uploadFile } from "@/lib/s3-client";
 import ImageCropperModal from "@/app/components/ImageCropperModal";
+import LocationSelector from "@/app/components/LocationSelector";
+import type { LocationData } from "@/lib/use-location";
 import dropdownsData from "@/data/dropdowns.json";
 
 const {
@@ -28,7 +30,7 @@ export default function ContractorRegisterForm() {
   const [mobile, setMobileNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
+  const [location, setLocation] = useState<LocationData | null>(null);
   const [registrationNumber, setRegistrationNumber] = useState<string>("");
 
   // Business Details
@@ -226,7 +228,7 @@ export default function ContractorRegisterForm() {
       setMobileNumber("");
       setEmail("");
       setPassword("");
-      setLocation("");
+      setLocation(null);
       setRegistrationNumber("");
       setSelectedBusinessTypes([]);
       setExperienceRange("");
@@ -279,6 +281,17 @@ export default function ContractorRegisterForm() {
       return;
     }
 
+    if (!location || !location.coordinates) {
+      alert("Please provide your location using Auto Detect or manual entry");
+      return;
+    }
+
+    // Validate location has at least city or state
+    if (!location.city && !location.state) {
+      alert("Please ensure your location includes city or state information");
+      return;
+    }
+
     const formPayload = {
       userType: "contractor",
       fullName,
@@ -286,7 +299,17 @@ export default function ContractorRegisterForm() {
       mobile,
       email,
       password,
-      location,
+      location: {
+        city: location.city,
+        state: location.state,
+        pincode: location.pincode,
+        country: location.country,
+        address: location.address,
+        coordinates: {
+          type: "Point",
+          coordinates: [location.coordinates.longitude, location.coordinates.latitude] as [number, number], // GeoJSON format: [longitude, latitude]
+        },
+      },
       registrationNumber,
       businessTypes: selectedBusinessTypes,
       experienceRange,
@@ -396,21 +419,19 @@ export default function ContractorRegisterForm() {
                   className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
                 />
               </div>
+            </div>
+
+            {/* Row 3: Location Selector */}
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Location (City) *
+                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Location (City / Area) *
                 </label>
-                <input
-                  type="text"
-                  placeholder="Your city"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                />
+                <LocationSelector onLocationChange={setLocation} />
               </div>
             </div>
 
-            {/* Row 3: Registration Number (Single Column) */}
+            {/* Row 4: Registration Number (Single Column) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
