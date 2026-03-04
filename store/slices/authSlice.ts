@@ -82,8 +82,6 @@ export interface LabourRegisterPayload {
   location: LocationPayload | string;
   experience: string;
   skills: string[];
-  workTypes: string[];
-  preferredWorkingHours: string;
   bio: string;
   profilePhotoUrl: string | null;
   termsAgreed: boolean;

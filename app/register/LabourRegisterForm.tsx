@@ -8,12 +8,8 @@ import LocationSelector from "@/app/components/LocationSelector";
 import type { LocationData } from "@/lib/use-location";
 import dropdownsData from "@/data/dropdowns.json";
 
-const {
-  skills: SKILLS_OPTIONS,
-  workType: WORK_TYPES,
-  workingHours: WORKING_HOURS,
-  experienceRange: EXPERIENCE_RANGE,
-} = dropdownsData.labour;
+const { skills: SKILLS_OPTIONS, experienceRange: EXPERIENCE_RANGE } =
+  dropdownsData.labour;
 
 export default function LabourRegisterForm() {
   const router = useRouter();
@@ -28,16 +24,13 @@ export default function LabourRegisterForm() {
   const [mobileNumber, setMobileNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [location, setLocation] = useState<LocationData | null>(null);
 
   // Professional Information
   const [experience, setExperience] = useState<string>("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [selectedWorkTypes, setSelectedWorkTypes] = useState<string[]>([]);
-  const [selectedHours, setSelectedHours] = useState<string>("");
   const [skillsDropdownOpen, setSkillsDropdownOpen] = useState<boolean>(false);
-  const [workTypesDropdownOpen, setWorkTypesDropdownOpen] =
-    useState<boolean>(false);
 
   // Additional Info
   const [bio, setBio] = useState<string>("");
@@ -61,18 +54,8 @@ export default function LabourRegisterForm() {
     );
   };
 
-  const toggleWorkType = (type: string) => {
-    setSelectedWorkTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
-    );
-  };
-
   const removeSkill = (skill: string) => {
     setSelectedSkills((prev) => prev.filter((s) => s !== skill));
-  };
-
-  const removeWorkType = (type: string) => {
-    setSelectedWorkTypes((prev) => prev.filter((t) => t !== type));
   };
 
   // Handle Profile Photo Upload - Show Cropper Instead
@@ -113,7 +96,7 @@ export default function LabourRegisterForm() {
     try {
       // Create preview immediately before uploading
       const previewUrl = URL.createObjectURL(croppedImage);
-      
+
       // Wait a bit to ensure URL is ready
       setTimeout(() => {
         setProfilePhotoPreview(previewUrl);
@@ -147,9 +130,6 @@ export default function LabourRegisterForm() {
       if (!target.closest('[data-dropdown="skills"]')) {
         setSkillsDropdownOpen(false);
       }
-      if (!target.closest('[data-dropdown="work-types"]')) {
-        setWorkTypesDropdownOpen(false);
-      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -169,13 +149,12 @@ export default function LabourRegisterForm() {
       setLocation(null);
       setExperience("");
       setSelectedSkills([]);
-      setSelectedWorkTypes([]);
-      setSelectedHours("");
       setBio("");
       setProfilePhotoUrl("");
       setTermsAgreed(false);
       setUploadStatus("idle");
       setUploadError("");
+      setShowPassword(false);
 
       // Reset state and redirect
       dispatch(resetAuthState());
@@ -223,13 +202,14 @@ export default function LabourRegisterForm() {
         address: location.address,
         coordinates: {
           type: "Point",
-          coordinates: [location.coordinates.longitude, location.coordinates.latitude] as [number, number], // GeoJSON format: [longitude, latitude]
+          coordinates: [
+            location.coordinates.longitude,
+            location.coordinates.latitude,
+          ] as [number, number], // GeoJSON format: [longitude, latitude]
         },
       },
       experience,
       skills: selectedSkills,
-      workTypes: selectedWorkTypes,
-      preferredWorkingHours: selectedHours,
       bio,
       profilePhotoUrl: profilePhotoUrl || null,
       termsAgreed,
@@ -247,7 +227,9 @@ export default function LabourRegisterForm() {
             onClick={() => router.push("/")}
             className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-sm transition-colors group"
           >
-            <span className="group-hover:-translate-x-1 transition-transform">←</span>
+            <span className="group-hover:-translate-x-1 transition-transform">
+              ←
+            </span>
             Back to Home
           </button>
         </div>
@@ -321,15 +303,51 @@ export default function LabourRegisterForm() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Password / OTP *
+                  Password *
                 </label>
-                <input
-                  type="password"
-                  placeholder="Enter password or OTP"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-3 py-2 pr-10 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path
+                          fillRule="evenodd"
+                          d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
+                          clipRule="evenodd"
+                        />
+                        <path d="M15.171 13.576l1.414 1.414A1 1 0 0016 14h-2.5a1.5 1.5 0 01-1.5-1.5V9.914l1.171 1.171a4 4 0 000 5.656z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -357,7 +375,10 @@ export default function LabourRegisterForm() {
             {/* Location Selector */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Your Location * <span className="text-red-500">Auto-detect or enter address</span>
+                Your Location *{" "}
+                <span className="text-red-500">
+                  Auto-detect or enter address
+                </span>
               </label>
               <LocationSelector
                 onLocationChange={setLocation}
@@ -448,108 +469,6 @@ export default function LabourRegisterForm() {
               )}
             </div>
 
-            {/* Work Type Dropdown */}
-            <div data-dropdown="work-types">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Interested In (Work Type) *
-              </label>
-              <div className="relative">
-                {/* Dropdown Button */}
-                <button
-                  type="button"
-                  onClick={() =>
-                    setWorkTypesDropdownOpen(!workTypesDropdownOpen)
-                  }
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white bg-white text-left flex justify-between items-center"
-                >
-                  <span>
-                    {selectedWorkTypes.length > 0
-                      ? `${selectedWorkTypes.length} selected`
-                      : "Select work types"}
-                  </span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      workTypesDropdownOpen ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </button>
-
-                {/* Dropdown Menu */}
-                {workTypesDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-                    <div className="max-h-48 overflow-y-auto p-2 space-y-2">
-                      {WORK_TYPES.map((type) => (
-                        <label
-                          key={type}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedWorkTypes.includes(type)}
-                            onChange={() => toggleWorkType(type)}
-                            className="w-4 h-4 rounded"
-                          />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {type}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Selected Work Types Chips */}
-              {selectedWorkTypes.length > 0 && (
-                <div className="flex flex-wrap gap-2 p-2 mt-2 bg-indigo-50 dark:bg-indigo-900 rounded">
-                  {selectedWorkTypes.map((type) => (
-                    <div
-                      key={type}
-                      className="flex items-center gap-1 px-2 py-1 bg-indigo-200 dark:bg-indigo-700 text-indigo-900 dark:text-indigo-100 text-xs rounded-full"
-                    >
-                      <span>{type}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeWorkType(type)}
-                        className="text-indigo-900 dark:text-indigo-100 hover:font-bold"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Working Hours */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Preferred Working Hours *
-              </label>
-              <select
-                value={selectedHours}
-                onChange={(e) => setSelectedHours(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Select working hours</option>
-                {WORKING_HOURS.map((hour) => (
-                  <option key={hour} value={hour}>
-                    {hour}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {/* Bio */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
@@ -600,7 +519,10 @@ export default function LabourRegisterForm() {
                         alt="Profile Preview"
                         className="w-24 h-24 rounded-full object-cover"
                         onError={(e) => {
-                          console.error("Preview image failed to load:", profilePhotoPreview);
+                          console.error(
+                            "Preview image failed to load:",
+                            profilePhotoPreview,
+                          );
                           e.currentTarget.style.display = "none";
                         }}
                         onLoad={() => {
