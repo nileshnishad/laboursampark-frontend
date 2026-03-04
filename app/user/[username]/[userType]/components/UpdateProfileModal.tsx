@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateUserProfile } from "@/store/slices/authSlice";
 import { uploadFile } from "@/lib/s3-client";
 import ImageCropperModal from "@/app/components/ImageCropperModal";
+import LocationSelector from "@/app/components/LocationSelector";
+import { LocationData } from "@/lib/use-location";
 import type { AppDispatch, RootState } from "@/store/store";
 import dropdownsData from "@/data/dropdowns.json";
 
@@ -19,7 +21,7 @@ const {
 } = dropdownsData.contractor;
 
 type ProfileFormState = {
-  location: string;
+  location: LocationData | null;
   age: string;
   display: boolean;
   availability: boolean;
@@ -54,7 +56,7 @@ const toArray = (value: string): string[] => {
 };
 
 const getInitialFormState = (user: any): ProfileFormState => ({
-  location: typeof user?.location === "string" ? user.location : "",
+  location: user?.location && typeof user.location === "object" ? user.location : null,
   age: user?.age ? String(user.age) : "",
   display: user?.display === true,
   availability: user?.availability !== false,
@@ -100,6 +102,14 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
     }
   }, [isOpen, user]);
 
+  const updateField = React.useCallback(
+    (key: keyof ProfileFormState, value: any) => {
+      setForm((prev) => ({ ...prev, [key]: value }));
+    },
+    []
+  );
+
+  // Early return after all hooks are defined
   if (!isOpen || !user) {
     return null;
   }
@@ -110,10 +120,6 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
     { label: "Mobile", value: user.mobile || "Not specified" },
     { label: "Password", value: "********" },
   ];
-
-  const updateField = <K extends keyof ProfileFormState>(key: K, value: ProfileFormState[K]) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
 
   const toggleCsvOption = (key: "servicesOffered" | "coverageArea", value: string) => {
     const current = toArray(form[key]);
@@ -127,7 +133,7 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
     e.preventDefault();
 
     const commonPayload: Record<string, any> = {
-      location: form.location.trim(),
+      location: form.location,
       display: form.display,
       availability: form.availability,
       preferredLanguages: toArray(form.preferredLanguages),
@@ -301,12 +307,12 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
                 </div>
               )}
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Location</label>
-                <input
-                  value={form.location}
-                  onChange={(e) => updateField("location", e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">Location Details</label>
+                <LocationSelector
+                  onLocationChange={(location) => updateField("location", location)}
+                  initialLocation={form.location}
+                  required={false}
                 />
               </div>
               <div>

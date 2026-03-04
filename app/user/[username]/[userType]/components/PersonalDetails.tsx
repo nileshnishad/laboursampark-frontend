@@ -87,7 +87,6 @@ export default function PersonalDetails() {
   ];
 
   const otherDetails: DetailItem[] = [
-    { label: "Address", value: formatLocation(user.location) },
     { label: "Status", value: user.status },
     { label: "Profile Visible", value: user.display },
     { label: "Available", value: user.availability },
@@ -177,6 +176,62 @@ export default function PersonalDetails() {
           </div>
         )}
         <CompactGrid items={userType === "labour" ? labourDetails : contractorDetails} />
+      </CompactSection>
+
+      <CompactSection title="Location Details" defaultOpen>
+        {user.location && typeof user.location === "object" ? (
+          <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {user.location.city && (
+                <div className="px-1 py-1.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">City</p>
+                  <p className="text-xs font-medium text-gray-900 dark:text-white mt-0.5">{user.location.city}</p>
+                </div>
+              )}
+              {user.location.state && (
+                <div className="px-1 py-1.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">State</p>
+                  <p className="text-xs font-medium text-gray-900 dark:text-white mt-0.5">{user.location.state}</p>
+                </div>
+              )}
+              {user.location.pincode && (
+                <div className="px-1 py-1.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Postal Code</p>
+                  <p className="text-xs font-medium text-gray-900 dark:text-white mt-0.5">{user.location.pincode}</p>
+                </div>
+              )}
+              {user.location.country && (
+                <div className="px-1 py-1.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Country</p>
+                  <p className="text-xs font-medium text-gray-900 dark:text-white mt-0.5">{user.location.country}</p>
+                </div>
+              )}
+            </div>
+            {user.location.address && (
+              <div className="rounded-md border border-gray-200 dark:border-gray-700 px-2.5 py-2 mt-2">
+                <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">Full Address</p>
+                <p className="text-xs font-medium text-gray-900 dark:text-white whitespace-pre-wrap wrap-break-word">
+                  {user.location.address}
+                </p>
+              </div>
+            )}
+            {user.location.coordinates && (
+              <div className="rounded-md border border-gray-200 dark:border-gray-700 px-2.5 py-2 mt-2">
+                <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">Coordinates</p>
+                <p className="text-xs font-medium text-gray-900 dark:text-white font-mono">
+                  Latitude: {user.location.coordinates.latitude?.toFixed(6) || "N/A"}
+                </p>
+                <p className="text-xs font-medium text-gray-900 dark:text-white font-mono mt-1">
+                  Longitude: {user.location.coordinates.longitude?.toFixed(6) || "N/A"}
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="px-1 py-1.5">
+            <p className="text-xs text-gray-500 dark:text-gray-400 italic">No location information provided</p>
+          </div>
+        )}
       </CompactSection>
 
       <CompactSection title="Other Details" defaultOpen>

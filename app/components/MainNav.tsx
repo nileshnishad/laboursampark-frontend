@@ -1,12 +1,14 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 export default function MainNav() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   return (
     <nav className="fixed top-0 left-0 w-full bg-white/80 dark:bg-black/80 shadow z-50 backdrop-blur flex items-center justify-between px-4 md:px-8 py-3">
-      <div className="flex items-center gap-2">
-        <img src="/images/logo.jpg" alt="LabourSampark" className="w-35 h-10 rounded-lg" />
+      <div className="flex items-center gap-2 cursor-pointer">
+        <img src="/images/logo.jpg" alt="LabourSampark" onClick={()=>router.push("/")} className="w-35 h-10 rounded-lg" />
       </div>
       {/* Hamburger for mobile */}
       <button

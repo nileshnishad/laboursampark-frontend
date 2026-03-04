@@ -9,7 +9,7 @@ interface AadharContractorCardProps {
 export default function AadharContractorCard({ contractor }: AadharContractorCardProps) {
   const name = contractor.fullName || contractor.businessName || contractor.name || "Business";
   const type = contractor.userType || contractor.type || "Contractor";
-  const location = typeof contractor.location === "string" ? contractor.location : "Not specified";
+  const location = typeof contractor.location === "string" ? contractor.location : contractor.location?.address || "Not specified";
   const rating = contractor.rating || 0;
   const projects = contractor.completedJobs || contractor.projects || 0;
   const phone = contractor.mobile || contractor.phone || "N/A";
@@ -120,24 +120,7 @@ export default function AadharContractorCard({ contractor }: AadharContractorCar
           </div>
         )}
 
-        {/* Work Types */}
-        {workTypes.length > 0 && (
-          <div className="mb-3 sm:mb-4">
-            <div className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
-              Work Types
-            </div>
-            <div className="flex flex-wrap gap-1 sm:gap-2">
-              {workTypes.slice(0, 2).map((w: string) => (
-                <span
-                  key={w}
-                  className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs"
-                >
-                  {w}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+        
 
         {/* Contact Info */}
         <div className="space-y-0.5 sm:space-y-1 mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-gray-200 dark:border-gray-700">

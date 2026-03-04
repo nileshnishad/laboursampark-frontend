@@ -23,32 +23,65 @@ export default function LocationSelector({
   const [autoEditedLocation, setAutoEditedLocation] = useState<LocationData | null>(null);
   const [showAddressInput, setShowAddressInput] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const initializedRef = React.useRef(false);
+  const lastSentLocationRef = React.useRef<string | null>(null);
 
-  // Initialize with provided location
+  // Helper to serialize location for comparison
+  const serializeLocation = (loc: LocationData | null): string => {
+    if (!loc) return "null";
+    return JSON.stringify({
+      city: loc.city,
+      state: loc.state,
+      pincode: loc.pincode,
+      country: loc.country,
+      address: loc.address,
+      coordinates: loc.coordinates,
+    });
+  };
+
+  // Initialize with provided location - only on mount
   useEffect(() => {
-    if (initialLocation && isValidLocation(initialLocation)) {
-      onLocationChange(initialLocation);
+    if (!initializedRef.current && initialLocation && isValidLocation(initialLocation)) {
+      // If user already has a location, show the form directly with their existing data
+      setManualLocation(initialLocation);
+      setShowAddressInput(true);
+      lastSentLocationRef.current = serializeLocation(initialLocation);
+      initializedRef.current = true;
     }
   }, []);
 
-  // Update parent when location changes (from auto-detect)
+  // Handle auto-detected location
   useEffect(() => {
     if (location && isValidLocation(location)) {
       // Initialize autoEditedLocation with detected location
       if (!autoEditedLocation) {
         setAutoEditedLocation(location);
       }
-      onLocationChange(autoEditedLocation || location);
       setLocalError(null);
     }
-  }, [location, onLocationChange, autoEditedLocation]);
+  }, [location, autoEditedLocation]);
 
-  // Update parent when manual location changes
+  // Call parent only when manualLocation meaningfully changes
   useEffect(() => {
     if (manualLocation && isValidLocation(manualLocation)) {
-      onLocationChange(manualLocation);
+      const serialized = serializeLocation(manualLocation);
+      if (serialized !== lastSentLocationRef.current) {
+        onLocationChange(manualLocation);
+        lastSentLocationRef.current = serialized;
+      }
     }
-  }, [manualLocation, onLocationChange]);
+  }, [manualLocation]);
+
+  // Call parent only when autoEditedLocation meaningfully changes
+  useEffect(() => {
+    if (autoEditedLocation && isValidLocation(autoEditedLocation)) {
+      const serialized = serializeLocation(autoEditedLocation);
+      if (serialized !== lastSentLocationRef.current) {
+        onLocationChange(autoEditedLocation);
+        lastSentLocationRef.current = serialized;
+      }
+    }
+  }, [autoEditedLocation]);
 
   /**
    * Handle Enter Manually - Create empty location form
@@ -214,17 +247,39 @@ export default function LocationSelector({
 
           {/* Editable Location Form - Same for both Auto and Manual */}
           <div className="space-y-3 p-4 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-gray-700/50 dark:to-blue-900/30 rounded-lg border-2 border-blue-200 dark:border-blue-800">
-            <p className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide flex items-center gap-2">
-              <span>✏️</span>
-              {showAddressInput ? "Enter Location Details" : "Edit Location Details (Optional)"}
-            </p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-              {showAddressInput 
-                ? "Fill in your location details below" 
-                : "If something looks wrong, you can edit the fields below"}
-            </p>
-
-            {/* Address Fields Grid */}
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide flex items-center gap-2">
+                  <span>✏️</span>
+                  {showAddressInput && !initialLocation ? "Enter Location Details" : "Edit Location Details (Optional)"}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 italic mt-1">
+                  {showAddressInput && !initialLocation
+                    ? "Fill in your location details below"
+                    : "Your existing address is shown below. You can edit any field or get a new address."}
+                </p>
+              </div>
+              {initialLocation && (
+                <button
+                  type="button"
+                  onClick={handleDetectLocation}
+                  disabled={loading}
+                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-semibold text-xs whitespace-nowrap transition-colors flex items-center gap-1"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Detecting...
+                    </>
+                  ) : (
+                    <>
+                      <span>🔄</span>
+                      Get New Address
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
             <div className="grid grid-cols-2 gap-3">
               {/* City */}
               <div>

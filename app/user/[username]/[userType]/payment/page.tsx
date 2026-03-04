@@ -18,6 +18,7 @@ export default function PaymentPage() {
   
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
 
   const username = params.username as string;
   const userType = params.userType as UserType;
@@ -77,14 +78,14 @@ export default function PaymentPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-4 py-1.5 sm:py-2">
           <div className="flex justify-between items-start sm:items-center gap-2 sm:gap-3">
-            <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+            <div className="flex items-start sm:items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <div className="shrink-0">
                 <img
                   src={user?.companyLogoUrl || user?.profilePhotoUrl || `https://ui-avatars.com/api/?name=${username}&background=random&rounded=true`}
                   alt={username}
-                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-600 dark:border-blue-400 shadow-md"
+                  className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-blue-600 dark:border-blue-400 shadow-md"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${username}&background=random&rounded=true`;
                   }}
@@ -92,19 +93,17 @@ export default function PaymentPage() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate leading-tight">
-                  {userType === "labour" ? "Labour" : "Contractor"} Dashboard
+                <h1 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white truncate leading-tight">
+                  {userType === "labour" ? "Labour" : "Contractor"} Payment
                 </h1>
-                <div className="flex items-center justify-between gap-2 mt-0.5">
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 capitalize truncate leading-tight">
-                    Welcome, {username.replace(/-/g, " ")}
-                  </p>
-                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 capitalize truncate leading-tight">
+                  {username.replace(/-/g, " ")}
+                </p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-red-600 text-white rounded-lg font-semibold text-xs sm:text-sm hover:bg-red-700 transition-all whitespace-nowrap shrink-0"
+              className="px-2 sm:px-3 py-1 bg-red-600 text-white rounded-lg font-semibold text-xs hover:bg-red-700 transition-all whitespace-nowrap shrink-0"
             >
               Logout
             </button>
@@ -112,77 +111,103 @@ export default function PaymentPage() {
         </div>
       </header>
 
-      <main className="w-full max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-8">
-          {/* Heading */}
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Complete Your Verification
-          </h2>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-8">
-            Make a one-time payment to verify your profile. This makes your profile visible to potential clients 
-            and increases your chances of getting more work opportunities.
-          </p>
+      <main className="w-full max-w-2xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 sm:p-4">
+          {/* Heading & Description */}
+          <div className="mb-3">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">
+              {userType === "labour" 
+                ? "Make Yourself Visible to Contractors" 
+                : "Be Visible to Trusted Labours on LabourSampark"}
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              {userType === "labour"
+                ? "Verify your profile on LabourSampark to get discovered by contractors looking for skilled labour. Increase your earning potential through direct job opportunities."
+                : "Verify your contractor profile on LabourSampark to connect with verified and trusted labours. Manage projects and find qualified workers for your requirements."}
+            </p>
+          </div>
 
           {/* Benefits Section */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 sm:p-6 mb-8">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Benefits of Verification:</h3>
-            <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400 font-bold">✓</span>
-                <span>Profile visibility to hundreds of potential clients</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400 font-bold">✓</span>
-                <span>Higher priority in search results</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400 font-bold">✓</span>
-                <span>Direct contact from interested parties</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400 font-bold">✓</span>
-                <span>Verified badge on your profile</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400 font-bold">✓</span>
-                <span>3 months of premium visibility</span>
-              </li>
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 mb-3">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-xs sm:text-sm">
+              {userType === "labour" ? "Visibility Benefits on LabourSampark" : "Contractor Visibility & Project Management"}
+            </h3>
+            <ul className="space-y-1 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+              {userType === "labour" ? (
+                <>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">✓</span>
+                    <span>Appear in contractor searches on LabourSampark</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">✓</span>
+                    <span>Get direct project opportunities from verified contractors</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">✓</span>
+                    <span>Priority visibility for 3 months on LabourSampark</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">✓</span>
+                    <span>Verified LabourSampark badge for credibility</span>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">✓</span>
+                    <span>Browse and connect with verified labours on LabourSampark</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">✓</span>
+                    <span>Visibility in labour searches - Find trusted workers easily</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">✓</span>
+                    <span>Premium contractor badge on LabourSampark</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">✓</span>
+                    <span>3 months of verified contractor status</span>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
           {/* Amount Section */}
-          <div className="bg-linear-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 rounded-lg p-6 mb-8 border border-blue-200 dark:border-blue-800">
-            <p className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 mb-2">
-              One-time Payment for 3 Months
+          <div className="bg-linear-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 rounded-lg p-2 mb-3 border border-blue-200 dark:border-blue-800">
+            <p className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 mb-1">
+              {userType === "labour" ? "3 Months Visibility on LabourSampark" : "3 Months Contractor Listing on LabourSampark"}
             </p>
             <div className="flex items-baseline gap-2">
-              <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+              <p className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">
                 ₹{payableAmount}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                (including GST)
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                (includes GST)
               </p>
             </div>
           </div>
 
           {/* Payment Info */}
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-8 border border-green-200 dark:border-green-800">
-            <p className="text-sm text-green-700 dark:text-green-300 flex items-center gap-2">
-              <span className="text-lg">🔒</span>
-              Secure payment via Razorpay - PCI-DSS compliant & SSL encrypted
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 mb-3 border border-green-200 dark:border-green-800">
+            <p className="text-xs text-green-700 dark:text-green-300 flex items-center gap-2">
+              <span>🔒</span>
+              <span>100% secure payments via Razorpay on LabourSampark</span>
             </p>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="flex flex-col sm:flex-row gap-2 mb-4">
             <button
               onClick={() => setIsPaymentModalOpen(true)}
               disabled={isProcessing}
-              className="flex-1 px-6 py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg font-semibold text-base sm:text-lg transition-colors flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg font-semibold text-sm sm:text-base transition-colors flex items-center justify-center gap-2"
             >
               {isProcessing ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   Processing...
                 </>
               ) : (
@@ -192,32 +217,72 @@ export default function PaymentPage() {
             <button
               onClick={handleBack}
               disabled={isProcessing}
-              className="flex-1 sm:flex-none px-6 py-4 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 text-gray-800 dark:text-white rounded-lg font-semibold transition-colors"
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 text-gray-800 dark:text-white rounded-lg font-semibold text-sm transition-colors"
             >
-              Back to Profile
+              Go Back
             </button>
           </div>
 
+          {/* Info Note for Future Features */}
+          {userType === "contractor" && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 mt-3 border border-blue-200 dark:border-blue-800">
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                <span className="font-semibold">💡 Coming Soon:</span> Project enquiry features will be available soon on LabourSampark. Your verified contractor status gives you early access to these premium features.
+              </p>
+            </div>
+          )}
+
           {/* FAQ Section */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Frequently Asked Questions</h3>
-            <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
-              <div>
-                <p className="font-semibold text-gray-900 dark:text-white mb-1">Is my payment secure?</p>
-                <p>Yes, we use Razorpay which is PCI-DSS compliant and uses industry-standard SSL encryption.</p>
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900 dark:text-white mb-1">What payment methods are accepted?</p>
-                <p>We accept UPI, Credit/Debit Cards, and Net Banking through Razorpay.</p>
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900 dark:text-white mb-1">Can I get a refund?</p>
-                <p>Refunds are processed within 5-7 business days if requested within 30 days of payment.</p>
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900 dark:text-white mb-1">How long is the verification valid?</p>
-                <p>Verification is valid for 3 months from the date of payment. You can renew anytime.</p>
-              </div>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2">Quick FAQs</h3>
+            <div className="space-y-2">
+              {[
+                {
+                  question: "Is payment secure on LabourSampark?",
+                  answer: "Yes. We use Razorpay with PCI-DSS Level 1 compliance - the highest security standard.",
+                },
+                {
+                  question: "What payment methods are accepted?",
+                  answer: "UPI, Debit/Credit Cards, Net Banking - all major payment options are available on LabourSampark.",
+                },
+                {
+                  question: "How long is verification valid?",
+                  answer: `3 months from payment date. You can renew your ${userType === "labour" ? "labour" : "contractor"} profile anytime.`,
+                },
+                {
+                  question: "What if I want to cancel?",
+                  answer: "Refunds are processed within 30 days of payment. Contact LabourSampark support for assistance.",
+                },
+              ].map((faq, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+                >
+                  <button
+                    onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between text-left transition-colors"
+                  >
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                      {faq.question}
+                    </p>
+                    <svg
+                      className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform shrink-0 ${
+                        expandedFAQ === index ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </button>
+                  {expandedFAQ === index && (
+                    <div className="px-3 py-2 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-xs text-gray-600 dark:text-gray-300">{faq.answer}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>

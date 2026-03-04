@@ -24,10 +24,12 @@ interface VisibleUserApiItem {
   coverageArea?: string[];
   servicesOffered?: string[];
   serviceCategories?: string[];
-  location?: string | { address?: string };
+  location?: string | { address?: string; city?: string; state?: string; pincode?: string; coordinates?: any };
   preferredWorkingHours?: string;
   status?: string;
   connectionStatus?: string;
+  city?: string;
+  state?: string;
 }
 
 interface VisibleUsersApiResponse {
@@ -53,6 +55,8 @@ export interface VisibleUser extends VisibleUserApiItem {
   completedJobs: number;
   rating: number;
   status: string;
+  city: string;
+  state?: string;
 }
 
 export interface VisibleUsersState {
@@ -88,6 +92,7 @@ export const fetchVisibleUsers = createAsyncThunk(
           typeof item.location === 'string'
             ? item.location
             : item.location?.address || 'Not specified',
+        city: typeof item.location === 'string' ? 'Not specified' : item.location?.city || 'Not specified',
         preferredWorkingHours: item.preferredWorkingHours || 'Flexible',
         businessName: item.businessName || item.fullName || 'Business',
         registrationNumber: item.registrationNumber || 'Not available',
@@ -99,6 +104,7 @@ export const fetchVisibleUsers = createAsyncThunk(
         completedJobs: item.completedJobs ?? 0,
         rating: item.rating ?? 0,
         status: item.status || item.connectionStatus || 'active',
+        state: typeof item.location === 'string' ? 'Not specified' : item.location?.state || 'Not specified',
       }));
 
       return mappedUsers;

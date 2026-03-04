@@ -11,7 +11,7 @@ export default function AadharLabourCard({ labour }: AadharLabourCardProps) {
   const experience = labour.experience || labour.experienceRange || "Not specified";
   const phone = labour.mobile || labour.phone || "N/A";
   const email = labour.email || "N/A";
-  const location = typeof labour.location === "string" ? labour.location : "Not specified";
+  const location = typeof labour.location === "string" ? labour.location : labour.location?.address || "Not specified";
   const workingHours = labour.preferredWorkingHours || labour.workingHours || "Flexible";
   const rating = labour.rating || 4.5;
   const completedJobs = labour.completedJobs || labour.projects || 0;
