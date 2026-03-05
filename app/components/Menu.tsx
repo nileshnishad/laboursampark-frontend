@@ -4,6 +4,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { buildUserDashboardPath } from "@/lib/user-route";
+import { useLanguage } from "@/app/context/LanguageContext";
+import LanguageSelector from "./LanguageSelector";
 
 const sections = [
   { id: "hero", label: "Home", path: "/" },
@@ -108,6 +110,9 @@ export default function Menu() {
           ))}
         </ul>
         
+        {/* Language Selector */}
+        <LanguageSelector compact />
+        
         {/* Login / Dashboard Button */}
         {user ? (
           <button
@@ -146,6 +151,14 @@ export default function Menu() {
               </button>
             </li>
           ))}
+          
+          {/* Language Selector for Mobile */}
+          <li className="border-t border-gray-300 dark:border-gray-700 pt-4 mt-2">
+            <div className="mb-4">
+              <LanguageSelector compact />
+            </div>
+          </li>
+          
           {/* Mobile Login Button */}
           <li className="border-t border-gray-300 dark:border-gray-700 pt-4 mt-2">
             {user ? (

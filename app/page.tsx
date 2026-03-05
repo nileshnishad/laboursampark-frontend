@@ -1,3 +1,5 @@
+"use client";
+
 import Menu from "./components/Menu";
 import HeroSection from "./components/HeroSection";
 import LaboursSection from "./components/LaboursSection";
@@ -5,6 +7,7 @@ import ContractorsSection from "./components/ContractorsSection";
 import AboutSection from "./components/AboutSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
+import LanguageSelector from "./components/LanguageSelector";
 import { primaryKeywords, secondaryKeywords, metaDescriptions } from "@/lib/seo-config";
 import SEOHead from "./components/SEOHead";
 
@@ -23,6 +26,11 @@ export default function Home() {
         ogUrl="https://laboursampark.com"
       />
       <main className="bg-zinc-50 dark:bg-black min-h-screen w-full font-sans">
+        {/* Language Selector - Floating in Top Right */}
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSelector />
+        </div>
+        
         <Menu />
         <HeroSection />
         <LaboursSection />

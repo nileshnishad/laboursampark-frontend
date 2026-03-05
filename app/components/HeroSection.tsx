@@ -1,8 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { t } from "@/lib/i18n";
 
 export default function HeroSection() {
+  const { locale } = useLanguage();
   const [searchType, setSearchType] = useState<"labour" | "contractor">("labour");
   const [query, setQuery] = useState("");
   const router = useRouter();
@@ -38,11 +41,11 @@ export default function HeroSection() {
       <div className="relative z-10 w-full flex flex-col items-center justify-center">
       {/* Header Section */}
       <div className="w-full max-w-3xl mb-8 sm:mb-12 md:mb-16">
-        <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-5xl font-extrabold text-center bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-4 sm:mb-6">
-          Connect Labours & Contractors
+        <h1 className="text-xl sm:text-xl md:text-2xl lg:text-4xl font-extrabold text-center bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-4 sm:mb-6">
+          {t(locale, "home.heroHeading")}
         </h1>
         <p className="text-base sm:text-md md:text-md text-gray-700 dark:text-gray-300 text-center max-w-3xl mx-auto mb-8 sm:mb-10">
-          Find skilled plumbers, construction workers, painters, electricians & more. Connect with experienced contractors for all your project needs.
+          {t(locale, "home.heroDesc")}
         </p>
 
         {/* Search Section */}
@@ -57,7 +60,7 @@ export default function HeroSection() {
                 }`}
                 onClick={() => setSearchType("labour")}
               >
-                Find Labour
+                {t(locale, "labour.findWork")}
               </button>
               <button
                 className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
@@ -67,7 +70,7 @@ export default function HeroSection() {
                 }`}
                 onClick={() => setSearchType("contractor")}
               >
-                Find Contractor
+                {t(locale, "contractor.findLabour")}
               </button>
             </div>
             <input
@@ -82,7 +85,7 @@ export default function HeroSection() {
               onClick={handleSearch}
               className="px-6 sm:px-8 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 text-sm sm:text-base whitespace-nowrap"
             >
-              Search
+              {searchType === "labour" ? t(locale, "home.exploreLabours") : t(locale, "home.exploreContractors")}
             </button>
           </div>
         </div>
@@ -92,10 +95,10 @@ export default function HeroSection() {
       <div className="w-full max-w-6xl mt-4 sm:mt-12 md:mt-10">
         <div className="text-center mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 sm:mb-4">
-            Don't Have an Account Yet?
+            {t(locale, "home.contactTitle")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
-            Join thousands of professionals and get access to exclusive opportunities
+            {t(locale, "home.contactDesc")}
           </p>
         </div>
 
@@ -110,7 +113,7 @@ export default function HeroSection() {
                 <span className="text-3xl sm:text-4xl">👷</span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold text-white">
-                Join as Labour
+                {t(locale, "labour.joinAs")}
               </h3>
             </div>
           </button>
@@ -125,7 +128,7 @@ export default function HeroSection() {
                 <span className="text-3xl sm:text-4xl">🏢</span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold text-white">
-                Join as Contractor
+                {t(locale, "contractor.joinAs")}
               </h3>
             </div>
           </button>
