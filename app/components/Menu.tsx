@@ -26,7 +26,7 @@ export default function Menu() {
   useEffect(() => {
     const handleScroll = () => {
       if (!isHomePage) return; // Only track scroll on home page
-      
+
       let current = "hero";
       for (const section of sections) {
         const el = document.getElementById(section.id);
@@ -44,7 +44,7 @@ export default function Menu() {
       window.addEventListener("scroll", handleScroll, { passive: true });
       handleScroll();
     }
-    
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isHomePage]);
 
@@ -60,7 +60,7 @@ export default function Menu() {
     };
   }, [open]);
 
-  const handleNavClick = (section: typeof sections[0]) => {
+  const handleNavClick = (section: (typeof sections)[0]) => {
     if (isHomePage) {
       // If on home page, scroll to section
       const element = document.getElementById(section.id);
@@ -70,27 +70,51 @@ export default function Menu() {
       }
     } else {
       // If not on home page, redirect to home page with hash
-      router.push(section.id === "hero" ? "/" : `/${section.id === "labours" ? "labours/all" : section.id === "contractors" ? "contractors/all" : ""}`);
+      router.push(
+        section.id === "hero"
+          ? "/"
+          : `/${section.id === "labours" ? "labours/all" : section.id === "contractors" ? "contractors/all" : ""}`,
+      );
     }
     setOpen(false);
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-white/80 dark:bg-black/80 shadow z-50 backdrop-blur flex items-center justify-between px-4 md:px-8 py-3">
+    <nav className="fixed top-0 left-0 w-full bg-white/80 dark:bg-black/80 shadow z-50 backdrop-blur flex items-center justify-between p-2 md:px-8">
       {/* Logo */}
-      <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/")}>
-        <img src="/images/logo.jpg" alt="LabourSampark" className="w-35 h-10 rounded-lg" />
+      <div
+        className="flex items-center gap-2 cursor-pointer"
+        onClick={() => router.push("/")}
+      >
+        <img
+          src="/images/logo.jpg"
+          alt="LabourSampark"
+          className="w-35 h-10 rounded-lg"
+        />
       </div>
       {/* Hamburger for mobile */}
-      <button
-        className="md:hidden flex flex-col justify-center items-center w-10 h-10 focus:outline-none"
-        aria-label="Open menu"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span className={`block w-6 h-0.5 bg-blue-700 mb-1 transition-all ${open ? 'rotate-45 translate-y-2' : ''}`}></span>
-        <span className={`block w-6 h-0.5 bg-blue-700 mb-1 transition-all ${open ? 'opacity-0' : ''}`}></span>
-        <span className={`block w-6 h-0.5 bg-blue-700 transition-all ${open ? '-rotate-45 -translate-y-2' : ''}`}></span>
-      </button>
+
+      <div className="flex items-center md:hidden">
+        <div>
+          <LanguageSelector compact />
+        </div>
+
+        <button
+          className=" flex flex-col justify-center items-center w-10 h-10 focus:outline-none"
+          aria-label="Open menu"
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span
+            className={`block w-6 h-0.5 bg-blue-700 mb-1 transition-all ${open ? "rotate-45 translate-y-2" : ""}`}
+          ></span>
+          <span
+            className={`block w-6 h-0.5 bg-blue-700 mb-1 transition-all ${open ? "opacity-0" : ""}`}
+          ></span>
+          <span
+            className={`block w-6 h-0.5 bg-blue-700 transition-all ${open ? "-rotate-45 -translate-y-2" : ""}`}
+          ></span>
+        </button>
+      </div>
       {/* Desktop menu */}
       <div className="hidden md:flex gap-8 items-center">
         <ul className="flex gap-8 text-gray-700 dark:text-gray-200 font-medium">
@@ -109,10 +133,10 @@ export default function Menu() {
             </li>
           ))}
         </ul>
-        
+
         {/* Language Selector */}
         <LanguageSelector compact />
-        
+
         {/* Login / Dashboard Button */}
         {user ? (
           <button
@@ -132,7 +156,10 @@ export default function Menu() {
       </div>
       {/* Mobile menu overlay for better UX */}
       {open && (
-        <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setOpen(false)}></div>
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setOpen(false)}
+        ></div>
       )}
       {/* Mobile menu */}
       {open && (
@@ -151,14 +178,14 @@ export default function Menu() {
               </button>
             </li>
           ))}
-          
+
           {/* Language Selector for Mobile */}
           <li className="border-t border-gray-300 dark:border-gray-700 pt-4 mt-2">
             <div className="mb-4">
               <LanguageSelector compact />
             </div>
           </li>
-          
+
           {/* Mobile Login Button */}
           <li className="border-t border-gray-300 dark:border-gray-700 pt-4 mt-2">
             {user ? (

@@ -12,28 +12,29 @@ interface LanguageSelectorProps {
 export default function LanguageSelector({ compact = false }: LanguageSelectorProps) {
   const { locale, setLocale } = useLanguage();
 
-  const languages: { code: Locale; name: string; flag: string }[] = [
-    { code: "en", name: "En", flag: "🇬🇧" },
-    { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
-    { code: "mr", name: "मराठी", flag: "🇮🇳" },
+  const languages: { code: Locale; name: string; shortName: string; flag: string }[] = [
+    { code: "en", name: "En", shortName: "En", flag: "🇬🇧" },
+    { code: "hi", name: "हिन्दी", shortName: "Hi", flag: "🇮🇳" },
+    { code: "mr", name: "मराठी", shortName: "Mr", flag: "🇮🇳" },
   ];
 
   if (compact) {
     // Compact version for header
     return (
       <div className="flex items-center gap-1">
-        {languages.map(({ code, name, flag }) => (
+        {languages.map(({ code, name, shortName, flag }) => (
           <button
             key={code}
             onClick={() => setLocale(code)}
-            className={`px-2 py-1.5 rounded text-xs font-medium transition-all whitespace-nowrap ${
+            className={`sm:px-2 sm:py-1.5 p-1 rounded text-xs font-medium transition-all whitespace-nowrap ${
               locale === code
                 ? "bg-linear-to-br from-green-400 to-green-600 text-white shadow-md"
                 : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
             title={name}
           >
-            {flag} {name}
+            <span className="hidden sm:inline">{flag} {name}</span>
+            <span className="sm:hidden">{flag} {shortName}</span>
           </button>
         ))}
       </div>
