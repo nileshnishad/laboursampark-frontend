@@ -9,6 +9,7 @@ import ContractorCard from "./components/ContractorCard";
 import LabourCard from "./components/LabourCard";
 import FilterMenu from "./components/FilterMenu";
 import UserProfile from "./components/UserProfile";
+import UnifiedSearchInput from "@/app/components/common/UnifiedSearchInput";
 import type { AppDispatch, RootState } from "@/store/store";
 
 type UserType = "labour" | "contractor";
@@ -26,6 +27,7 @@ export default function UserDashboardPage() {
   const username = params.username as string;
   const userType = params.userType as UserType;
   const [activeFilter, setActiveFilter] = useState<FilterType>("active");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleLogout = () => {
     dispatch(logout());
@@ -55,7 +57,25 @@ export default function UserDashboardPage() {
 
   const isLabour = userType === "labour";
   const isProfileView = activeFilter === "profile";
-  const filteredData = visibleUsers.filter((item) => item.status === activeFilter);
+  
+  // Filter data by status first
+  let filteredData = visibleUsers.filter((item) => item.status === activeFilter);
+
+  // Apply unified search across name, location, and skills
+  if (searchQuery.trim()) {
+    const query = searchQuery.toLowerCase();
+    filteredData = filteredData.filter((item) => {
+      const name = (item.fullName || "").toLowerCase();
+      const location = (item.location || item.city || "").toLowerCase();
+      const skills = (item.skills || []).map((s: string) => s.toLowerCase()).join(" ");
+      
+      return (
+        name.includes(query) ||
+        location.includes(query) ||
+        skills.includes(query)
+      );
+    });
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -142,6 +162,8 @@ export default function UserDashboardPage() {
         />
       </div>
 
+      
+
       {/* Profile Visibility Banner - After Header */}
       {user?.display === false && (
         <div className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4 border-b-2 bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-700">
@@ -166,6 +188,17 @@ export default function UserDashboardPage() {
           </div>
         </div>
       )}
+      {/* Advanced Search & Filter Section */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-12 lg:px-8 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto sm:px-10">
+          <UnifiedSearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            label="🔍 Search by Name, Location, or Skills"
+            placeholder="Type to search... (e.g., 'John', 'Mumbai', 'Plumbing')"
+          />
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-5 pb-6">
@@ -184,7 +217,7 @@ export default function UserDashboardPage() {
                 <p className="text-red-600 dark:text-red-400 text-lg">{usersError}</p>
               </div>
             ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredData.length > 0 ? (
                 isLabour ? (
                   filteredData.map((contractor: any) => (
