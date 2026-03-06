@@ -143,7 +143,6 @@ export default function ContractorsSection() {
               <VisitingCard
                 contractor={c}
                 onConnect={async (id) => {
-                  console.log("Connecting with contractor:", id);
                   // Add your connection logic here
                 }}
                 onViewProfile={isLoggedIn ? undefined : () => handleGuestViewAttempt()}

@@ -86,11 +86,7 @@ export default function ContractorRegisterForm() {
     );
   };
 
-  const toggleCoverage = (area: string) => {
-    setSelectedCoverage((prev) =>
-      prev.includes(area) ? prev.filter((a) => a !== area) : [...prev, area],
-    );
-  };
+ 
 
   const removeService = (service: string) => {
     setSelectedServices((prev) => prev.filter((s) => s !== service));
@@ -435,11 +431,11 @@ export default function ContractorRegisterForm() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Registration Number
+                  Registration Number / GST Number
                 </label>
                 <input
                   type="text"
-                  placeholder="Business registration"
+                  placeholder="Business registration / GST Number"
                   value={registrationNumber}
                   onChange={(e) => setRegistrationNumber(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
@@ -601,87 +597,6 @@ export default function ContractorRegisterForm() {
                         type="button"
                         onClick={() => removeService(service)}
                         className="text-indigo-900 dark:text-indigo-100 hover:font-bold"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Coverage Area Dropdown */}
-            <div data-dropdown="coverage">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Service Coverage Area (Select Multiple) *
-              </label>
-              <div className="relative">
-                {/* Dropdown Button */}
-                <button
-                  type="button"
-                  onClick={() => setCoverageDropdownOpen(!coverageDropdownOpen)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white bg-white text-left flex justify-between items-center"
-                >
-                  <span>
-                    {selectedCoverage.length > 0
-                      ? `${selectedCoverage.length} selected`
-                      : "Select coverage areas"}
-                  </span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      coverageDropdownOpen ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </button>
-
-                {/* Dropdown Menu */}
-                {coverageDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-                    <div className="max-h-48 overflow-y-auto p-2 space-y-2">
-                      {COVERAGE_AREA.map((area) => (
-                        <label
-                          key={area}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedCoverage.includes(area)}
-                            onChange={() => toggleCoverage(area)}
-                            className="w-4 h-4 rounded"
-                          />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {area}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Selected Coverage Chips */}
-              {selectedCoverage.length > 0 && (
-                <div className="flex flex-wrap gap-2 p-2 mt-2 bg-purple-50 dark:bg-purple-900 rounded">
-                  {selectedCoverage.map((area) => (
-                    <div
-                      key={area}
-                      className="flex items-center gap-1 px-2 py-1 bg-purple-200 dark:bg-purple-700 text-purple-900 dark:text-purple-100 text-xs rounded-full"
-                    >
-                      <span>{area}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeCoverage(area)}
-                        className="text-purple-900 dark:text-purple-100 hover:font-bold"
                       >
                         ×
                       </button>

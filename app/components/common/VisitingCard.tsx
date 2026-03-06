@@ -19,7 +19,6 @@ export default function VisitingCard({
   className = "",
 }: VisitingCardProps) {
 
-    console.log("Rendering VisitingCard with contractor:", contractor);
   const [sending, setSending] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const name = contractor.fullName || contractor.businessName || contractor.name || "Business";

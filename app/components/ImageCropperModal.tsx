@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import ReactEasyCrop, { Area, Point } from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
 
@@ -26,6 +26,15 @@ const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
   const [livePreviewUrl, setLivePreviewUrl] = useState<string>("");
   const [previewDimensions, setPreviewDimensions] = useState<{ width: number; height: number } | null>(null);
   const previewUrlRef = useRef<string | null>(null);
+
+  // Clean up preview object URL when modal unmounts.
+  useEffect(() => {
+    return () => {
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+      }
+    };
+  }, []);
 
   const onCropChange = (crop: Point) => {
     setCrop(crop);
@@ -188,20 +197,33 @@ const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-blue-600 px-6 py-4">
-          <h3 className="text-lg font-bold text-white">Crop Your Photo</h3>
-          <p className="text-blue-100 text-sm mt-1">
-            Adjust the image size and position as needed
-          </p>
+        <div className="bg-blue-600 px-4 sm:px-6 py-3 sm:py-4 shrink-0">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-white">Crop Your Photo</h3>
+              <p className="text-blue-100 text-xs sm:text-sm mt-1">
+                Adjust the image size and position as needed
+              </p>
+            </div>
+            <button
+              onClick={onCancel}
+              disabled={isProcessing}
+              className="text-white/90 hover:text-white text-xl leading-none px-2 py-1 rounded disabled:opacity-50"
+              aria-label="Close crop modal"
+              title="Close"
+            >
+              ×
+            </button>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
+        <div className="p-3 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto flex-1">
           {/* Crop Container */}
-          <div className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden" style={{ height: "400px" }}>
+          <div className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden h-[42vh] sm:h-100">
             <ReactEasyCrop
               image={imageSrc}
               crop={crop}
@@ -234,7 +256,7 @@ const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
           </div>
 
           {/* Preview */}
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <div>
               <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">Original</p>
               <div className="border-2 border-blue-400 rounded-lg p-1 bg-white dark:bg-gray-700">
@@ -301,18 +323,18 @@ const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex gap-3 justify-end border-t border-gray-200 dark:border-gray-600">
+        <div className="bg-gray-50 dark:bg-gray-700 px-3 sm:px-6 py-3 sm:py-4 flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 justify-end border-t border-gray-200 dark:border-gray-600 shrink-0">
           <button
             onClick={onCancel}
             disabled={isProcessing}
-            className="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-100 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
+            className="w-full sm:w-auto px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-100 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleCropSubmit}
             disabled={isProcessing}
-            className="px-6 py-2 bg-linear-to-r from-green-600 to-green-500 text-white rounded-lg font-semibold text-sm hover:shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-2 bg-linear-to-r from-green-600 to-green-500 text-white rounded-lg font-semibold text-sm hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isProcessing ? (
               <>

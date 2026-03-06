@@ -131,7 +131,6 @@ export default function LaboursSection() {
               <IDCard
                 labour={l}
                 onConnect={async (id) => {
-                  console.log("Connecting with labour:", id);
                   // Add your connection logic here
                 }}
                 onViewProfile={isLoggedIn ? undefined : () => handleGuestViewAttempt()}
