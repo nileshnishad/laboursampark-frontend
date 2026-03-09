@@ -78,11 +78,12 @@ function LoginContent() {
   }, [success, user, dispatch, router, searchParams, userType]);
 
   return (
-    <div className="min-h-screen relative py-12 px-4" style={{
+    <div className="min-h-screen relative py-10 px-2" style={{
       backgroundImage: "url('/images/labourimg.jpg')",
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed'
+      backgroundSize: 'contain',
+      backgroundPosition: 'bottom',
+      backgroundAttachment: 'fixed',
+      backgroundRepeat: 'no-repeat',
     }}>
       {/* Background Overlay */}
       {/* <div className="absolute inset-0 bg-black/40 dark:bg-black/60"></div> */}
@@ -102,7 +103,7 @@ function LoginContent() {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
             Welcome Back
           </h1>
