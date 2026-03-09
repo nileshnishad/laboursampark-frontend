@@ -127,7 +127,7 @@ export default function HeroSection() {
             onClick={() => handleRegisterClick("contractor")}
             className="group hover:shadow-2xl transition-all duration-300 cursor-pointer"
           >
-            <div className="bg-linear-to-r from-indigo-500 to-indigo-600 p-6 sm:p-8 text-center rounded-2xl shadow-lg hover:shadow-xl">
+            <div className="bg-linear-to-r from-green-500 to-green-600 p-6 sm:p-8 text-center rounded-2xl shadow-lg hover:shadow-xl">
               <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white bg-opacity-20 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl sm:text-4xl">🏢</span>
               </div>
