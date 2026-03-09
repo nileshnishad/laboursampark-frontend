@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { getToken } from "@/lib/api-service";
 import UserProfileModal from "./UserProfileModal";
 
 interface IDCardProps {
@@ -21,6 +22,12 @@ export default function IDCard({
 
   const [sending, setSending] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsLoggedIn(Boolean(getToken()));
+  }, []);
+
   const name = labour.fullName || labour.name || "Labour";
   const experience =
     labour.experience || labour.experienceRange || "Not specified";
@@ -43,6 +50,23 @@ export default function IDCard({
   const verified = labour.aadharVerified || labour.verified || false;
   const profilePic = labour.profilePic || labour.profilePhotoUrl || "";
   const feedback = labour.feedback || [];
+
+  const maskPhone = (phoneValue: string) => {
+    if (!phoneValue || phoneValue === "N/A") return "N/A";
+    const digits = phoneValue.replace(/\D/g, "");
+    if (digits.length <= 3) return "xxxxxx";
+    return `xxxxxx${digits.slice(-3)}`;
+  };
+
+  const maskEmail = (emailValue: string) => {
+    if (!emailValue || emailValue === "N/A" || !emailValue.includes("@")) return "N/A";
+    const [localPart, domainPart] = emailValue.split("@");
+    const lastThree = localPart.slice(-3);
+    return `xxxxxx${lastThree}@${domainPart}`;
+  };
+
+  const displayPhone = isLoggedIn ? phone : maskPhone(phone);
+  const displayEmail = isLoggedIn ? email : maskEmail(email);
 
   const handleConnect = async () => {
     if (onConnect) {
@@ -76,7 +100,7 @@ export default function IDCard({
       <div className="h-1 bg-linear-to-r from-blue-600 to-blue-400"></div>
 
       {/* ID Card Style Content - Vertical Layout - Compact */}
-      <div className="p-1 sm:p-1 flex flex-col items-center space-y-1">
+      <div className="p-1 sm:p-1.5 flex flex-col items-center space-y-1">
         {/* Photo Section */}
         <div className="shrink-0">
           {profilePic ? (
@@ -112,10 +136,10 @@ export default function IDCard({
         {/* Contact Info */}
         <div className="w-full text-xs text-gray-600 dark:text-gray-400 space-y-0.5 text-center">
           <div className="truncate">
-            <span className="font-semibold">📧</span> {email}
+            <span className="font-semibold">📧</span> {displayEmail}
           </div>
           <div className="truncate">
-            <span className="font-semibold">📱</span> {phone}
+            <span className="font-semibold">📱</span> {displayPhone}
           </div>
           <div className="truncate">
             <span className="font-semibold">📍</span> {location}

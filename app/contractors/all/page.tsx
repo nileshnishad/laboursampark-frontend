@@ -98,14 +98,17 @@ export default function AllContractorsPage() {
   });
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 md:pt-32 pb-8 md:pb-16 px-3 sm:px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-green-900 dark:text-white mb-3">All Contractors</h1>
-          <p className="text-gray-700 dark:text-gray-300 max-w-2xl">Browse all available contractors in our network. Find verified professionals for your construction and project needs.</p>
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-18 md:pt-20 pb-4 px-2 sm:px-3">
+      <div className="max-w-7xl mx-auto h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] flex flex-col">
+        <div className="sticky top-0 z-20 bg-gray-50 dark:bg-gray-900 pb-3 border-b border-gray-200 dark:border-gray-700">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-green-900 dark:text-white mb-1">
+            All Contractors
+          </h1>
+          <p className="text-gray-700 text-xs dark:text-gray-300">
+            Browse all available contractors in our network. Find verified professionals for your construction and project needs.
+          </p>
 
-          <div className="mt-5 max-w-2xl">
+          <div className="mt-3 max-w-2xl">
             <UnifiedSearchInput
               value={searchQuery}
               onChange={setSearchQuery}
@@ -115,43 +118,48 @@ export default function AllContractorsPage() {
           </div>
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, index) => (
-              <div key={index} className="h-full">
-                <Skeleton type="card" />
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="flex-1 overflow-y-auto pt-4 pr-1">
+          {/* Loading State */}
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="h-full">
+                  <Skeleton type="card" />
+                </div>
+              ))}
+            </div>
+          )}
 
-        {/* Error State */}
-        {error && !loading && (
-          <div className="flex justify-center items-center py-20">
-            <div className="text-red-600 dark:text-red-400">Error: {error}</div>
-          </div>
-        )}
+          {/* Error State */}
+          {error && !loading && (
+            <div className="flex justify-center items-center py-20">
+              <div className="text-red-600 dark:text-red-400">Error: {error}</div>
+            </div>
+          )}
 
-        {/* Contractors Grid */}
-        {!loading && !error && filteredContractors.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredContractors.map((c) => (
-              <div key={c._id} className="h-full">
-                <VisitingCard contractor={c} onViewProfile={isLoggedIn ? undefined : () => handleGuestViewAttempt()}/>
-              </div>
-            ))}
-          </div>
-        )}
+          {/* Contractors Grid */}
+          {!loading && !error && filteredContractors.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredContractors.map((c) => (
+                <div key={c._id} className="h-full">
+                  <VisitingCard
+                    contractor={c}
+                    onViewProfile={isLoggedIn ? undefined : () => handleGuestViewAttempt()}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
-        {/* Empty State */}
-        {!loading && !error && filteredContractors.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-600 dark:text-gray-300">
-              {searchQuery.trim() ? "No contractors match your search." : "No contractors found."}
-            </p>
-          </div>
-        )}
+          {/* Empty State */}
+          {!loading && !error && filteredContractors.length === 0 && (
+            <div className="text-center py-20">
+              <p className="text-gray-600 dark:text-gray-300">
+                {searchQuery.trim() ? "No contractors match your search." : "No contractors found."}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );

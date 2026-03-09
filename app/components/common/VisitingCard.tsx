@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { getToken } from "@/lib/api-service";
 import ContractorProfileModal from "./ContractorProfileModal";
 
 interface VisitingCardProps {
@@ -21,7 +22,14 @@ export default function VisitingCard({
 
   const [sending, setSending] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const name = contractor.fullName || contractor.businessName || contractor.name || "Business";
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsLoggedIn(Boolean(getToken()));
+  }, []);
+
+  const name = contractor.fullName || contractor.name || "Business";
+  const companyName = contractor.businessName || contractor.companyName || "";
   const type = contractor.userType || contractor.type || "Contractor";
   const rawLocation =
     contractor.city || contractor.location || "Not specified";
@@ -33,8 +41,6 @@ export default function VisitingCard({
   const projects = contractor.completedJobs || contractor.projects || 0;
   const phone = contractor.mobile || contractor.phone || "N/A";
   const email = contractor.email || "N/A";
-  const isActuallyConnected = contractor.status === "connected";
-  const isActuallyPending = contractor.status === "pending";
   const profilePic = contractor.companyLogoUrl || contractor.profilePic || contractor.profilePhotoUrl || "";
   const specialization =
     contractor.serviceCategories ||
@@ -46,6 +52,23 @@ export default function VisitingCard({
     ? specialization
     : [specialization].filter(Boolean);
   const experience = contractor.experienceRange || contractor.experience || "N/A";
+
+  const maskPhone = (phoneValue: string) => {
+    if (!phoneValue || phoneValue === "N/A") return "N/A";
+    const digits = phoneValue.replace(/\D/g, "");
+    if (digits.length <= 3) return "xxxxxx";
+    return `xxxxxx${digits.slice(-3)}`;
+  };
+
+  const maskEmail = (emailValue: string) => {
+    if (!emailValue || emailValue === "N/A" || !emailValue.includes("@")) return "N/A";
+    const [localPart, domainPart] = emailValue.split("@");
+    const lastThree = localPart.slice(-3);
+    return `xxxxxx${lastThree}@${domainPart}`;
+  };
+
+  const displayPhone = isLoggedIn ? phone : maskPhone(phone);
+  const displayEmail = isLoggedIn ? email : maskEmail(email);
 
   const getInitials = (fullName: string) => {
     return fullName
@@ -78,7 +101,7 @@ export default function VisitingCard({
     <div
       className={`w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm ${className}`}
     >
-      <div className="p-1 sm:p-1 bg-white dark:bg-gray-900">
+      <div className="p-1 sm:p-1.5 bg-white dark:bg-gray-900">
         <div className="rounded-lg p-1 bg-white dark:bg-gray-900">
           <div className="flex items-start gap-2.5">
             <div className="w-24 sm:w-28 shrink-0">
@@ -103,10 +126,13 @@ export default function VisitingCard({
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <h3 className="text-sm sm:text-base font-bold text-red-700 dark:text-red-400 line-clamp-1">
-                    {name}
+                    {companyName}
                   </h3>
                   <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-1">
-                    {experience}
+                    {name}
+                  </p>
+                   <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-1">
+                    {experience} experience
                   </p>
                 </div>
                
@@ -125,10 +151,10 @@ export default function VisitingCard({
           <div className="mt-2 grid grid-cols-[1fr_auto] gap-2 items-end">
             <div className="min-w-0 text-[10px] sm:text-[11px] text-gray-700 dark:text-gray-300 leading-4">
               <p className="truncate">
-                <span className="font-semibold">Contact:</span> {phone}
+                <span className="font-semibold">Contact:</span> {displayPhone}
               </p>
               <p className="break-all">
-                <span className="font-semibold">Email:</span> {email}
+                <span className="font-semibold">Email:</span> {displayEmail}
               </p>
               <p className="line-clamp-1">
                 <span className="font-semibold">Location:</span> {location}
