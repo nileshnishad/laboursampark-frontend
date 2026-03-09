@@ -12,8 +12,22 @@ import UserProfile from "./components/UserProfile";
 import UnifiedSearchInput from "@/app/components/common/UnifiedSearchInput";
 import type { AppDispatch, RootState } from "@/store/store";
 
-type UserType = "labour" | "contractor";
+type UserType = "labour" | "contractor" | "sub_contractor";
 type FilterType = "active" | "pending" | "miscalls" | "connected" | "profile";
+
+const normalizeUserType = (type: string): UserType => {
+  const normalized = type.toLowerCase();
+  if (normalized === "sub_contractor" || normalized === "sub-contractor") {
+    return "sub_contractor";
+  }
+  return normalized === "contractor" ? "contractor" : "labour";
+};
+
+const getDashboardLabel = (type: UserType): string => {
+  if (type === "labour") return "Labour";
+  if (type === "sub_contractor") return "Sub-Contractor";
+  return "Contractor";
+};
 
 export default function UserDashboardPage() {
   const router = useRouter();
@@ -25,7 +39,7 @@ export default function UserDashboardPage() {
   );
 
   const username = params.username as string;
-  const userType = params.userType as UserType;
+  const userType = normalizeUserType(params.userType as string);
   const [activeFilter, setActiveFilter] = useState<FilterType>("active");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -56,6 +70,7 @@ export default function UserDashboardPage() {
   }
 
   const isLabour = userType === "labour";
+  const dashboardLabel = getDashboardLabel(userType);
   const isProfileView = activeFilter === "profile";
   
   // Filter data by status first
@@ -100,7 +115,7 @@ export default function UserDashboardPage() {
               {/* Text Content Column */}
               <div className="flex-1 min-w-0">
                 <h1 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate leading-tight">
-                  {userType === "labour" ? "Labour" : "Contractor"} Dashboard
+                  {dashboardLabel} Dashboard
                 </h1>
                 <div className="flex items-center justify-between gap-2 mt-0.5">
                   <p className="text-xs text-gray-600 dark:text-gray-400 capitalize truncate leading-tight">

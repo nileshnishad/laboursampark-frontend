@@ -7,7 +7,7 @@ type FilterType = "active" | "pending" | "miscalls" | "connected" | "profile";
 interface FilterMenuProps {
   activeFilter: FilterType;
   onFilterChange: (filter: FilterType) => void;
-  userType: "labour" | "contractor";
+  userType: "labour" | "contractor" | "sub_contractor";
 }
 
 export default function FilterMenu({ activeFilter, onFilterChange, userType }: FilterMenuProps) {

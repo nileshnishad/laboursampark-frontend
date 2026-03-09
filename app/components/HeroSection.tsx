@@ -65,7 +65,7 @@ export default function HeroSection() {
               <button
                 className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
                   searchType === "contractor"
-                    ? "bg-indigo-600 text-white shadow-lg"
+                    ? "bg-green-600 text-white shadow-lg"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
                 onClick={() => setSearchType("contractor")}
@@ -83,7 +83,11 @@ export default function HeroSection() {
             />
             <button
               onClick={handleSearch}
-              className="px-6 sm:px-8 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 text-sm sm:text-base whitespace-nowrap"
+              className={`px-6 sm:px-8 py-3 bg-linear-to-r text-white rounded-lg font-bold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 text-sm sm:text-base whitespace-nowrap ${
+                searchType === "contractor"
+                  ? "from-green-600 to-green-700"
+                  : "from-blue-600 to-indigo-600"
+              }`}
             >
               {searchType === "labour" ? t(locale, "home.exploreLabours") : t(locale, "home.exploreContractors")}
             </button>
@@ -92,8 +96,8 @@ export default function HeroSection() {
       </div>
 
       {/* Create Profile Section */}
-      <div className="w-full max-w-6xl mt-4 sm:mt-12 md:mt-10">
-        <div className="text-center mb-8 sm:mb-12">
+      <div className="w-full max-w-6xl mt-2 sm:mt-12 md:mt-10">
+        <div className="text-center mb-2 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 sm:mb-4">
             {t(locale, "home.contactTitle")}
           </h2>
@@ -112,7 +116,7 @@ export default function HeroSection() {
               <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white bg-opacity-20 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl sm:text-4xl">👷</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white">
+              <h3 className="text-lg sm:text-2xl font-bold text-white">
                 {t(locale, "labour.joinAs")}
               </h3>
             </div>
@@ -127,7 +131,7 @@ export default function HeroSection() {
               <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white bg-opacity-20 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl sm:text-4xl">🏢</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white">
+              <h3 className="text-lg sm:text-2xl font-bold text-white">
                 {t(locale, "contractor.joinAs")}
               </h3>
             </div>

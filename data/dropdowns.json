@@ -1,16 +1,29 @@
 {
   "contractor": {
     "businessTypes": [
-      "Construction",
-      "Renovation",
+      "General Construction",
+      "Civil Construction",
+      "Building Construction",
+      "Infrastructure Projects",
+      "Interior Design & Fit-Out",
+      "Renovation & Remodeling",
       "Plumbing",
       "Electrical",
-      "Painting",
-      "Carpentry",
-      "Landscaping",
-      "HVAC",
-      "Roofing",
-      "General Contracting"
+      "Painting & Finishing",
+      "Carpentry & Woodwork",
+      "Furniture & Modular Work",
+      "Landscaping & Gardening",
+      "HVAC & Air Conditioning",
+      "Roofing & Waterproofing",
+      "Flooring & Tiling",
+      "Glass & Aluminum Work",
+      "Steel Fabrication",
+      "False Ceiling & Drywall",
+      "Demolition Work",
+      "Road & Paving Work",
+      "Construction Material Supply",
+      "Equipment & Machinery Rental",
+      "Multi-Service Contractor"
     ],
     "servicesOffered": [
       "Residential",
@@ -57,12 +70,7 @@
       "Tiling",
       "Scaffolding"
     ],
-    "workType": [
-      "Full-time",
-      "Part-time",
-      "Contract",
-      "Project-based"
-    ],
+    "workType": ["Full-time", "Part-time", "Contract", "Project-based"],
     "workingHours": [
       "8 AM - 5 PM",
       "9 AM - 6 PM",

@@ -110,7 +110,7 @@ export default function ContractorsSection() {
   return (
     <section id="contractors" className="py-10 px-4 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-blue-900 dark:text-white">Contractors</h2>
+        <h2 className="text-2xl font-bold text-green-600 dark:text-white">Contractors</h2>
         <a
           href="/contractors/all"
           className="px-2 py-2 text-sm bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition shadow"

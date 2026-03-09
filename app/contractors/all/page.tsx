@@ -101,9 +101,20 @@ export default function AllContractorsPage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-18 md:pt-20 pb-4 px-2 sm:px-3">
       <div className="max-w-7xl mx-auto h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] flex flex-col">
         <div className="sticky top-0 z-20 bg-gray-50 dark:bg-gray-900 pb-3 border-b border-gray-200 dark:border-gray-700">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-green-900 dark:text-white mb-1">
-            All Contractors
-          </h1>
+          <div className="flex items-center gap-2 mb-1">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              aria-label="Go back"
+              title="Go back"
+            >
+              <span aria-hidden="true">&larr;</span>
+            </button>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-green-900 dark:text-white">
+              All Contractors
+            </h1>
+          </div>
           <p className="text-gray-700 text-xs dark:text-gray-300">
             Browse all available contractors in our network. Find verified professionals for your construction and project needs.
           </p>

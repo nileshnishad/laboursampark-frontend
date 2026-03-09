@@ -14,7 +14,7 @@ function LoginContent() {
   const { loading, success, user } = useSelector((state: RootState) => state.auth);
 
   // Form states
-  const [userType, setUserType] = useState<"labour" | "contractor">("labour");
+  const [userType, setUserType] = useState<"labour" | "contractor" | "sub_contractor">("labour");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -116,35 +116,7 @@ function LoginContent() {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 md:p-8">
           <form onSubmit={handleLogin} className="space-y-5">
             {/* User Type Selection */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                I am a *
-              </label>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setUserType("labour")}
-                  className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
-                    userType === "labour"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
-                  }`}
-                >
-                  Labour
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUserType("contractor")}
-                  className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
-                    userType === "contractor"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
-                  }`}
-                >
-                  Contractor
-                </button>
-              </div>
-            </div>
+            
 
             {/* Email or Mobile Input */}
             <div>
@@ -268,7 +240,7 @@ function LoginContent() {
           <p className="text-xs text-gray-700 dark:text-gray-300">
             Don't have an account?{" "}
             <button
-              onClick={() => router.push(`/register?type=${userType}`)}
+              onClick={() => router.push("/register")}
               className="text-indigo-600 dark:text-indigo-300 font-bold hover:underline"
             >
               Register here

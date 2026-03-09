@@ -54,6 +54,7 @@ export interface LocationPayload {
 
 export interface ContractorRegisterPayload {
   userType: string;
+  role: 'contractor' | 'sub_contractor';
   fullName: string;
   businessName: string;
   mobile: string;
@@ -64,8 +65,6 @@ export interface ContractorRegisterPayload {
   businessTypes: string[];
   experienceRange: string;
   teamSize: string;
-  servicesOffered: string[];
-  coverageArea: string[];
   about: string;
   businessLicenseUrl: string | null;
   companyLogoUrl: string | null;
@@ -92,7 +91,7 @@ export interface LoginPayload {
   mobile?: string;
   password?: string;
   otp?: string;
-  userType: 'labour' | 'contractor';
+  userType: 'labour' | 'contractor' | 'sub_contractor';
 }
 
 export interface AuthState {

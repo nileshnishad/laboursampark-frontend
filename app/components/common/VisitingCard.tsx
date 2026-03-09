@@ -43,7 +43,7 @@ export default function VisitingCard({
   const email = contractor.email || "N/A";
   const profilePic = contractor.companyLogoUrl || contractor.profilePic || contractor.profilePhotoUrl || "";
   const specialization =
-    contractor.serviceCategories ||
+    contractor.businessTypes ||
     contractor.servicesOffered ||
     contractor.specialization ||
     contractor.skills ||

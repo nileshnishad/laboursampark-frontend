@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 interface RazorpayPaymentModalProps {
   isOpen: boolean;
   amount: number;
-  userType: "labour" | "contractor";
+  userType: "labour" | "contractor" | "sub_contractor";
   userDetails: {
     name: string;
     email: string;

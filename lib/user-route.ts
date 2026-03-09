@@ -5,6 +5,7 @@ type UserLike = {
   email?: string;
   userType?: string;
   type?: string;
+  role?: string;
 };
 
 const toSlug = (value: string): string => {
@@ -32,14 +33,23 @@ const getSafeUsername = (user?: UserLike | null): string => {
   return slug || 'profile';
 };
 
-const getSafeUserType = (user?: UserLike | null, fallback?: 'labour' | 'contractor'): 'labour' | 'contractor' => {
+const getSafeUserType = (
+  user?: UserLike | null,
+  fallback?: 'labour' | 'contractor' | 'sub_contractor'
+): 'labour' | 'contractor' | 'sub_contractor' => {
   const rawType = (user?.userType || user?.type || fallback || 'labour').toString().toLowerCase();
+  const role = (user?.role || '').toString().toLowerCase();
+
+  if (rawType === 'sub_contractor' || rawType === 'sub-contractor' || role === 'sub_contractor' || role === 'sub-contractor') {
+    return 'sub_contractor';
+  }
+
   return rawType === 'contractor' ? 'contractor' : 'labour';
 };
 
 export const buildUserDashboardPath = (
   user?: UserLike | null,
-  fallbackType?: 'labour' | 'contractor'
+  fallbackType?: 'labour' | 'contractor' | 'sub_contractor'
 ): string => {
   const username = getSafeUsername(user);
   const userType = getSafeUserType(user, fallbackType);

@@ -8,7 +8,21 @@ import type { AppDispatch, RootState } from "@/store/store";
 import RazorpayPaymentModal from "@/app/components/RazorpayPaymentModal";
 import { toast } from "react-toastify";
 
-type UserType = "labour" | "contractor";
+type UserType = "labour" | "contractor" | "sub_contractor";
+
+const normalizeUserType = (type: string): UserType => {
+  const normalized = type.toLowerCase();
+  if (normalized === "sub_contractor" || normalized === "sub-contractor") {
+    return "sub_contractor";
+  }
+  return normalized === "contractor" ? "contractor" : "labour";
+};
+
+const getUserTypeLabel = (type: UserType): string => {
+  if (type === "labour") return "Labour";
+  if (type === "sub_contractor") return "Sub-Contractor";
+  return "Contractor";
+};
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -21,7 +35,8 @@ export default function PaymentPage() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
 
   const username = params.username as string;
-  const userType = params.userType as UserType;
+  const userType = normalizeUserType(params.userType as string);
+  const userTypeLabel = getUserTypeLabel(userType);
 
   const payableAmount = useMemo(() => {
     return userType === "labour" ? 499 : 999;
@@ -94,7 +109,7 @@ export default function PaymentPage() {
 
               <div className="flex-1 min-w-0">
                 <h1 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white truncate leading-tight">
-                  {userType === "labour" ? "Labour" : "Contractor"} Payment
+                  {userTypeLabel} Payment
                 </h1>
                 <p className="text-xs text-gray-600 dark:text-gray-400 capitalize truncate leading-tight">
                   {username.replace(/-/g, " ")}
@@ -247,7 +262,7 @@ export default function PaymentPage() {
                 },
                 {
                   question: "How long is verification valid?",
-                  answer: `3 months from payment date. You can renew your ${userType === "labour" ? "labour" : "contractor"} profile anytime.`,
+                  answer: `3 months from payment date. You can renew your ${userType === "labour" ? "labour" : userType === "sub_contractor" ? "sub-contractor" : "contractor"} profile anytime.`,
                 },
                 {
                   question: "What if I want to cancel?",

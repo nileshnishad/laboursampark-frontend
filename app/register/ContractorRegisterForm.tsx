@@ -11,13 +11,17 @@ import dropdownsData from "@/data/dropdowns.json";
 
 const {
   businessTypes: BUSINESS_TYPES,
-  servicesOffered: SERVICES_OPTIONS,
   teamSize: TEAM_SIZE,
   experienceRange: EXPERIENCE_RANGE,
-  coverageArea: COVERAGE_AREA,
 } = dropdownsData.contractor;
 
-export default function ContractorRegisterForm() {
+interface ContractorRegisterFormProps {
+  registrationRole?: "contractor" | "sub-contractor";
+}
+
+export default function ContractorRegisterForm({
+  registrationRole = "contractor",
+}: ContractorRegisterFormProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { loading, success, error, message } = useAppSelector(
@@ -266,6 +270,9 @@ export default function ContractorRegisterForm() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const payloadRole: "contractor" | "sub_contractor" =
+      registrationRole === "sub-contractor" ? "sub_contractor" : "contractor";
+
     // Validation
     if (!termsAgreed) {
       alert("Please agree to terms and conditions");
@@ -289,7 +296,8 @@ export default function ContractorRegisterForm() {
     }
 
     const formPayload = {
-      userType: "contractor",
+      userType: payloadRole,
+      role: payloadRole,
       fullName,
       businessName,
       mobile,
@@ -310,8 +318,6 @@ export default function ContractorRegisterForm() {
       businessTypes: selectedBusinessTypes,
       experienceRange,
       teamSize,
-      servicesOffered: selectedServices,
-      coverageArea: selectedCoverage,
       about,
       businessLicenseUrl: businessLicense || null,
       companyLogoUrl: companyLogo || null,
@@ -339,11 +345,22 @@ export default function ContractorRegisterForm() {
         {/* Header */}
         <div className="text-center mb-4">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
-            Register Your Business
+            {registrationRole === "sub-contractor"
+              ? "Register as Sub-Contractor"
+              : "Register Your Business"}
           </h1>
           <p className="text-sm md:text-base text-gray-700 dark:text-gray-300">
-            Get connected with skilled workers and grow your business
+            {registrationRole === "sub-contractor"
+              ? "Create your sub-contractor profile and start getting project work"
+              : "Get connected with skilled workers and grow your business"}
           </p>
+          <button
+            type="button"
+            onClick={() => router.push("/register?type=contractor")}
+            className="mt-3 text-xs font-semibold text-indigo-600 dark:text-indigo-300 hover:underline"
+          >
+            Change registration type
+          </button>
         </div>
 
         {/* Registration Form */}
@@ -365,11 +382,11 @@ export default function ContractorRegisterForm() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Business Name *
+                  Comapny Name *
                 </label>
                 <input
                   type="text"
-                  placeholder="Your business name"
+                  placeholder="Your Company name"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
@@ -405,11 +422,11 @@ export default function ContractorRegisterForm() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Password / OTP *
+                  Password *
                 </label>
                 <input
                   type="password"
-                  placeholder="Enter password or OTP"
+                  placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
@@ -431,7 +448,7 @@ export default function ContractorRegisterForm() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Registration Number / GST Number
+                  Registration Number / GST Number *
                 </label>
                 <input
                   type="text"
@@ -525,86 +542,7 @@ export default function ContractorRegisterForm() {
                 </div>
               )}
             </div>
-            {/* Services Offered Dropdown */}
-            <div data-dropdown="services">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Services Offered (Select Multiple) *
-              </label>
-              <div className="relative">
-                {/* Dropdown Button */}
-                <button
-                  type="button"
-                  onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white bg-white text-left flex justify-between items-center"
-                >
-                  <span>
-                    {selectedServices.length > 0
-                      ? `${selectedServices.length} selected`
-                      : "Select services offered"}
-                  </span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      servicesDropdownOpen ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </button>
-
-                {/* Dropdown Menu */}
-                {servicesDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-                    <div className="max-h-48 overflow-y-auto p-2 space-y-2">
-                      {SERVICES_OPTIONS.map((service) => (
-                        <label
-                          key={service}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedServices.includes(service)}
-                            onChange={() => toggleService(service)}
-                            className="w-4 h-4 rounded"
-                          />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {service}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Selected Services Chips */}
-              {selectedServices.length > 0 && (
-                <div className="flex flex-wrap gap-2 p-2 mt-2 bg-indigo-50 dark:bg-indigo-900 rounded">
-                  {selectedServices.map((service) => (
-                    <div
-                      key={service}
-                      className="flex items-center gap-1 px-2 py-1 bg-indigo-200 dark:bg-indigo-700 text-indigo-900 dark:text-indigo-100 text-xs rounded-full"
-                    >
-                      <span>{service}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeService(service)}
-                        className="text-indigo-900 dark:text-indigo-100 hover:font-bold"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          
 
             {/* Row 4: Experience, Team Size */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

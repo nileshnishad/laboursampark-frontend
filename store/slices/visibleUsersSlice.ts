@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { apiGet } from '@/lib/api-service';
 
-type UserType = 'labour' | 'contractor';
+type UserType = 'labour' | 'contractor' | 'sub_contractor';
 
 interface VisibleUserApiItem {
   _id: string;
