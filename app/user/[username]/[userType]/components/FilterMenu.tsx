@@ -1,28 +1,30 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-
-type FilterType = "active" | "pending" | "miscalls" | "connected" | "profile";
+import {
+  getTabsForUserType,
+  type DashboardTabValue,
+  type DashboardUserType,
+} from "./dashboard-tabs-config";
 
 interface FilterMenuProps {
-  activeFilter: FilterType;
-  onFilterChange: (filter: FilterType) => void;
-  userType: "labour" | "contractor" | "sub_contractor";
+  activeFilter: DashboardTabValue;
+  onFilterChange: (filter: DashboardTabValue) => void;
+  userType: DashboardUserType;
 }
 
 export default function FilterMenu({ activeFilter, onFilterChange, userType }: FilterMenuProps) {
-  const otherType = userType === "labour" ? "Contractors" : "Labourers";
+  const roleColorMap: Record<DashboardUserType, string> = {
+    labour: "bg-blue-600 text-white shadow-md",
+    contractor: "bg-indigo-600 text-white shadow-md",
+    sub_contractor: "bg-emerald-600 text-white shadow-md",
+  };
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftIndicator, setShowLeftIndicator] = useState(false);
   const [showRightIndicator, setShowRightIndicator] = useState(false);
 
-  const filters: { type: FilterType; label: string }[] = [
-    { type: "active", label: `Active ${otherType}` },
-    { type: "pending", label: "Pending Requests" },
-    { type: "connected", label: "Connected" },
-    { type: "miscalls", label: "Miscalls" },
-    { type: "profile", label: "Profile" },
-  ];
+  const filters = getTabsForUserType(userType);
 
   useEffect(() => {
     const container = scrollRef.current;
@@ -68,13 +70,11 @@ export default function FilterMenu({ activeFilter, onFilterChange, userType }: F
       >
         {filters.map((filter) => (
           <button
-            key={filter.type}
-            onClick={() => onFilterChange(filter.type)}
+            key={filter.value}
+            onClick={() => onFilterChange(filter.value)}
             className={`px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all whitespace-nowrap ${
-              activeFilter === filter.type
-                ? userType === "labour"
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "bg-indigo-600 text-white shadow-md"
+              activeFilter === filter.value
+                ? roleColorMap[userType]
                 : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
             }`}
           >
