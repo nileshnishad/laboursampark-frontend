@@ -6,6 +6,8 @@ import { loginUser, resetAuthState } from "@/store/slices/authSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import type { LoginPayload } from "@/store/slices/authSlice";
 import { buildUserDashboardPath } from "@/lib/user-route";
+import { apiPost } from "@/lib/api-service";
+import { showErrorToast, showSuccessToast } from "@/lib/toast-utils";
 
 function LoginContent() {
   const router = useRouter();
@@ -20,6 +22,9 @@ function LoginContent() {
   const [otp, setOtp] = useState("");
   const [useOTP, setUseOTP] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   // Detect if input is email or mobile
   const isEmail = (value: string) => {
@@ -64,6 +69,36 @@ function LoginContent() {
     }
 
     await dispatch(loginUser(payload));
+  };
+
+  const handleSendForgotPasswordLink = async () => {
+    const email = forgotEmail.trim().toLowerCase();
+    if (!isEmail(email)) {
+      showErrorToast("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      setForgotLoading(true);
+      const response = await apiPost(
+        "/auth/forgot-password",
+        { email },
+        { includeToken: false }
+      );
+
+      if (!response.success) {
+        throw new Error(response.error || response.message || "Unable to send reset link.");
+      }
+
+      showSuccessToast("Password reset link sent to your email.");
+      setIsForgotModalOpen(false);
+      setForgotEmail("");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to send reset link.";
+      showErrorToast(message);
+    } finally {
+      setForgotLoading(false);
+    }
   };
 
   // Handle successful login
@@ -201,6 +236,10 @@ function LoginContent() {
               </label>
               <button
                 type="button"
+                onClick={() => {
+                  setForgotEmail(contactType === "email" ? contact.trim().toLowerCase() : "");
+                  setIsForgotModalOpen(true);
+                }}
                 className="text-xs text-indigo-600 dark:text-indigo-300 hover:underline font-semibold"
               >
                 Forgot password?
@@ -249,6 +288,61 @@ function LoginContent() {
         </div>
       </div>
       </div>
+
+      {isForgotModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3">
+          <div className="w-full max-w-md rounded-xl bg-white dark:bg-gray-800 shadow-xl p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Forgot Password</h3>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Enter your email to receive a password reset link.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsForgotModalOpen(false)}
+                disabled={forgotLoading}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                placeholder="your.email@example.com"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+              />
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setIsForgotModalOpen(false)}
+                disabled={forgotLoading}
+                className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white text-sm font-semibold disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSendForgotPasswordLink}
+                disabled={forgotLoading || !forgotEmail.trim()}
+                className="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold disabled:opacity-60"
+              >
+                {forgotLoading ? "Sending..." : "Send Link"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
