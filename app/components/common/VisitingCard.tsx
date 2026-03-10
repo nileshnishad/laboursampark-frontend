@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
+import { useSelector } from "react-redux";
 import { getToken } from "@/lib/api-service";
 import ContractorProfileModal from "./ContractorProfileModal";
+import type { RootState } from "@/store/store";
 
 interface VisitingCardProps {
   contractor: any;
@@ -19,6 +21,7 @@ export default function VisitingCard({
   onViewProfile,
   className = "",
 }: VisitingCardProps) {
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [sending, setSending] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -67,8 +70,10 @@ export default function VisitingCard({
     return `xxxxxx${lastThree}@${domainPart}`;
   };
 
-  const displayPhone = isLoggedIn ? phone : maskPhone(phone);
-  const displayEmail = isLoggedIn ? email : maskEmail(email);
+  // Contact info is visible only when logged in and profile visibility is enabled.
+  const canViewContact = isLoggedIn && user?.display !== false;
+  const displayPhone = canViewContact ? phone : maskPhone(phone);
+  const displayEmail = canViewContact ? email : maskEmail(email);
 
   const getInitials = (fullName: string) => {
     return fullName

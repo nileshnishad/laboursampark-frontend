@@ -34,16 +34,10 @@ export default function RequestsTabContent(props: TabContentProps) {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="mb-4 sm:mb-6">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Requests</h2>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-          Review connection requests and communicate with users for work discussions.
-        </p>
-      </div>
-
+    
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-4">
         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-          This section is for communication flow: users check jobs, send requests, and coordinate work details.
+          This section is for communication: users check jobs, send requests, and coordinate work details.
         </p>
       </div>
 

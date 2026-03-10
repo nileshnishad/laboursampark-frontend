@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import LabourCard from "../LabourCard";
 import type { TabContentProps } from "../TabValueContentMap";
-import { showSuccessToast } from "@/lib/toast-utils";
+import type { RootState } from "@/store/store";
+import { showSuccessToast, showWarningToast } from "@/lib/toast-utils";
 
 type RequirementTarget = "labour" | "sub_contractor" | "both";
 
@@ -36,8 +38,10 @@ const INITIAL_FORM: RequirementFormState = {
 
 export default function JobRequirementsTabContent(props: TabContentProps) {
   const { usersLoading, usersError, filteredData, onConnect } = props;
+  const { user } = useSelector((state: RootState) => state.auth);
   const [form, setForm] = useState<RequirementFormState>(INITIAL_FORM);
   const [publishedRequirements, setPublishedRequirements] = useState<PublishedRequirement[]>([]);
+  const isProfileHidden = user?.display === false;
 
   const canSubmit = useMemo(() => {
     return (
@@ -55,6 +59,10 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
 
   const handlePublishRequirement = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isProfileHidden) {
+      showWarningToast("Make profile visible to create a job.");
+      return;
+    }
     if (!canSubmit) return;
 
     const requirement: PublishedRequirement = {
@@ -70,19 +78,17 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="mb-4 sm:mb-6">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Create Jobs</h2>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-          Create requirement for labour/sub-contractor and browse matching profiles.
-        </p>
-      </div>
+      
 
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-5">
+      <div className="relative rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-5">
         <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3">
           Create New Job
         </h3>
 
-        <form onSubmit={handlePublishRequirement} className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <form
+          onSubmit={handlePublishRequirement}
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 ${isProfileHidden ? "opacity-40 pointer-events-none select-none" : ""}`}
+        >
           <div className="sm:col-span-2">
             <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Work Title *</label>
             <input
@@ -116,25 +122,8 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Budget *</label>
-            <input
-              value={form.budget}
-              onChange={(e) => updateField("budget", e.target.value)}
-              placeholder="e.g., 2,50,000"
-              className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
 
-          <div>
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Timeline *</label>
-            <input
-              value={form.timeline}
-              onChange={(e) => updateField("timeline", e.target.value)}
-              placeholder="e.g., 30 days"
-              className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
+          
 
           <div>
             <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Workers Needed</label>
@@ -170,20 +159,33 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
           <div className="sm:col-span-2">
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || isProfileHidden}
               className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold"
             >
               Publish Requirement
             </button>
           </div>
         </form>
+
+        {isProfileHidden && (
+          <div className="absolute inset-0 rounded-xl bg-white/70 dark:bg-gray-900/75 backdrop-blur-[1px] flex items-center justify-center p-4">
+            <div className="max-w-md text-center rounded-lg border border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-900/25 px-4 py-3">
+              <p className="text-sm font-semibold text-orange-800 dark:text-orange-200">
+                Make profile visible to create a job.
+              </p>
+              <p className="mt-1 text-xs text-orange-700 dark:text-orange-300">
+                Your profile is hidden right now. Complete payment and make your profile visible, then you can publish jobs.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-5">
-        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3">Published Requirements</h3>
+        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3">Published Jobs</h3>
 
         {publishedRequirements.length === 0 ? (
-          <p className="text-sm text-gray-600 dark:text-gray-400">No requirements published yet.</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">No Jobs published yet.</p>
         ) : (
           <div className="space-y-3">
             {publishedRequirements.map((item) => (
