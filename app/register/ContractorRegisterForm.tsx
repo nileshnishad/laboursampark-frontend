@@ -34,6 +34,7 @@ export default function ContractorRegisterForm({
   const [mobile, setMobileNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [registrationNumber, setRegistrationNumber] = useState<string>("");
 
@@ -228,6 +229,7 @@ export default function ContractorRegisterForm({
       setMobileNumber("");
       setEmail("");
       setPassword("");
+      setShowPassword(false);
       setLocation(null);
       setRegistrationNumber("");
       setSelectedBusinessTypes([]);
@@ -424,13 +426,49 @@ export default function ContractorRegisterForm({
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   Password *
                 </label>
-                <input
-                  type="password"
-                  placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-3 py-2 pr-10 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
+                  >
+                    {showPassword ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="w-4 h-4"
+                      >
+                        <path d="M3 3l18 18" />
+                        <path d="M10.58 10.58a2 2 0 102.83 2.83" />
+                        <path d="M9.88 5.09A9.77 9.77 0 0112 5c5.52 0 10 7 10 7a18.73 18.73 0 01-3.32 4.31" />
+                        <path d="M6.61 6.61C3.62 8.34 2 12 2 12s4.48 7 10 7a9.86 9.86 0 004.2-.93" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="w-4 h-4"
+                      >
+                        <path d="M2 12s4.48-7 10-7 10 7 10 7-4.48 7-10 7S2 12 2 12z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 

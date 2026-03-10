@@ -139,9 +139,36 @@ export default function ResetPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setShowNewPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-2 text-xs font-semibold text-indigo-600 dark:text-indigo-300"
+                  aria-label={showNewPassword ? "Hide password" : "Show password"}
+                  className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300"
                 >
-                  {showNewPassword ? "Hide" : "Show"}
+                  {showNewPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="w-4 h-4"
+                    >
+                      <path d="M3 3l18 18" />
+                      <path d="M10.58 10.58a2 2 0 102.83 2.83" />
+                      <path d="M9.88 5.09A9.77 9.77 0 0112 5c5.52 0 10 7 10 7a18.73 18.73 0 01-3.32 4.31" />
+                      <path d="M6.61 6.61C3.62 8.34 2 12 2 12s4.48 7 10 7a9.86 9.86 0 004.2-.93" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="w-4 h-4"
+                    >
+                      <path d="M2 12s4.48-7 10-7 10 7 10 7-4.48 7-10 7S2 12 2 12z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
                 </button>
               </div>
               <p className="mt-1 text-[11px] text-gray-600 dark:text-gray-400">
@@ -169,9 +196,36 @@ export default function ResetPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-2 text-xs font-semibold text-indigo-600 dark:text-indigo-300"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300"
                 >
-                  {showConfirmPassword ? "Hide" : "Show"}
+                  {showConfirmPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="w-4 h-4"
+                    >
+                      <path d="M3 3l18 18" />
+                      <path d="M10.58 10.58a2 2 0 102.83 2.83" />
+                      <path d="M9.88 5.09A9.77 9.77 0 0112 5c5.52 0 10 7 10 7a18.73 18.73 0 01-3.32 4.31" />
+                      <path d="M6.61 6.61C3.62 8.34 2 12 2 12s4.48 7 10 7a9.86 9.86 0 004.2-.93" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="w-4 h-4"
+                    >
+                      <path d="M2 12s4.48-7 10-7 10 7 10 7-4.48 7-10 7S2 12 2 12z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
