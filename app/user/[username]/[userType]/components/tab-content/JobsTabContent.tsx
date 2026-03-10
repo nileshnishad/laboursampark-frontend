@@ -20,12 +20,7 @@ export default function JobsTabContent(props: TabContentProps) {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="mb-4 sm:mb-6">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Jobs</h2>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-          Explore active contractor opportunities relevant to your skills.
-        </p>
-      </div>
+     
 
       {usersLoading ? (
         <div className="text-center py-12">

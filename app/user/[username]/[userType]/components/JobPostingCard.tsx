@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 interface JobPostingCardProps {
   job: any;
@@ -9,11 +11,11 @@ interface JobPostingCardProps {
 }
 
 export default function JobPostingCard({ job, onApply, onView }: JobPostingCardProps) {
+  const { user } = useSelector((state: RootState) => state.auth);
   const companyName = job?.businessName || job?.companyName || "";
   const postedBy = job?.fullName || companyName || "Contractor";
   const workType = job?.workType || job?.jobType || job?.category || "General Work";
   const location = job?.location || job?.city || "Location not specified";
-  const timeline = job?.timeline || job?.deadline || job?.duration || "Start as soon as possible";
   const workersNeeded = job?.workersNeeded || job?.teamSize || "As required";
   const target = (job?.target || "Labour + Sub-Contractor").toString().replace("_", " ");
   const workDetails = job?.description || job?.bio || "Work details will be discussed after connection.";
@@ -25,14 +27,23 @@ export default function JobPostingCard({ job, onApply, onView }: JobPostingCardP
 
   const locationText = typeof location === "string" ? location : location?.city || "Not specified";
   const jobId = job?.id || job?._id || "";
+  const isProfileHidden = user?.display === false;
+
+  const handleApplyClick = () => {
+    if (isProfileHidden || !jobId) return;
+    onApply?.(jobId);
+  };
+
+  const handleViewClick = () => {
+    if (isProfileHidden || !jobId) return;
+    onView?.(jobId);
+  };
 
   return (
     <div className="h-full rounded-xl border border-blue-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-3.5 sm:p-4 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-[11px] sm:text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">
-            New Work
-          </p>
+         
           <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white mt-0.5 leading-snug">
             {job?.jobTitle || "Construction Work Available"}
           </h3>
@@ -65,10 +76,7 @@ export default function JobPostingCard({ job, onApply, onView }: JobPostingCardP
           <span className="font-semibold text-gray-900 dark:text-white">{locationText}</span>
         </div>
 
-        <div className="py-1.5 flex items-start gap-2 text-sm">
-          <span className="w-28 shrink-0 text-gray-500 dark:text-gray-400">Timeline</span>
-          <span className="font-semibold text-gray-900 dark:text-white">{timeline}</span>
-        </div>
+       
 
         <div className="py-1.5 flex items-start gap-2 text-sm">
           <span className="w-28 shrink-0 text-gray-500 dark:text-gray-400">Workers</span>
@@ -99,16 +107,24 @@ export default function JobPostingCard({ job, onApply, onView }: JobPostingCardP
         </div>
       )}
 
+      {isProfileHidden && (
+        <p className="mt-2 text-[11px] text-orange-700 dark:text-orange-300">
+          Make profile visible to view and connect on jobs.
+        </p>
+      )}
+
       <div className="mt-3 grid grid-cols-2 gap-1.5">
         <button
-          onClick={() => onApply?.(jobId)}
-          className="w-full px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors"
+          onClick={handleApplyClick}
+          disabled={isProfileHidden || !jobId}
+          className="w-full px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
         >
           Get Connect
         </button>
         <button
-          onClick={() => onView?.(jobId)}
-          className="w-full px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm font-semibold transition-colors"
+          onClick={handleViewClick}
+          disabled={isProfileHidden || !jobId}
+          className="w-full px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 disabled:opacity-60 disabled:cursor-not-allowed text-gray-900 dark:text-white text-sm font-semibold transition-colors"
         >
           View
         </button>
