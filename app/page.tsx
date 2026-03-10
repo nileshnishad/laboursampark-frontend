@@ -27,7 +27,7 @@ export default function Home() {
       />
       <main className="bg-zinc-50 dark:bg-black min-h-screen w-full font-sans">
         {/* Language Selector - Floating in Top Right */}
-        <div className="fixed top-4 right-4 z-50">
+        <div className="hidden md:block fixed top-4 right-4 z-50">
           <LanguageSelector />
         </div>
         

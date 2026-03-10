@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { t } from "@/lib/i18n";
@@ -8,7 +8,27 @@ export default function HeroSection() {
   const { locale } = useLanguage();
   const [searchType, setSearchType] = useState<"labour" | "contractor">("labour");
   const [query, setQuery] = useState("");
+  const [useFixedBackground, setUseFixedBackground] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    // Mobile/touch browsers can have tap issues with background-attachment: fixed.
+    const media = window.matchMedia("(hover: none), (pointer: coarse)");
+    setUseFixedBackground(!media.matches);
+
+    const onChange = (event: MediaQueryListEvent) => {
+      setUseFixedBackground(!event.matches);
+    };
+
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", onChange);
+      return () => media.removeEventListener("change", onChange);
+    }
+
+    media.addListener(onChange);
+    return () => media.removeListener(onChange);
+  }, []);
 
   const handleSearch = () => {
     // Redirect to the appropriate page based on search type
@@ -31,11 +51,11 @@ export default function HeroSection() {
         backgroundImage: 'url(/images/heroimg.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        backgroundAttachment: useFixedBackground ? "fixed" : "scroll"
       }}
     >
       {/* Background overlay with 0.3 opacity */}
-      <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 opacity-80 z-0"></div>
+      <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 opacity-80 z-0 pointer-events-none"></div>
       
       {/* Content wrapper */}
       <div className="relative z-10 w-full flex flex-col items-center justify-center">
@@ -109,8 +129,9 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {/* Labour Profile Card */}
           <button
+            type="button"
             onClick={() => handleRegisterClick("labour")}
-            className="group hover:shadow-2xl transition-all duration-300 cursor-pointer"
+            className="group relative z-20 touch-manipulation hover:shadow-2xl transition-all duration-300 cursor-pointer"
           >
             <div className="bg-linear-to-r from-blue-500 to-blue-600 p-6 sm:p-8 text-center rounded-2xl shadow-lg hover:shadow-xl">
               <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white bg-opacity-20 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -124,8 +145,9 @@ export default function HeroSection() {
 
           {/* Contractor Profile Card */}
           <button
+            type="button"
             onClick={() => handleRegisterClick("contractor")}
-            className="group hover:shadow-2xl transition-all duration-300 cursor-pointer"
+            className="group relative z-20 touch-manipulation hover:shadow-2xl transition-all duration-300 cursor-pointer"
           >
             <div className="bg-linear-to-r from-green-500 to-green-600 p-6 sm:p-8 text-center rounded-2xl shadow-lg hover:shadow-xl">
               <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white bg-opacity-20 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">

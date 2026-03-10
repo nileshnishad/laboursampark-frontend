@@ -37,7 +37,7 @@ export default function Menu() {
           }
         }
       }
-      setActive(current);
+      setActive((prev) => (prev === current ? prev : current));
     };
 
     if (isHomePage) {
@@ -80,7 +80,16 @@ export default function Menu() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-white/80 dark:bg-black/80 shadow z-50 backdrop-blur flex items-center justify-between p-2 md:px-8">
+    <nav
+      className="fixed top-0 left-0 right-0 w-full bg-white/95 dark:bg-black/90 md:bg-white/80 md:dark:bg-black/80 shadow z-50 md:backdrop-blur flex items-center justify-between p-2 md:px-8 border-b border-black/5 dark:border-white/10"
+      style={{
+        transform: "translateZ(0)",
+        WebkitTransform: "translateZ(0)",
+        willChange: "transform",
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+      }}
+    >
       {/* Logo */}
       <div
         className="flex items-center gap-2 cursor-pointer"
