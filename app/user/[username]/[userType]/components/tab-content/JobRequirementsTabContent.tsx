@@ -4,11 +4,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import type { TabContentProps } from "../TabValueContentMap";
 import type { RootState } from "@/store/store";
+import { useAppDispatch } from "@/store/hooks";
+import { toggleJobActivation } from "@/store/slices/jobEnquirySlice";
 import { apiGet, apiPatch, apiPost, apiPut } from "@/lib/api-service";
 import { showErrorToast, showSuccessToast, showWarningToast } from "@/lib/toast-utils";
 
 type RequirementTargetOption = "labour" | "sub_contractor";
-type RequirementTarget = "labour" | "sub-contractor";
+type RequirementTarget = "labour" | "sub_contractor";
 
 interface RequirementFormState {
   title: string;
@@ -22,6 +24,7 @@ interface RequirementFormState {
 interface PublishedRequirement extends RequirementFormState {
   id: string;
   createdAt: string;
+  visibility: boolean;
 }
 
 interface JobDetailsModalProps {
@@ -37,6 +40,7 @@ interface ApiJob {
   id?: string;
   workTitle?: string;
   jobTitle?: string;
+  visibility?: boolean;
   target?: RequirementTarget[];
   description?: string;
   location?: string;
@@ -58,6 +62,8 @@ const INITIAL_FORM: RequirementFormState = {
 export default function JobRequirementsTabContent(props: TabContentProps) {
   const { usersLoading, usersError, filteredData, onConnect } = props;
   const { user } = useSelector((state: RootState) => state.auth);
+  const { jobActivation } = useSelector((state: RootState) => state.jobEnquiry);
+  const dispatch = useAppDispatch();
   const [form, setForm] = useState<RequirementFormState>(INITIAL_FORM);
   const [publishedRequirements, setPublishedRequirements] = useState<PublishedRequirement[]>([]);
   const [jobsLoading, setJobsLoading] = useState(false);
@@ -72,9 +78,87 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
   const [updatingJob, setUpdatingJob] = useState(false);
   const isProfileHidden = user?.display === false;
 
+  // Applied Jobs state
+  const [appliedJobs, setAppliedJobs] = useState<any[]>([]);
+  const [appliedJobsLoading, setAppliedJobsLoading] = useState(false);
+  const [appliedJobsError, setAppliedJobsError] = useState<string | null>(null);
+  const [appliedJobsPage, setAppliedJobsPage] = useState(1);
+  const [appliedJobsTotalPages, setAppliedJobsTotalPages] = useState(1);
+  const [appliedJobsLimit] = useState(10);
+
   const logFieldUpdate = (field: keyof RequirementFormState, value: string) => {
     console.log("[JobRequirements] Field update:", { field, value });
   };
+
+  // Fetch applied jobs on component mount
+  useEffect(() => {
+    const fetchAppliedJobs = async () => {
+      setAppliedJobsLoading(true);
+      setAppliedJobsError(null);
+      try {
+        const response = await apiGet(
+          `/api/job-enquiries/applied/jobs?page=1&limit=${appliedJobsLimit}`
+        );
+
+        if (!response.success) {
+          throw new Error(response.error || "Failed to fetch applied jobs");
+        }
+
+        const data = response.data || response;
+        const jobs = data.appliedJobs || data.jobs || data.items || [];
+        const pagination = data.pagination || data.meta || {};
+
+        setAppliedJobs(jobs);
+        setAppliedJobsTotalPages(
+          Number(pagination.totalPages || pagination.pages || 1)
+        );
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Error fetching applied jobs";
+        setAppliedJobsError(message);
+      } finally {
+        setAppliedJobsLoading(false);
+      }
+    };
+
+    fetchAppliedJobs();
+  }, [appliedJobsLimit]);
+
+  // Update applied jobs when pagination page changes
+  useEffect(() => {
+    if (appliedJobsPage === 1) return;
+
+    const fetchAppliedJobs = async () => {
+      setAppliedJobsLoading(true);
+      setAppliedJobsError(null);
+      try {
+        const response = await apiGet(
+          `/api/job-enquiries/applied/jobs?page=${appliedJobsPage}&limit=${appliedJobsLimit}`
+        );
+
+        if (!response.success) {
+          throw new Error(response.error || "Failed to fetch applied jobs");
+        }
+
+        const data = response.data || response;
+        const jobs = data.appliedJobs || data.jobs || data.items || [];
+        const pagination = data.pagination || data.meta || {};
+
+        setAppliedJobs(jobs);
+        setAppliedJobsTotalPages(
+          Number(pagination.totalPages || pagination.pages || 1)
+        );
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Error fetching applied jobs";
+        setAppliedJobsError(message);
+        showErrorToast(message);
+      } finally {
+        setAppliedJobsLoading(false);
+      }
+    };
+
+    fetchAppliedJobs();
+  }, [appliedJobsPage, appliedJobsLimit]);
+
 
   const canSubmit = useMemo(() => {
     return (
@@ -88,16 +172,16 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
   }, [form]);
 
   const getTargetOptionFromArray = (targets: RequirementTarget[]): RequirementTargetOption => {
-    if (targets.includes("sub-contractor")) return "sub_contractor";
+    if (targets.includes("sub_contractor")) return "sub_contractor";
     return "labour";
   };
 
   const getTargetArrayFromOption = (option: RequirementTargetOption): RequirementTarget[] => {
-    return option === "labour" ? ["labour"] : ["sub-contractor"];
+    return option === "labour" ? ["labour"] : ["sub_contractor"];
   };
 
   const formatTarget = (targets: RequirementTarget[]) => {
-    return targets.map((item) => (item === "sub-contractor" ? "Sub-Contractor" : "Labour")).join(" + ");
+    return targets.map((item) => (item === "sub_contractor" ? "Sub_Contractor" : "Labour")).join(" + ");
   };
 
   const mapApiJobToRequirement = (job: ApiJob): PublishedRequirement => {
@@ -105,7 +189,7 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
       ? job.target
           .map((item) => {
             if (item === "labour") return "labour";
-            if (item === "sub-contractor" || item === "sub_contractor") return "sub-contractor";
+            if (item === "sub_contractor" || item === "sub_contractor") return "sub_contractor";
             return null;
           })
           .filter((item): item is RequirementTarget => item !== null)
@@ -128,6 +212,7 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
       workersNeeded: String(job.workersNeeded ?? ""),
       skills: skillsArray.join(", "),
       createdAt: job.createdAt ? new Date(job.createdAt).toLocaleString() : "",
+      visibility: Boolean(job.visibility ?? false),
     };
   };
 
@@ -284,6 +369,25 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
     }
   };
 
+  const handleToggleJobVisibility = async (jobId: string, currentVisibility: boolean) => {
+    try {
+      const result = await dispatch(toggleJobActivation({ jobId, currentVisibility })).unwrap();
+
+      setPublishedRequirements((prev) =>
+        prev.map((job) =>
+          job.id === jobId ? { ...job, visibility: result.visibility } : job
+        )
+      );
+
+      showSuccessToast(
+        result.visibility ? "Job made visible successfully." : "Job hidden successfully."
+      );
+    } catch (error) {
+      const message = typeof error === "string" ? error : "Failed to update job visibility.";
+      showErrorToast(message);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-5">
@@ -350,10 +454,19 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
                   }
                   className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="labour">Labour</option>
-                  <option value="sub_contractor">Contractor (Sub-Contractor)</option>
-                </select>
-              </div>
+                    {user.userType === "sub_contractor" ? (
+                      <>
+                        <option value="labour">Labour</option>
+                        
+                      </>
+                    ) : (
+                      <>
+                        <option value="labour">Labour</option>
+                        <option value="sub_contractor">Sub-Contractor</option>
+                      </>
+                    )}
+                  </select>
+                </div>
 
               <div>
                 <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Location *</label>
@@ -459,6 +572,8 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
                 item={item}
                 formatTarget={formatTarget}
                 onShowDetails={() => openJobDetails(item)}
+                onToggleVisibility={handleToggleJobVisibility}
+                toggling={Boolean(jobActivation.loadingByJobId[item.id])}
               />
             ))}
             </div>
@@ -506,15 +621,41 @@ function PublishedJobCard({
   item,
   formatTarget,
   onShowDetails,
+  onToggleVisibility,
+  toggling,
 }: {
   item: PublishedRequirement;
   formatTarget: (targets: RequirementTarget[]) => string;
   onShowDetails: () => void;
+  onToggleVisibility: (jobId: string, currentVisibility: boolean) => void;
+  toggling: boolean;
 }) {
   return (
     <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800 flex flex-col">
       <div className="flex items-start justify-between gap-2">
         <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">{item.title}</h4>
+        <label className="inline-flex items-center gap-2 cursor-pointer select-none shrink-0">
+          <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+            {item.visibility ? "Visible" : "Hidden"}
+          </span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={item.visibility}
+            aria-label="Toggle published job visibility"
+            onClick={() => onToggleVisibility(item.id, item.visibility)}
+            disabled={toggling}
+            className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
+              item.visibility ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
+            } ${toggling ? "opacity-60 cursor-not-allowed" : ""}`}
+          >
+            <span
+              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                item.visibility ? "translate-x-5.5" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </label>
       </div>
 
       <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Created: {item.createdAt || "-"}</p>
@@ -606,10 +747,10 @@ function JobDetailsModal({ isOpen, job, saving, onClose, onSave }: JobDetailsMod
           <div>
             <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Target *</label>
             <select
-              value={form.target.includes("sub-contractor") ? "sub_contractor" : "labour"}
+              value={form.target.includes("sub_contractor") ? "sub_contractor" : "labour"}
               onChange={(e) => setForm((prev) => ({
                 ...prev,
-                target: e.target.value === "labour" ? ["labour"] : ["sub-contractor"],
+                target: e.target.value === "labour" ? ["labour"] : ["sub_contractor"],
               }))}
               className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             >

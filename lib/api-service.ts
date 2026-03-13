@@ -14,6 +14,7 @@ interface ApiOptions {
   headers?: Record<string, string>;
   includeToken?: boolean;
   timeout?: number;
+  baseUrl?: string;
 }
 
 export interface ApiResponse<T = any> {
@@ -66,12 +67,13 @@ export const clearToken = (): void => {
 /**
  * Build complete URL for API endpoint
  */
-const buildURL = (endpoint: string): string => {
+const buildURL = (endpoint: string, baseUrl?: string): string => {
   if (endpoint.startsWith('http')) {
     return endpoint;
   }
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-  return `${API_BASE_URL}/${cleanEndpoint}`;
+  const resolvedBaseUrl = baseUrl || API_BASE_URL;
+  return `${resolvedBaseUrl}/${cleanEndpoint}`;
 };
 
 /**
@@ -174,7 +176,7 @@ const request = async <T = any>(
   payload?: any,
   options: ApiOptions = {}
 ): Promise<ApiResponse<T>> => {
-  const url = buildURL(endpoint);
+  const url = buildURL(endpoint, options.baseUrl);
   const headers = prepareHeaders(
     payload,
     options.headers,

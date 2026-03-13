@@ -4,6 +4,7 @@ export type DashboardTabValue =
   | "jobs"
   | "contractors"
   | "requests"
+  | "history"
   | "profile"
   | "job_requirements"
   | "sub_contractors"
@@ -33,6 +34,7 @@ export const DASHBOARD_TAB_CONFIG: DashboardTabItem[] = [
   { label: "Find Labour", value: "labours", userTypes: ["contractor"] },
   { label: "Find Labour", value: "labour_required", userTypes: ["sub_contractor"] },
   { label: "Requests", value: "requests", userTypes: ["labour", "contractor", "sub_contractor"] },
+  { label: "History", value: "history", userTypes: ["labour", "contractor", "sub_contractor"] },
   { label: "Profile", value: "profile", userTypes: ["labour", "contractor", "sub_contractor"] },
 
 ];
@@ -57,6 +59,11 @@ export const getSearchMetaForTab = (tabValue: DashboardTabValue): DashboardSearc
       label: "Search Requests",
       placeholder: "Search requests by name, location, or skill...",
       showSearch: true,
+    },
+    history: {
+      label: "",
+      placeholder: "",
+      showSearch: false,
     },
     profile: {
       label: "",

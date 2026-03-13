@@ -5,9 +5,12 @@ import JobPostingCard from "../JobPostingCard";
 import JobViewModal from "../JobViewModal";
 import type { TabContentProps } from "../TabValueContentMap";
 import { apiGet } from "@/lib/api-service";
+import { useAppDispatch } from "@/store/hooks";
+import { fetchAppliedJobs } from "@/store/slices/jobEnquirySlice";
 
 export default function JobPostingsTabContent(props: TabContentProps) {
   const { onConnect } = props;
+  const dispatch = useAppDispatch();
   const [jobs, setJobs] = useState<any[]>([]);
   const [jobsLoading, setJobsLoading] = useState(false);
   const [jobsError, setJobsError] = useState<string | null>(null);
@@ -45,6 +48,11 @@ export default function JobPostingsTabContent(props: TabContentProps) {
   useEffect(() => {
     fetchOpenJobs(page);
   }, [page, limit]);
+
+  // Fetch applied jobs on mount using Redux
+  useEffect(() => {
+    dispatch(fetchAppliedJobs());
+  }, [dispatch]);
 
   const handleView = (jobId: string) => {
     const found = jobs.find((job: any) => getJobId(job) === String(jobId));
