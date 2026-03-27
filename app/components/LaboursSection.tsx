@@ -76,12 +76,12 @@ export default function LaboursSection() {
     fetchLabours();
   }, []);
 
-  const slickSettings = {
+  const loadingSlickSettings = {
     dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 4,
-    slidesToScroll: 1,
+    // slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 4000,
     responsive: [
@@ -90,6 +90,43 @@ export default function LaboursSection() {
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
+  const labourCount = labours.length;
+  const desktopSlides = Math.min(Math.max(labourCount, 1), 4);
+  const tabletSlides = Math.min(Math.max(labourCount, 1), 2);
+  const mobileSlides = 1;
+
+  const slickSettings = {
+    dots: labourCount > 1,
+    infinite: labourCount > desktopSlides,
+    speed: 500,
+    slidesToShow: desktopSlides,
+    slidesToScroll: 1,
+    autoplay: labourCount > 1,
+    autoplaySpeed: 4000,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          dots: labourCount > 1,
+          infinite: labourCount > tabletSlides,
+          slidesToShow: tabletSlides,
+          slidesToScroll: 1,
+          autoplay: labourCount > 1,
+        },
+      },
+      {
+        breakpoint: 468,
+        settings: {
+          dots: labourCount > 1,
+          infinite: labourCount > mobileSlides,
+          slidesToShow: mobileSlides,
+          slidesToScroll: 1,
+          autoplay: labourCount > 1,
         },
       },
     ],
@@ -109,7 +146,7 @@ export default function LaboursSection() {
       
       {/* Loading State - Show Skeleton Carousel */}
       {loading && (
-        <Slider {...slickSettings}>
+        <Slider {...loadingSlickSettings}>
           {[...Array(3)].map((_, index) => (
             <Skeleton key={index} type="card" />
           ))}

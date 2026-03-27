@@ -39,7 +39,9 @@ export default function PaymentPage() {
   const userTypeLabel = getUserTypeLabel(userType);
 
   const payableAmount = useMemo(() => {
-    return userType === "labour" ? 499 : 999;
+    if (userType === "labour") return 5;
+    if (userType === "sub_contractor") return 10;
+    return 15;
   }, [userType]);
 
   useEffect(() => {

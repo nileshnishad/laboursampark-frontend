@@ -34,7 +34,12 @@ export default function RazorpayPaymentModal({
   onPaymentError,
 }: RazorpayPaymentModalProps) {
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"upi" | "card" | "netbanking">("upi");
+  const userTypeLabel =
+    userType === "labour"
+      ? "Labour"
+      : userType === "sub_contractor"
+      ? "Sub-Contractor"
+      : "Contractor";
 
   const handlePayment = async () => {
     try {
@@ -74,7 +79,6 @@ export default function RazorpayPaymentModal({
                 ...response,
                 amount,
                 userType,
-                method: paymentMethod,
               });
             } else {
               toast.error(verificationResult.message || "Payment verification failed");
@@ -123,67 +127,11 @@ export default function RazorpayPaymentModal({
         {/* Amount Section */}
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
           <p className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 mb-2">
-            Amount for {userType === "labour" ? "Labour" : "Contractor"} (3 Months)
+            Amount for {userTypeLabel} (3 Months)
           </p>
           <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
             ₹{amount}
           </p>
-        </div>
-
-        {/* Payment Methods */}
-        <div className="mb-6">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-            Payment Method
-          </p>
-          <div className="space-y-2">
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="upi"
-                checked={paymentMethod === "upi"}
-                onChange={(e) => setPaymentMethod(e.target.value as "upi")}
-                disabled={loading}
-                className="cursor-pointer"
-              />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">UPI</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Google Pay, PhonePe, Paytm</p>
-              </div>
-            </label>
-
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="card"
-                checked={paymentMethod === "card"}
-                onChange={(e) => setPaymentMethod(e.target.value as "card")}
-                disabled={loading}
-                className="cursor-pointer"
-              />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Card</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Credit / Debit Card</p>
-              </div>
-            </label>
-
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="netbanking"
-                checked={paymentMethod === "netbanking"}
-                onChange={(e) => setPaymentMethod(e.target.value as "netbanking")}
-                disabled={loading}
-                className="cursor-pointer"
-              />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Net Banking</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">All major banks</p>
-              </div>
-            </label>
-          </div>
         </div>
 
         {/* Info Box */}

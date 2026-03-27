@@ -5,36 +5,47 @@
 
 import { apiService } from "./api-service";
 
-interface CreateOrderRequest {
+interface CreateCheckoutRequest {
   amount: number;
   currency?: string;
-  receipt?: string;
-  userType?: string;
+  purpose?: string;
+  description?: string;
+  checkoutTtlMinutes?: number;
+  metadata?: Record<string, unknown>;
+  userType?: "labour" | "contractor" | "sub_contractor";
   userId?: string;
 }
 
 interface VerifyPaymentRequest {
+  paymentId: string;
   razorpay_payment_id: string;
   razorpay_order_id: string;
   razorpay_signature: string;
-  userId?: string;
-  userType?: string;
+  metadata?: Record<string, unknown>;
 }
 
-interface PaymentResponse {
-  success: boolean;
-  message: string;
-  order?: any;
-  data?: any;
+interface RecordPaymentFailureRequest {
+  paymentId: string;
+  razorpay_order_id: string;
+  razorpay_payment_id?: string;
+  status: "failed" | "cancelled" | "expired";
+  error: {
+    code?: string;
+    description: string;
+    source?: string;
+    step?: string;
+    reason?: string;
+    metadata?: Record<string, unknown>;
+  };
+  metadata?: Record<string, unknown>;
 }
 
 export const paymentApi = {
   /**
-   * Create a payment order via Razorpay
-   * Backend should use Razorpay API to create order
+   * Create checkout session/order via backend checkout API
    */
-  createOrder: (data: CreateOrderRequest): Promise<any> =>
-    apiService.post("/payments/create-order", data, {
+  createCheckout: (data: CreateCheckoutRequest): Promise<any> =>
+    apiService.post("/api/payments/checkout", data, {
       includeToken: true,
     }),
 
@@ -43,7 +54,7 @@ export const paymentApi = {
    * Backend should verify with Razorpay using secret key
    */
   verifyPayment: (data: VerifyPaymentRequest): Promise<any> =>
-    apiService.post("/payments/verify-payment", data, {
+    apiService.post("/api/payments/verify", data, {
       includeToken: true,
     }),
 
@@ -74,12 +85,8 @@ export const paymentApi = {
   /**
    * Handle payment failure
    */
-  recordPaymentFailure: (data: {
-    orderId: string;
-    error: string;
-    userId?: string;
-  }): Promise<any> =>
-    apiService.post("/payments/failure", data, {
+  recordPaymentFailure: (data: RecordPaymentFailureRequest): Promise<any> =>
+    apiService.post("/api/payments/failure", data, {
       includeToken: true,
     }),
 };
