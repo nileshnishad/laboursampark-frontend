@@ -34,15 +34,15 @@ export default function Footer() {
           <div className="font-semibold text-gray-900 dark:text-white mb-2">Contact Us</div>
           <ul className="text-gray-700 dark:text-gray-300 text-sm flex flex-col gap-2">
             <li>Email: <a href="mailto:laboursampark@gmail.com" className="hover:underline">laboursampark@gmail.com</a></li>
-            <li>Phone: <a href="tel:+911234567890" className="hover:underline">+91 12345 67890</a></li>
-            <li>Address: 123, Main Road, City, India</li>
+            <li>Phone: <a href="tel:+919172272305" className="hover:underline">+91 9172272305</a></li>
+            <li>Address: Mumbai city, Maharashtra, India</li>
           </ul>
         </div>
         {/* Newsletter */}
         
       </div>
       <div className="max-w-6xl mx-auto px-4 mt-8 border-t border-gray-200 dark:border-gray-800 pt-4 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-        <div>© {new Date().getFullYear()} LabourSampark. All rights reserved.</div>
+        <div>© {new Date().getFullYear()} LabourSampark. All rights reserved. | Operated by NILESH RAJENDRA NISHAD</div>
         <div className="flex gap-4 mt-2 md:mt-0">
           <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
           <a href="/terms-of-service" className="hover:underline">Terms of Service</a>

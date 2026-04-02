@@ -163,12 +163,12 @@ export default function ContactSection() {
           {
             icon: "📍",
             title: "Address",
-            content: "123 Labour Street, New Delhi, India 110001"
+            content: "Mumbai city, Maharashtra, India"
           },
           {
             icon: "📞",
             title: "Phone",
-            content: "+91 (800) 123-4567"
+            content: "+91 9172272305"
           },
           {
             icon: "✉️",
