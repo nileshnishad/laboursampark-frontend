@@ -219,310 +219,39 @@ export default function LabourRegisterForm() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 py-4 px-2">
       <div className="max-w-6xl mx-auto">
         {/* Back to Home Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => router.push("/")}
-            className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-sm transition-colors group"
-          >
-            <span className="group-hover:-translate-x-1 transition-transform">
-              ←
-            </span>
-            Back to Home
-          </button>
-        </div>
+
 
         {/* Header */}
-        <div className="text-center mb-4">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
+        <div className="text-center mb-2">
+          <h1 className="text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white mb-2">
             Join as Labour
           </h1>
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          <p className="text-xs md:text-sm text-gray-700 dark:text-gray-300">
             Create your profile and get work opportunities
           </p>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 md:p-8">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Row 1: Name, Age, Mobile */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Your name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Age *
-                </label>
-                <input
-                  type="number"
-                  placeholder="Age"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Mobile Number *
-                </label>
-                <input
-                  type="tel"
-                  placeholder="+91 XXXXXXXXXX"
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-            </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6">
+          <form className="space-y-3" onSubmit={handleSubmit}>
+            {/* SECTION 1: Profile Photo - Top Center */}
+            <div className="flex flex-col items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-base font-bold text-gray-900 dark:text-white">Profile Photo</h2>
 
-            {/* Row 2: Email, Password */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Email ID *
-                </label>
-                <input
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Password *
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-3 py-2 pr-10 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                    title={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? (
-                      <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                        <path
-                          fillRule="evenodd"
-                          d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
-                          clipRule="evenodd"
-                        />
-                        <path d="M15.171 13.576l1.414 1.414A1 1 0 0016 14h-2.5a1.5 1.5 0 01-1.5-1.5V9.914l1.171 1.171a4 4 0 000 5.656z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 3: Experience, Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Years of Experience *
-                </label>
-                <select
-                  value={experience}
-                  onChange={(e) => setExperience(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
-                >
-                  <option>Select experience</option>
-                  {EXPERIENCE_RANGE.map((exp) => (
-                    <option key={exp} value={exp}>
-                      {exp}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Location Selector */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Your Location *{" "}
-                <span className="text-red-500">
-                  Auto-detect or enter address
-                </span>
-              </label>
-              <LocationSelector
-                onLocationChange={setLocation}
-                initialLocation={location}
-                required={true}
-              />
-            </div>
-
-            {/* Skills */}
-            {/* Skills Dropdown */}
-            <div data-dropdown="skills">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Select Skills *
-              </label>
-              <div className="relative">
-                {/* Dropdown Button */}
-                <button
-                  type="button"
-                  onClick={() => setSkillsDropdownOpen(!skillsDropdownOpen)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white bg-white text-left flex justify-between items-center"
-                >
-                  <span>
-                    {selectedSkills.length > 0
-                      ? `${selectedSkills.length} selected`
-                      : "Select skills"}
-                  </span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      skillsDropdownOpen ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </button>
-
-                {/* Dropdown Menu */}
-                {skillsDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-                    <div className="max-h-48 overflow-y-auto p-2 space-y-2">
-                      {SKILLS_OPTIONS.map((skill) => (
-                        <label
-                          key={skill}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedSkills.includes(skill)}
-                            onChange={() => toggleSkill(skill)}
-                            className="w-4 h-4 rounded"
-                          />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {skill}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Selected Skills Chips */}
-              {selectedSkills.length > 0 && (
-                <div className="flex flex-wrap gap-2 p-2 mt-2 bg-blue-50 dark:bg-blue-900 rounded">
-                  {selectedSkills.map((skill) => (
-                    <div
-                      key={skill}
-                      className="flex items-center gap-1 px-2 py-1 bg-blue-200 dark:bg-blue-700 text-blue-900 dark:text-blue-100 text-xs rounded-full"
-                    >
-                      <span>{skill}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeSkill(skill)}
-                        className="text-blue-900 dark:text-blue-100 hover:font-bold"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Bio */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                About You / Bio
-              </label>
-              <textarea
-                placeholder="Tell about your experience and expertise..."
-                rows={2}
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white resize-none"
-              />
-            </div>
-
-            {/* Profile Photo */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Profile Photo
-              </label>
-              <div className="flex gap-4 items-start">
-                {/* Upload Section */}
-                <div className="flex-1">
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePhotoUpload}
-                      disabled={loading || uploadStatus === "uploading"}
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white disabled:opacity-50 cursor-pointer"
-                    />
-                    {uploadStatus === "uploading" && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <span className="inline-block w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Click to select image • Crop and resize • Max 10MB
-                  </p>
-                </div>
-
-                {/* Preview Section */}
-                {profilePhotoPreview && (
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="border-2 border-green-400 rounded-full p-1 bg-white dark:bg-gray-700 flex items-center justify-center">
+              {/* Photo Preview or Upload Area */}
+              <div className="flex flex-col items-center gap-1 w-full max-w-md">
+                {profilePhotoPreview ? (
+                  <div className="relative group">
+                    <div className="border-4 border-green-400 rounded-full p-1 bg-white dark:bg-gray-700 flex items-center justify-center shadow-lg">
                       <img
                         src={profilePhotoPreview}
                         alt="Profile Preview"
-                        className="w-24 h-24 rounded-full object-cover"
+                        className="w-22 h-22 rounded-full object-cover"
                         onError={(e) => {
-                          console.error(
-                            "Preview image failed to load:",
-                            profilePhotoPreview,
-                          );
+                          console.error("Preview image failed to load:", profilePhotoPreview);
                           e.currentTarget.style.display = "none";
                         }}
                         onLoad={() => {
@@ -530,75 +259,346 @@ export default function LabourRegisterForm() {
                         }}
                       />
                     </div>
-                    <p className="text-xs font-semibold text-green-600 dark:text-green-400">
-                      ✓ Uploaded
-                    </p>
+                    <div className="flex gap-1 mt-2">
+                      <label className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors cursor-pointer flex items-center gap-2">
+                        <span>📷 Change Photo</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleProfilePhotoUpload}
+                          disabled={loading || uploadStatus === "uploading"}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                    <p className="text-xs text-green-600 dark:text-green-400 font-semibold mt-1">✓ Photo Uploaded</p>
+                  </div>
+                ) : (
+                  <label className="w-full cursor-pointer">
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-full w-22 h-22 mx-auto flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                      <div className="text-center">
+                        <span className="text-xl block mb-1">📷</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-400">Add Photo</span>
+                      </div>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePhotoUpload}
+                      disabled={loading || uploadStatus === "uploading"}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+
+                {/* Upload Status Messages */}
+                <div className="text-center w-full">
+                  {uploadStatus === "uploading" && (
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="inline-block w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
+                      <p className="text-xs text-blue-600 dark:text-blue-400">Uploading...</p>
+                    </div>
+                  )}
+                  {uploadError && (
+                    <p className="text-xs text-red-600 dark:text-red-400">✗ {uploadError}</p>
+                  )}
+                  {!profilePhotoPreview && uploadStatus !== "uploading" && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Max 10MB • Crop & Resize Available</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: Personal Details */}
+            <div>
+              <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">Personal Details</h2>
+
+              {/* Row 1: Name, Age, Mobile */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Your name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Age *
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Age"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Mobile Number *
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="+91 XXXXXXXXXX"
+                    value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Email, Password */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Email ID *
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-3 py-2 pr-10 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                          <path
+                            fillRule="evenodd"
+                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
+                            clipRule="evenodd"
+                          />
+                          <path d="M15.171 13.576l1.414 1.414A1 1 0 0016 14h-2.5a1.5 1.5 0 01-1.5-1.5V9.914l1.171 1.171a4 4 0 000 5.656z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>            </div>
+            {/* SECTION 3: Professional Details */}
+            <div>
+              <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">Professional Details</h2>
+
+              {/* Row: Experience & Location */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Years of Experience *
+                  </label>
+                  <select
+                    value={experience}
+                    onChange={(e) => setExperience(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  >
+                    <option>Select experience</option>
+                    {EXPERIENCE_RANGE.map((exp) => (
+                      <option key={exp} value={exp}>
+                        {exp}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Your Location *{" "}
+                    <span className="text-red-500 text-xs">
+                      (Auto-detect available)
+                    </span>
+                  </label>
+                  <LocationSelector
+                    onLocationChange={setLocation}
+                    initialLocation={location}
+                    required={true}
+                  />
+                </div>
+              </div>
+
+              {/* Skills */}
+              <div data-dropdown="skills" className="mb-3">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Select Skills *
+                </label>
+                <div className="relative">
+                  {/* Dropdown Button */}
+                  <button
+                    type="button"
+                    onClick={() => setSkillsDropdownOpen(!skillsDropdownOpen)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white bg-white text-left flex justify-between items-center"
+                  >
+                    <span>
+                      {selectedSkills.length > 0
+                        ? `${selectedSkills.length} selected`
+                        : "Select skills"}
+                    </span>
+                    <svg
+                      className={`w-4 h-4 transition-transform ${skillsDropdownOpen ? "rotate-180" : ""
+                        }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {skillsDropdownOpen && (
+                    <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+                      <div className="max-h-48 overflow-y-auto p-2 space-y-2">
+                        {SKILLS_OPTIONS.map((skill) => (
+                          <label
+                            key={skill}
+                            className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedSkills.includes(skill)}
+                              onChange={() => toggleSkill(skill)}
+                              className="w-4 h-4 rounded"
+                            />
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              {skill}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Selected Skills Chips */}
+                {selectedSkills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 p-2 mt-2 bg-blue-50 dark:bg-blue-900 rounded">
+                    {selectedSkills.map((skill) => (
+                      <div
+                        key={skill}
+                        className="flex items-center gap-1 px-2 py-1 bg-blue-200 dark:bg-blue-700 text-blue-900 dark:text-blue-100 text-xs rounded-full"
+                      >
+                        <span>{skill}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeSkill(skill)}
+                          className="text-blue-900 dark:text-blue-100 hover:font-bold"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
-              {/* Feedback Messages */}
-              <div className="mt-2 space-y-1">
-                {uploadStatus === "success" && (
-                  <p className="text-xs text-green-600 dark:text-green-400">
-                    ✓ Profile photo uploaded successfully
-                  </p>
-                )}
-                {uploadError && (
-                  <p className="text-xs text-red-600 dark:text-red-400">
-                    ✗ {uploadError}
-                  </p>
-                )}
+              {/* Bio */}
+              <div className="mt-3">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  About You / Bio
+                </label>
+                <textarea
+                  placeholder="Tell about your experience and expertise..."
+                  rows={2}
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white resize-none"
+                />
               </div>
             </div>
 
-            {/* Terms & Conditions */}
-            <div className="flex items-start gap-2">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={termsAgreed}
-                onChange={(e) => setTermsAgreed(e.target.checked)}
-                className="w-4 h-4 rounded mt-0.5"
-              />
-              <label
-                htmlFor="terms"
-                className="text-xs text-gray-700 dark:text-gray-300"
-              >
-                I agree to the Terms & Conditions and Privacy Policy
-              </label>
-            </div>
+            {/* SECTION 4: Terms & Submission */}
+            <div>
+              <div className="flex items-start gap-2 mb-4">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={termsAgreed}
+                  onChange={(e) => setTermsAgreed(e.target.checked)}
+                  className="w-4 h-4 rounded mt-1 cursor-pointer accent-blue-600"
+                />
+                <label
+                  htmlFor="terms"
+                  className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed cursor-pointer"
+                >
+                  I agree to the <span className="text-blue-600 dark:text-blue-400 font-semibold">Terms & Conditions</span> and <span className="text-blue-600 dark:text-blue-400 font-semibold">Privacy Policy</span>
+                </label>
+              </div>
 
-            {/* Submit Buttons */}
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                disabled={loading}
-                className="flex-1 px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 px-4 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold text-sm hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    Creating Account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
-              </button>
+              {/* Submit Buttons */}
+              <div className="flex gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => router.back()}
+                  disabled={loading}
+                  className="flex-1 px-3 py-2 border-2 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold text-sm hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      Creating Account...
+                    </>
+                  ) : (
+                    "Create Account"
+                  )}
+                </button>
+              </div>
             </div>
           </form>
         </div>
 
         {/* Footer Info */}
-        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg text-center">
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900 rounded-lg text-center">
           <p className="text-xs text-gray-700 dark:text-gray-300">
             Already have an account?{" "}
             <button

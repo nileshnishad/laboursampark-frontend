@@ -161,15 +161,8 @@ export default function LocationSelector({
       {/* STEP 1: Show Buttons (No location selected yet) */}
       {!hasLocationSelected && (
         <div className="space-y-3">
-          {/* Instructions */}
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <p className="text-xs text-blue-700 dark:text-blue-300 font-semibold mb-1">
-              📍 Get Your Location
-            </p>
-            <p className="text-xs text-blue-600 dark:text-blue-400">
-              Click the button below to automatically detect your location, or enter your address manually.
-            </p>
-          </div>
+
+
 
           {/* Buttons */}
           <div className="flex gap-2 flex-wrap">
