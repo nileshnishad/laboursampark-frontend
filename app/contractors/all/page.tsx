@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import VisitingCard from "@/app/components/common/VisitingCard";
 import UnifiedSearchInput from "@/app/components/common/UnifiedSearchInput";
@@ -36,7 +37,7 @@ type Contractor = {
   locationText?: string;
 };
 
-export default function AllContractorsPage() {
+function AllContractorsContent() {
   const router = useRouter();
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -182,5 +183,26 @@ export default function AllContractorsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function AllContractorsPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-18 md:pt-20 pb-4 px-2 sm:px-3">
+        <div className="max-w-7xl mx-auto h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] flex flex-col">
+          <div className="sticky top-0 z-20 bg-gray-50 dark:bg-gray-900 pb-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+          </div>
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} type="card" />
+            ))}
+          </div>
+        </div>
+      </main>
+    }>
+      <AllContractorsContent />
+    </Suspense>
   );
 }
