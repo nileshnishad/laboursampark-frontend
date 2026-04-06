@@ -6,7 +6,7 @@ import { labourApi } from "@/lib/api-endpoints";
 import Skeleton from "@/app/components/Skeleton";
 import { getToken } from "@/lib/api-service";
 import { showInfoToast } from "@/lib/toast-utils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Labour = {
   _id: string;
@@ -35,6 +35,17 @@ export default function AllLaboursPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const isLoggedIn = Boolean(getToken());
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize searchQuery from URL search parameter
+  useEffect(() => {
+    const urlSearch = searchParams.get("search");
+    if (urlSearch) {
+      setSearchQuery(decodeURIComponent(urlSearch));
+    }
+  }, [searchParams]);
+  
+  
 
   useEffect(() => {
     const fetchLabours = async () => {

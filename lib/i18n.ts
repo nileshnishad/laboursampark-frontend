@@ -26,13 +26,13 @@ export const translations = {
       title: "Labour",
       joinAs: "Join as Labour",
       myProfile: "My Profile",
-      findWork: "Find Work",
+      findWork: "Find Worker",
     },
     contractor: {
       title: "Contractor",
       joinAs: "Join as Contractor",
       myProfile: "My Profile",
-      findLabour: "Find Labour",
+      findLabour: "Find Contractor",
     },
     home: {
       title: "LabourSampark",
@@ -104,13 +104,13 @@ export const translations = {
       title: "मजदूर",
       joinAs: "मजदूर के रूप में शामिल हों",
       myProfile: "मेरी प्रोफाइल",
-      findWork: "काम खोजें",
+      findWork: "मजदूर खोजें",
     },
     contractor: {
       title: "ठेकेदार",
       joinAs: "ठेकेदार के रूप में शामिल हों",
       myProfile: "मेरी प्रोफाइल",
-      findLabour: "मजदूर खोजें",
+      findLabour: "ठेकेदार खोजें",
     },
     home: {
       title: "लेबरसमपार्क",
@@ -182,13 +182,13 @@ export const translations = {
       title: "मजूर",
       joinAs: "मजूर म्हणून सामील व्हा",
       myProfile: "माझी प्रोफाईल",
-      findWork: "काम शोधा",
+      findWork: "मजूर शोधा",
     },
     contractor: {
       title: "कंत्राटर",
       joinAs: "कंत्राटर म्हणून सामील व्हा",
       myProfile: "माझी प्रोफाईल",
-      findLabour: "मजूर शोधा",
+      findLabour: "कंत्राटर शोधा",
     },
     home: {
       title: "लेबरसमपार्क",

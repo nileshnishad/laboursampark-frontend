@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { t } from "@/lib/i18n";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import { buildUserDashboardPath } from "@/lib/user-route";
 
 export default function HeroSection() {
   const { locale } = useLanguage();
@@ -10,6 +13,7 @@ export default function HeroSection() {
   const [query, setQuery] = useState("");
   const [useFixedBackground, setUseFixedBackground] = useState(true);
   const router = useRouter();
+  const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
@@ -40,6 +44,11 @@ export default function HeroSection() {
   };
 
   const handleRegisterClick = (type: "labour" | "contractor") => {
+    if (user) {
+      router.push(buildUserDashboardPath(user, type));
+      return;
+    }
+
     router.push(`/register?type=${type}`);
   };
 
@@ -60,7 +69,7 @@ export default function HeroSection() {
       {/* Content wrapper */}
       <div className="relative z-10 w-full flex flex-col items-center justify-center">
       {/* Header Section */}
-      <div className="w-full max-w-3xl mb-8 sm:mb-12 md:mb-16">
+      <div className="w-full max-w-4xl mb-8 sm:mb-12 md:mb-16">
         <h1 className="text-xl sm:text-xl md:text-2xl lg:text-4xl font-extrabold text-center bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-4 sm:mb-6">
           {t(locale, "home.heroHeading")}
         </h1>

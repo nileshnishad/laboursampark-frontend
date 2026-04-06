@@ -6,7 +6,7 @@ import { contractorApi } from "@/lib/api-endpoints";
 import { getToken } from "@/lib/api-service";
 import { showInfoToast } from "@/lib/toast-utils";
 import Skeleton from "@/app/components/Skeleton";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Contractor = {
   _id: string;
@@ -43,11 +43,20 @@ export default function AllContractorsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const isLoggedIn = Boolean(getToken());
+  const searchParams = useSearchParams();
 
   const handleGuestViewAttempt = () => {
     showInfoToast("For viewing profile details, please login first.");
     router.push("/login");
   };
+
+  // Initialize searchQuery from URL search parameter
+  useEffect(() => {
+    const urlSearch = searchParams.get("search");
+    if (urlSearch) {
+      setSearchQuery(decodeURIComponent(urlSearch));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchContractors = async () => {
