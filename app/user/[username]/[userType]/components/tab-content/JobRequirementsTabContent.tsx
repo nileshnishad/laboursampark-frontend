@@ -5,9 +5,10 @@ import { useSelector } from "react-redux";
 import type { TabContentProps } from "../TabValueContentMap";
 import type { RootState } from "@/store/store";
 import { useAppDispatch } from "@/store/hooks";
-import { toggleJobActivation } from "@/store/slices/jobEnquirySlice";
+import { toggleJobActivation, fetchJobEnquiries } from "@/store/slices/jobEnquirySlice";
 import { apiGet, apiPatch, apiPost, apiPut } from "@/lib/api-service";
 import { showErrorToast, showSuccessToast, showWarningToast } from "@/lib/toast-utils";
+import JobStatCards, { type JobCardKey } from "../JobStatCards";
 
 type RequirementTargetOption = "labour" | "sub_contractor";
 type RequirementTarget = "labour" | "sub_contractor";
@@ -60,9 +61,9 @@ const INITIAL_FORM: RequirementFormState = {
 };
 
 export default function JobRequirementsTabContent(props: TabContentProps) {
-  const { usersLoading, usersError, filteredData, onConnect } = props;
+  const { usersLoading, usersError, filteredData, onConnect, userType } = props;
   const { user } = useSelector((state: RootState) => state.auth);
-  const { jobActivation } = useSelector((state: RootState) => state.jobEnquiry);
+  const { jobActivation, jobEnquiries } = useSelector((state: RootState) => state.jobEnquiry);
   const dispatch = useAppDispatch();
   const [form, setForm] = useState<RequirementFormState>(INITIAL_FORM);
   const [publishedRequirements, setPublishedRequirements] = useState<PublishedRequirement[]>([]);
@@ -76,6 +77,8 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
   const [selectedJob, setSelectedJob] = useState<PublishedRequirement | null>(null);
   const [jobEditForm, setJobEditForm] = useState<RequirementFormState>(INITIAL_FORM);
   const [updatingJob, setUpdatingJob] = useState(false);
+  const [activeCardKey, setActiveCardKey] = useState<JobCardKey>("posted");
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const isProfileHidden = user?.display === false;
 
   // Applied Jobs state
@@ -252,8 +255,13 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
       }
 
       const { jobs, totalPagesFromApi } = extractJobsAndPagination(response.data);
-      setPublishedRequirements(jobs.map(mapApiJobToRequirement));
+      const mapped = jobs.map(mapApiJobToRequirement);
+      setPublishedRequirements(mapped);
       setTotalPages(totalPagesFromApi);
+      // Fetch enquiries for each job so JobStatCards has data
+      mapped.forEach((job) => {
+        if (job.id) dispatch(fetchJobEnquiries({ jobId: job.id }));
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to fetch jobs.";
       setJobsError(message);
@@ -388,8 +396,131 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
     }
   };
 
+  const handleCardClick = (key: JobCardKey) => {
+    setActiveCardKey(key);
+    setMobileDetailOpen(true);
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
+      <div className="px-4 sm:px-6 pt-5">
+        <JobStatCards
+          userType={userType}
+          totalPostedJobs={publishedRequirements.length}
+          activeCardKey={activeCardKey}
+          onCardClick={handleCardClick}
+        />
+      </div>
+
+      {/* Content: full-screen overlay on mobile when card is tapped, always-inline on desktop */}
+      <div className={
+        mobileDetailOpen
+          ? "fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col lg:static lg:inset-auto lg:z-auto lg:bg-transparent lg:block"
+          : "hidden lg:block"
+      }>
+        {/* Mobile: back-navigation header */}
+        {mobileDetailOpen && (
+          <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => setMobileDetailOpen(false)}
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h2 className="text-sm font-bold text-gray-900 dark:text-white">
+              {activeCardKey === "posted" && "Published Jobs"}
+              {activeCardKey === "applications" && "All Applications"}
+              {activeCardKey === "pending" && "Requests Received"}
+              {activeCardKey === "accepted" && "Accepted Applications"}
+              {activeCardKey === "completed" && "Completed Jobs"}
+              {activeCardKey === "rejected" && "Rejected Applications"}
+            </h2>
+          </div>
+        )}
+        <div className={mobileDetailOpen ? "flex-1 overflow-y-auto lg:overflow-visible lg:flex-none" : ""}>
+          {/* Filtered enquiries panel — shown when a non-"posted" card is active */}
+          {activeCardKey !== "posted" && (() => {
+        const allEnquiries: any[] = Object.values(
+          jobEnquiries.enquiries as Record<string, any[]>
+        ).flat();
+        let filtered: any[];
+        if (activeCardKey === "applications") {
+          filtered = allEnquiries;
+        } else {
+          filtered = allEnquiries.filter((e: any) => {
+            const s = (e?.status || "").toLowerCase();
+            return s === activeCardKey;
+          });
+        }
+        const sectionLabel: Record<string, string> = {
+          applications: "All Applications",
+          pending: "Requests Received",
+          accepted: "Accepted Applications",
+          completed: "Completed Jobs",
+          rejected: "Rejected Applications",
+        };
+        return (
+          <div className="px-4 sm:px-6 pb-5">
+            <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
+              {sectionLabel[activeCardKey] ?? activeCardKey}
+            </h3>
+            {filtered.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">No records found for this category.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {filtered.map((enquiry: any, idx: number) => {
+                  const id = enquiry?.id || enquiry?._id || idx;
+                  const status = (enquiry?.status || "pending").toLowerCase();
+                  const statusColors: Record<string, string> = {
+                    pending: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+                    accepted: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+                    completed: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+                    rejected: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+                  };
+                  return (
+                    <div key={id} className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3.5">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-1">
+                          {enquiry?.applicantName || enquiry?.labourName || enquiry?.name || "Applicant"}
+                        </p>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 capitalize ${statusColors[status] ?? "bg-gray-100 text-gray-600"}`}>
+                          {status}
+                        </span>
+                      </div>
+                      {enquiry?.jobTitle && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                          Job: <span className="font-medium text-gray-700 dark:text-gray-300">{enquiry.jobTitle}</span>
+                        </p>
+                      )}
+                      {enquiry?.location && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                          Location: <span className="font-medium text-gray-700 dark:text-gray-300">{enquiry.location}</span>
+                        </p>
+                      )}
+                      {enquiry?.skills && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Skills: <span className="font-medium text-gray-700 dark:text-gray-300">{Array.isArray(enquiry.skills) ? enquiry.skills.join(", ") : enquiry.skills}</span>
+                        </p>
+                      )}
+                      {enquiry?.message && (
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mt-2 line-clamp-2 italic">"{enquiry.message}"</p>
+                      )}
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2">
+                        {enquiry?.createdAt ? new Date(enquiry.createdAt).toLocaleDateString() : ""}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {activeCardKey === "posted" && (
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-5">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -413,9 +544,10 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
           </p>
         )}
       </div>
+      )}
 
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3 sm:p-4">
+        <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-3 sm:p-4">
           <div className="w-full max-w-2xl rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl max-h-[88vh] overflow-y-auto">
             <div className="px-4 sm:px-5 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Create New Job</h3>
@@ -530,6 +662,7 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
         </div>
       )}
 
+      {activeCardKey === "posted" && (
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-5">
         <div className="flex items-center justify-between gap-3 mb-3">
           <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Published Jobs</h3>
@@ -600,6 +733,10 @@ export default function JobRequirementsTabContent(props: TabContentProps) {
           >
             Next
           </button>
+        </div>
+      </div>
+      )}
+
         </div>
       </div>
 
