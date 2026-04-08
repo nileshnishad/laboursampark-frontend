@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 import type { AppDispatch, RootState } from "@/store/store";
+import { createPayULink, buildSubscriptionPayload, type PayULinkStatus } from "@/lib/payu-service";
 
 type UserType = "labour" | "contractor" | "sub_contractor";
 
@@ -29,6 +30,8 @@ export default function PaymentPage() {
   const { user } = useSelector((state: RootState) => state.auth);
   
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+  const [payStatus, setPayStatus] = useState<PayULinkStatus>("idle");
+  const [payError, setPayError] = useState<string | null>(null);
 
   const username = params.username as string;
   const userType = normalizeUserType(params.userType as string);
@@ -53,6 +56,24 @@ export default function PaymentPage() {
 
   const handleBack = () => {
     router.push(`/user/${username}/${userType}`);
+  };
+
+  const handlePayNow = async () => {
+    try {
+      setPayError(null);
+      setPayStatus("loading");
+
+      const payload = buildSubscriptionPayload(userType, payableAmount);
+      const { paymentUrl } = await createPayULink(payload);
+
+      setPayStatus("success");
+      // Redirect to PayU payment page
+      window.location.href = paymentUrl;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Payment initiation failed. Please try again.";
+      setPayError(message);
+      setPayStatus("error");
+    }
   };
 
   if (!user) {
@@ -182,21 +203,45 @@ export default function PaymentPage() {
           <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 mb-3 border border-green-200 dark:border-green-800">
             <p className="text-xs text-green-700 dark:text-green-300 flex items-center gap-2">
               <span>🔒</span>
-              <span>Secure payment processing — gateway integration coming soon</span>
+              <span>Secure payment processing powered by PayU</span>
             </p>
           </div>
+
+          {/* Error banner */}
+          {payError && (
+            <div className="rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20 px-3 py-2.5 mb-3">
+              <p className="text-xs text-red-700 dark:text-red-300 flex items-start gap-1.5">
+                <span className="shrink-0">⚠️</span>
+                <span>{payError}</span>
+              </p>
+            </div>
+          )}
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-2 mb-4">
             <button
-              disabled
-              className="flex-1 px-4 py-2.5 sm:py-3 bg-blue-400 cursor-not-allowed text-white rounded-lg font-semibold text-sm sm:text-base flex items-center justify-center gap-2"
+              onClick={handlePayNow}
+              disabled={payStatus === "loading" || payStatus === "success"}
+              className="flex-1 px-4 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-semibold text-sm sm:text-base transition-colors flex items-center justify-center gap-2"
             >
-              💳 Pay ₹{payableAmount} — Coming Soon
+              {payStatus === "loading" ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Initiating Payment...
+                </>
+              ) : payStatus === "success" ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Redirecting to PayU...
+                </>
+              ) : (
+                <>💳 Pay ₹{payableAmount} via PayU</>
+              )}
             </button>
             <button
               onClick={handleBack}
-              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold text-sm transition-colors"
+              disabled={payStatus === "loading" || payStatus === "success"}
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 text-gray-800 dark:text-white rounded-lg font-semibold text-sm transition-colors"
             >
               Go Back
             </button>
