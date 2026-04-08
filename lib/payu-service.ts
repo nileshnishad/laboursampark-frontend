@@ -3,7 +3,7 @@
  * Handles payment link creation and redirection via backend API.
  */
 
-import { apiPost } from "./api-service";
+import { apiPost, apiGet } from "./api-service";
 
 // ─── Config (reads from env at call-time so it always picks up .env.local) ───
 
@@ -43,6 +43,50 @@ export interface PayUCreateLinkResponse {
 }
 
 export type PayULinkStatus = "idle" | "loading" | "success" | "error";
+
+// ─── Payment Status ───────────────────────────────────────────────────────────
+
+export interface PaymentStatusResponse {
+  paymentId: string;
+  txnId: string;
+  status: string;       // e.g. "success" | "pending" | "failed"
+  amount: number;
+  currency: string;
+  gateway: string;
+  productInfo?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Fetches the current status of a payment from the backend.
+ * Requires a valid JWT (auto-attached by apiGet).
+ */
+export async function fetchPaymentStatus(
+  paymentId: string
+): Promise<PaymentStatusResponse> {
+  const response = await apiGet<any>(
+    `/api/payments/${paymentId}/status`,
+    { baseUrl: getApiBase(), timeout: 10000 }
+  );
+
+  if (!response.success) {
+    throw new Error(response.error || response.message || "Could not fetch payment status.");
+  }
+
+  const d: any = (response.data as any)?.data ?? response.data ?? {};
+  return {
+    paymentId: d.paymentId || d._id || paymentId,
+    txnId: d.txnId || "",
+    status: d.status || "unknown",
+    amount: Number(d.amount ?? 0),
+    currency: d.currency || "INR",
+    gateway: d.gateway || "payu",
+    productInfo: d.productInfo || d.product_info || "",
+    createdAt: d.createdAt || "",
+    updatedAt: d.updatedAt || "",
+  };
+}
 
 // ─── Service ──────────────────────────────────────────────────────────────────
 

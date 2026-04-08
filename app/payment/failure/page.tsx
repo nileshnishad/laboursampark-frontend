@@ -3,11 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { fetchPaymentStatus, type PaymentStatusResponse } from "@/lib/payu-service";
 
 function PaymentFailureContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [visible, setVisible] = useState(false);
+  const [statusData, setStatusData] = useState<PaymentStatusResponse | null>(null);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   // PayU passes these params on redirect
   const txnId = searchParams.get("txnid") || searchParams.get("txnId") || "";
@@ -17,10 +21,26 @@ function PaymentFailureContent() {
     searchParams.get("message") ||
     "";
   const amount = searchParams.get("amount") || "";
-  const status = searchParams.get("status") || "failed";
+  const payuStatus = searchParams.get("status") || "failed";
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
+
+    // Call backend status API with the paymentId saved before redirect
+    const paymentId = sessionStorage.getItem("payu_payment_id");
+    if (paymentId) {
+      setStatusLoading(true);
+      fetchPaymentStatus(paymentId)
+        .then((data) => {
+          setStatusData(data);
+          sessionStorage.removeItem("payu_payment_id");
+        })
+        .catch((err) => {
+          setStatusError(err instanceof Error ? err.message : "Could not verify payment.");
+        })
+        .finally(() => setStatusLoading(false));
+    }
+
     return () => clearTimeout(t);
   }, []);
 
@@ -31,6 +51,15 @@ function PaymentFailureContent() {
   const handleGoHome = () => {
     router.push("/");
   };
+
+  const displayTxnId = statusData?.txnId || txnId;
+  const displayAmount = statusData?.amount ? `₹${statusData.amount}` : amount ? `₹${amount}` : "";
+  const displayStatus = statusData?.status || payuStatus;
+  const displayError =
+    errorMessage ||
+    (statusData?.status && statusData.status !== "success"
+      ? `Payment ${statusData.status}. Please try again.`
+      : "Your payment could not be processed. Please try again.");
 
   return (
     <div className="min-h-screen bg-gray-900/80 flex items-center justify-center p-4">
@@ -66,33 +95,62 @@ function PaymentFailureContent() {
         <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-1">
           Payment Failed
         </h1>
-        <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-6">
-          {errorMessage || "Your payment could not be processed. Please try again."}
+        <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-5">
+          {displayError}
         </p>
 
+        {/* Backend status verification */}
+        {statusLoading && (
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
+            <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+            Checking payment status...
+          </div>
+        )}
+        {statusError && (
+          <div className="text-xs text-amber-600 dark:text-amber-400 text-center mb-4">
+            ⚠️ {statusError}
+          </div>
+        )}
+
         {/* Transaction details */}
-        {(txnId || amount) && (
-          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 p-4 mb-6 space-y-2">
-            {txnId && (
+        {(displayTxnId || displayAmount || statusData?.paymentId) && (
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 p-4 mb-5 space-y-2">
+            {displayTxnId && (
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Transaction ID</span>
                 <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[55%] text-right">
-                  {txnId}
+                  {displayTxnId}
                 </span>
               </div>
             )}
-            {amount && (
+            {statusData?.paymentId && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Payment ID</span>
+                <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[55%] text-right">
+                  {statusData.paymentId}
+                </span>
+              </div>
+            )}
+            {displayAmount && (
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Amount</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">₹{amount}</span>
+                <span className="font-medium text-gray-800 dark:text-gray-200">{displayAmount}</span>
               </div>
             )}
             <div className="flex justify-between text-sm">
               <span className="text-gray-500 dark:text-gray-400">Status</span>
               <span className="font-semibold text-red-600 dark:text-red-400 capitalize">
-                {status}
+                {displayStatus}
               </span>
             </div>
+            {statusData && (
+              <div className="flex items-center gap-1.5 pt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+                <span className="text-xs text-blue-600 dark:text-blue-400">
+                  Verified by server
+                </span>
+              </div>
+            )}
           </div>
         )}
 
@@ -140,3 +198,5 @@ export default function PaymentFailurePage() {
     </Suspense>
   );
 }
+
+

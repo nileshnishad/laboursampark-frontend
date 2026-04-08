@@ -64,11 +64,16 @@ export default function PaymentPage() {
       setPayStatus("loading");
 
       const payload = buildSubscriptionPayload(userType, payableAmount);
-      const { paymentUrl } = await createPayULink(payload);
+      const result = await createPayULink(payload);
+
+      // Persist paymentId so success/failure pages can call the status API
+      if (result.paymentId) {
+        sessionStorage.setItem("payu_payment_id", result.paymentId);
+      }
 
       setPayStatus("success");
       // Redirect to PayU payment page
-      window.location.href = paymentUrl;
+      window.location.href = result.paymentUrl;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Payment initiation failed. Please try again.";
       setPayError(message);
