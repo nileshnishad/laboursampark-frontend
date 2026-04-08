@@ -21,7 +21,12 @@ export default function Menu() {
   const { user } = useSelector((state: RootState) => state.auth);
   const [active, setActive] = useState("hero");
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const isHomePage = pathname === "/";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -147,7 +152,7 @@ export default function Menu() {
         <LanguageSelector compact />
 
         {/* Login / Dashboard Button */}
-        {user ? (
+        {mounted && user ? (
           <button
             onClick={() => router.push(buildUserDashboardPath(user))}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
@@ -197,7 +202,7 @@ export default function Menu() {
 
           {/* Mobile Login Button */}
           <li className="border-t border-gray-300 dark:border-gray-700 pt-4 mt-2">
-            {user ? (
+            {mounted && user ? (
               <button
                 onClick={() => {
                   router.push(buildUserDashboardPath(user));

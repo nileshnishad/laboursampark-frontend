@@ -1,5 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import { buildUserDashboardPath } from "@/lib/user-route";
 import Menu from "./components/Menu";
 import HeroSection from "./components/HeroSection";
 import LaboursSection from "./components/LaboursSection";
@@ -12,6 +17,15 @@ import { primaryKeywords, secondaryKeywords, metaDescriptions } from "@/lib/seo-
 import SEOHead from "./components/SEOHead";
 
 export default function Home() {
+  const router = useRouter();
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (user) {
+      router.replace(buildUserDashboardPath(user));
+    }
+  }, [user, router]);
+
   // Combine primary and secondary keywords for maximum coverage
   const allHomeKeywords = [...primaryKeywords, ...secondaryKeywords];
 
