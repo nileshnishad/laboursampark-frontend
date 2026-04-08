@@ -5,8 +5,6 @@ import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 import type { AppDispatch, RootState } from "@/store/store";
-import RazorpayPaymentModal from "@/app/components/RazorpayPaymentModal";
-import { toast } from "react-toastify";
 
 type UserType = "labour" | "contractor" | "sub_contractor";
 
@@ -30,8 +28,6 @@ export default function PaymentPage() {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
 
   const username = params.username as string;
@@ -57,31 +53,6 @@ export default function PaymentPage() {
 
   const handleBack = () => {
     router.push(`/user/${username}/${userType}`);
-  };
-
-  const handlePaymentSuccess = async (paymentData: any) => {
-    try {
-      setIsProcessing(true);
-      console.log("Payment successful:", paymentData);
-
-      // TODO: Update user subscription status on backend
-      // After backend confirms payment, redirect to dashboard
-      setTimeout(() => {
-        toast.success("Payment verified! Your profile is now visible.");
-        setIsPaymentModalOpen(false);
-        router.push(`/user/${username}/${userType}`);
-      }, 2000);
-    } catch (error) {
-      console.error("Error processing payment:", error);
-      toast.error("Error processing payment. Please contact support.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handlePaymentError = (error: string) => {
-    console.error("Payment error:", error);
-    toast.error(error);
   };
 
   if (!user) {
@@ -211,30 +182,21 @@ export default function PaymentPage() {
           <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 mb-3 border border-green-200 dark:border-green-800">
             <p className="text-xs text-green-700 dark:text-green-300 flex items-center gap-2">
               <span>🔒</span>
-              <span>100% secure payments via Razorpay on LabourSampark</span>
+              <span>Secure payment processing — gateway integration coming soon</span>
             </p>
           </div>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-2 mb-4">
             <button
-              onClick={() => setIsPaymentModalOpen(true)}
-              disabled={isProcessing}
-              className="flex-1 px-4 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg font-semibold text-sm sm:text-base transition-colors flex items-center justify-center gap-2"
+              disabled
+              className="flex-1 px-4 py-2.5 sm:py-3 bg-blue-400 cursor-not-allowed text-white rounded-lg font-semibold text-sm sm:text-base flex items-center justify-center gap-2"
             >
-              {isProcessing ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Processing...
-                </>
-              ) : (
-                <>💳 Pay ₹{payableAmount}</>
-              )}
+              💳 Pay ₹{payableAmount} — Coming Soon
             </button>
             <button
               onClick={handleBack}
-              disabled={isProcessing}
-              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 text-gray-800 dark:text-white rounded-lg font-semibold text-sm transition-colors"
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold text-sm transition-colors"
             >
               Go Back
             </button>
@@ -256,7 +218,7 @@ export default function PaymentPage() {
               {[
                 {
                   question: "Is payment secure on LabourSampark?",
-                  answer: "Yes. We use Razorpay with PCI-DSS Level 1 compliance - the highest security standard.",
+                  answer: "Yes. Your payment details are fully encrypted and never stored on our servers. We follow PCI-DSS security standards.",
                 },
                 {
                   question: "What payment methods are accepted?",
@@ -304,24 +266,6 @@ export default function PaymentPage() {
           </div>
         </div>
       </main>
-
-      {/* Razorpay Payment Modal */}
-      {user && (
-        <RazorpayPaymentModal
-          isOpen={isPaymentModalOpen}
-          amount={payableAmount}
-          userType={userType}
-          userDetails={{
-            name: user.fullName || username,
-            email: user.email || "",
-            phone: user.mobile || "",
-            userId: user._id,
-          }}
-          onClose={() => setIsPaymentModalOpen(false)}
-          onPaymentSuccess={handlePaymentSuccess}
-          onPaymentError={handlePaymentError}
-        />
-      )}
     </div>
   );
 }
