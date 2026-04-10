@@ -331,7 +331,7 @@ export default function ContractorRegisterForm({
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 py-8 px-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 py-10 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Back to Home Button */}
         <div className="mb-6">
@@ -339,39 +339,31 @@ export default function ContractorRegisterForm({
             onClick={() => router.push("/")}
             className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold text-sm transition-colors group"
           >
-            <span className="group-hover:-translate-x-1 transition-transform">←</span>
-            Back to Home
+            ← Back to Home
           </button>
         </div>
 
         {/* Header */}
-        <div className="text-center mb-4">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-3">
             {registrationRole === "sub-contractor"
-              ? "Register as Sub-Contractor"
+              ? "Join as Sub-Contractor"
               : "Register Your Business"}
           </h1>
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          <p className="text-sm md:text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
             {registrationRole === "sub-contractor"
-              ? "Create your sub-contractor profile and start getting project work"
-              : "Get connected with skilled workers and grow your business"}
+              ? "Create your sub-contractor profile and start getting project work."
+              : "Get connected with skilled workers and grow your business today."}
           </p>
-          <button
-            type="button"
-            onClick={() => router.push("/register?type=contractor")}
-            className="mt-3 text-xs font-semibold text-indigo-600 dark:text-indigo-300 hover:underline"
-          >
-            Change registration type
-          </button>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 md:p-8">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="bg-white/95 dark:bg-gray-900 shadow-2xl rounded-3xl p-6 md:p-10 backdrop-blur-md border border-gray-100 dark:border-gray-800">
+          <form className="space-y-8" onSubmit={handleSubmit}>
             {/* Row 1: Full Name, Business Name, Mobile */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
                   Full Name *
                 </label>
                 <input
@@ -379,23 +371,23 @@ export default function ContractorRegisterForm({
                   placeholder="Your full name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Comapny Name *
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
+                  Company Name *
                 </label>
                 <input
                   type="text"
                   placeholder="Your Company name"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
                   Mobile Number *
                 </label>
                 <input
@@ -403,15 +395,15 @@ export default function ContractorRegisterForm({
                   placeholder="+91 XXXXXXXXXX"
                   value={mobile}
                   onChange={(e) => setMobileNumber(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
                 />
               </div>
             </div>
 
             {/* Row 2: Email, Password, Location */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
                   Email ID *
                 </label>
                 <input
@@ -419,11 +411,11 @@ export default function ContractorRegisterForm({
                   placeholder="your.email@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
                   Password *
                 </label>
                 <div className="relative">
@@ -432,13 +424,13 @@ export default function ContractorRegisterForm({
                     placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-3 py-2 pr-10 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                    className="w-full px-4 py-2.5 pr-12 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors"
                   >
                     {showPassword ? (
                       <svg

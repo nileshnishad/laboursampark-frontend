@@ -235,14 +235,17 @@ export default function LabourRegisterForm() {
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6">
-          <form className="space-y-3" onSubmit={handleSubmit}>
+        <div className="bg-white/95 dark:bg-gray-900 shadow-2xl rounded-2xl p-4 md:p-8 backdrop-blur-sm border border-gray-100 dark:border-gray-800">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* SECTION 1: Profile Photo - Top Center */}
-            <div className="flex flex-col items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-base font-bold text-gray-900 dark:text-white">Profile Photo</h2>
+            <div className="flex flex-col items-center gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">1</span>
+                Profile Photo
+              </h2>
 
               {/* Photo Preview or Upload Area */}
-              <div className="flex flex-col items-center gap-1 w-full max-w-md">
+              <div className="flex flex-col items-center gap-3 w-full max-w-md">
                 {profilePhotoPreview ? (
                   <div className="relative group">
                     <div className="border-4 border-green-400 rounded-full p-1 bg-white dark:bg-gray-700 flex items-center justify-center shadow-lg">

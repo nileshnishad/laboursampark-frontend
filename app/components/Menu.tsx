@@ -9,10 +9,11 @@ import LanguageSelector from "./LanguageSelector";
 
 const sections = [
   { id: "hero", label: "Home", path: "/" },
-  { id: "labours", label: "Labours", path: "#labours" },
-  { id: "contractors", label: "Contractors", path: "#contractors" },
-  { id: "about", label: "About", path: "#about" },
-  { id: "contact", label: "Contact", path: "#contact" },
+  { id: "labours", label: "Labours", path: "/labours" },
+  { id: "contractors", label: "Contractors", path: "/contractors" },
+  { id: "jobs", label: "Jobs", path: "/jobs" },
+  { id: "about", label: "About", path: "/about" },
+  { id: "contact", label: "Contact", path: "/contact" },
 ];
 
 export default function Menu() {
@@ -29,29 +30,15 @@ export default function Menu() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!isHomePage) return; // Only track scroll on home page
-
-      let current = "hero";
-      for (const section of sections) {
-        const el = document.getElementById(section.id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 80) {
-            current = section.id;
-          }
-        }
-      }
-      setActive((prev) => (prev === current ? prev : current));
-    };
-
-    if (isHomePage) {
-      window.addEventListener("scroll", handleScroll, { passive: true });
-      handleScroll();
-    }
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isHomePage]);
+    let current = "hero";
+    if (pathname === "/") current = "hero";
+    else if (pathname.startsWith("/labours")) current = "labours";
+    else if (pathname.startsWith("/contractors")) current = "contractors";
+    else if (pathname.startsWith("/jobs")) current = "jobs";
+    else if (pathname.startsWith("/about")) current = "about";
+    else if (pathname.startsWith("/contact")) current = "contact";
+    setActive(current);
+  }, [pathname]);
 
   // Prevent background scroll when mobile menu is open
   useEffect(() => {
@@ -66,21 +53,7 @@ export default function Menu() {
   }, [open]);
 
   const handleNavClick = (section: (typeof sections)[0]) => {
-    if (isHomePage) {
-      // If on home page, scroll to section
-      const element = document.getElementById(section.id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-        setActive(section.id);
-      }
-    } else {
-      // If not on home page, redirect to home page with hash
-      router.push(
-        section.id === "hero"
-          ? "/"
-          : `/${section.id === "labours" ? "labours/all" : section.id === "contractors" ? "contractors/all" : ""}`,
-      );
-    }
+    router.push(section.path);
     setOpen(false);
   };
 
@@ -137,7 +110,7 @@ export default function Menu() {
               <button
                 onClick={() => handleNavClick(section)}
                 className={
-                  active === section.id && isHomePage
+                  active === section.id
                     ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1 cursor-pointer"
                     : "hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer"
                 }
@@ -183,7 +156,7 @@ export default function Menu() {
               <button
                 onClick={() => handleNavClick(section)}
                 className={
-                  active === section.id && isHomePage
+                  active === section.id
                     ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1 text-left w-full cursor-pointer"
                     : "hover:text-blue-600 dark:hover:text-blue-300 text-left w-full cursor-pointer"
                 }

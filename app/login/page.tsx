@@ -131,7 +131,7 @@ function LoginContent() {
         <div className="mb-6">
           <button
             onClick={() => router.push("/")}
-            className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold text-sm transition-colors group"
+            className="inline-flex items-center gap-2 text-gray-700 dark:text-black-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold text-sm transition-colors group"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span>
             Back to Home
@@ -140,23 +140,23 @@ function LoginContent() {
 
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-black mb-2">
             Welcome Back
           </h1>
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          <p className="text-sm md:text-base text-gray-700 dark:text-black-300">
             Sign in to your account
           </p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 md:p-8">
+        <div className="bg-white/95 dark:bg-gray-900 shadow-2xl rounded-2xl p-6 md:p-8 backdrop-blur-sm border border-gray-100 dark:border-gray-800">
           <form onSubmit={handleLogin} className="space-y-5">
             {/* User Type Selection */}
             
 
             {/* Email or Mobile Input */}
             <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
                 Email or Mobile *
               </label>
               <input
@@ -164,11 +164,11 @@ function LoginContent() {
                 placeholder="your.email@example.com or +91 XXXXX XXXXX"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                className={`w-full px-3 py-2 text-sm rounded-lg border ${
+                className={`w-full px-4 py-2.5 text-sm rounded-xl border ${
                   contact && !contactType
-                    ? "border-red-300 dark:border-red-500"
-                    : "border-gray-200 dark:border-gray-600"
-                } focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white`}
+                    ? "border-red-400 dark:border-red-500"
+                    : "border-gray-200 dark:border-gray-700"
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white transition-all`}
               />
               {contact && !contactType && (
                 <p className="text-xs text-red-600 dark:text-red-400 mt-1">
@@ -199,9 +199,9 @@ function LoginContent() {
 
             {/* Password or OTP Input */}
             {contactType && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  {useOTP ? "OTP" : "Password"} *
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
+                  {useOTP ? "OTP Code" : "Password"} *
                 </label>
                 {useOTP ? (
                   <input
@@ -210,22 +210,22 @@ function LoginContent() {
                     maxLength={6}
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
                   />
                 ) : (
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder="Enter your security password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-3 py-2 pr-16 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-2.5 pr-12 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
                       aria-label={showPassword ? "Hide password" : "Show password"}
-                      className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300"
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400 transition-colors"
                     >
                       {showPassword ? (
                         <svg

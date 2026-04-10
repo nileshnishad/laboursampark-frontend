@@ -6,10 +6,41 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/api", "/private"],
+        disallow: [
+          "/admin", 
+          "/api", 
+          "/private", 
+          "/user/dashboard", 
+          "/*?token=",
+          "/*.php",
+          "/*.env",
+          "/wp-admin",
+          "/.git"
+        ],
       },
       {
-        userAgent: "Googlebot",
+        // Block Scrapers and Aggressive AI Bots (Not Search Engines)
+        userAgent: [
+          "GPTBot",          // OpenAI
+          "CCBot",           // Common Crawl (Major source of bot traffic)
+          "ClaudeBot",       // Anthropic
+          "AdsBot-Google", 
+          "Amazonbot", 
+          "anthropic-ai", 
+          "Bytespider",      // TikTok/ByteDance (Very aggressive)
+          "Curebot",
+          "ImagesiftBot",
+          "PetalBot",
+          "SemrushBot",      // SEO Tools (Can be heavy)
+          "AhrefsBot",       // SEO Tools
+          "DotBot",
+          "Rogerbot"
+        ],
+        disallow: "/",
+      },
+      {
+        // Explicitly allow Google and Bing (Main Search Engines)
+        userAgent: ["Googlebot", "Bingbot", "DuckDuckBot"],
         allow: "/",
       },
     ],

@@ -60,6 +60,8 @@ export const metadata: Metadata = {
   },
 };
 
+import LayoutWrapper from "./components/LayoutWrapper";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -109,7 +111,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <LanguageProvider>
-          <ReduxProvider>{children}</ReduxProvider>
+          <ReduxProvider>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+          </ReduxProvider>
         </LanguageProvider>
       </body>
     </html>

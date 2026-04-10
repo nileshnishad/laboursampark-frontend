@@ -37,9 +37,9 @@ export default function HeroSection() {
   const handleSearch = () => {
     // Redirect to the appropriate page based on search type
     if (searchType === "labour") {
-      router.push(`/labours/all${query ? `?search=${encodeURIComponent(query)}` : ""}`);
+      router.push(`/labours${query ? `?search=${encodeURIComponent(query)}` : ""}`);
     } else {
-      router.push(`/contractors/all${query ? `?search=${encodeURIComponent(query)}` : ""}`);
+      router.push(`/contractors${query ? `?search=${encodeURIComponent(query)}` : ""}`);
     }
   };
 
@@ -55,7 +55,7 @@ export default function HeroSection() {
   return (
     <section 
       id="hero" 
-      className="flex flex-col items-center justify-center min-h-screen w-full px-4 pt-20 relative overflow-hidden"
+      className="flex flex-col items-center justify-center min-h-[90vh] w-full  pt-16 md:pt-14 relative overflow-hidden"
       style={{
         backgroundImage: 'url(/images/heroimg.jpg)',
         backgroundSize: 'cover',
@@ -63,112 +63,95 @@ export default function HeroSection() {
         backgroundAttachment: useFixedBackground ? "fixed" : "scroll"
       }}
     >
-      {/* Background overlay with 0.3 opacity */}
-      <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 opacity-80 z-0 pointer-events-none"></div>
+      {/* Background overlay with dynamic gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-indigo-950/85 to-black/90 z-0 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')] opacity-20"></div>
+      </div>
       
       {/* Content wrapper */}
-      <div className="relative z-10 w-full flex flex-col items-center justify-center">
-      {/* Header Section */}
-      <div className="w-full max-w-4xl mb-8 sm:mb-12 md:mb-16">
-        <h1 className="text-xl sm:text-xl md:text-2xl lg:text-4xl font-extrabold text-center bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-4 sm:mb-6">
-          {t(locale, "home.heroHeading")}
-        </h1>
-        <p className="text-base sm:text-md md:text-md text-gray-700 dark:text-gray-300 text-center max-w-3xl mx-auto mb-8 sm:mb-10">
-          {t(locale, "home.heroDesc")}
-        </p>
+      <div className="relative z-10 w-full flex flex-col items-center justify-center max-w-7xl mx-auto px-2">
+        {/* Header Section */}
+        <div className="w-full text-center mb-2 md:mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-300 text-sm font-semibold mb-6 animate-fade-in">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+            </span>
+            India's #1 Labour Platform
+          </div>
 
-        {/* Search Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-2 sm:p-6 md:p-8 flex flex-col gap-4 w-full">
-          <div className="flex flex-col sm:flex-row gap-3 w-full">
-            <div className="flex items-center text-xs gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1 w-full sm:w-auto">
-              <button
-                className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  searchType === "labour"
-                    ? "bg-blue-600 text-white shadow-lg"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
-                onClick={() => setSearchType("labour")}
-              >
-                {t(locale, "labour.findWork")}
-              </button>
-              <button
-                className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  searchType === "contractor"
-                    ? "bg-green-600 text-white shadow-lg"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
-                onClick={() => setSearchType("contractor")}
-              >
-                {t(locale, "contractor.findLabour")}
-              </button>
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-center tracking-tight text-white mb-6 leading-tight">
+            {t(locale, "home.heroHeading").split(" ").map((word, i) => (
+              <span key={i} className={i > 2 ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400" : ""}>
+                {word}{" "}
+              </span>
+            ))}
+          </h1>
+          
+          <p className="text-lg md:text-2xl text-gray-300 text-center max-w-3xl mx-auto mb-10 font-medium leading-relaxed">
+            {t(locale, "home.heroDesc")}
+          </p>
+
+          {/* Search Section */}
+          <div className="max-w-4xl mx-auto w-full bg-white/10 backdrop-blur-xl rounded-[2rem] p-1 border border-white/20 shadow-2xl">
+            <div className="bg-white dark:bg-zinc-900 rounded-[1.5rem] p-2 md:p-4 flex flex-col md:flex-row gap-3">
+              <div className="flex bg-zinc-100 dark:bg-zinc-800 rounded-2xl p-1.5 flex-1 min-w-[280px]">
+                <button
+                  className={`flex-1 px-2 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
+                    searchType === "labour"
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-gray-500 hover:text-blue-600"
+                  }`}
+                  onClick={() => setSearchType("labour")}
+                >
+                  {t(locale, "labour.findWork")}
+                </button>
+                <button
+                  className={`flex-1 px-2 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
+                    searchType === "contractor"
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-gray-500 hover:text-blue-600"
+                  }`}
+                  onClick={() => setSearchType("contractor")}
+                >
+                  {t(locale, "contractor.findLabour")}
+                </button>
+              </div>
+              
+              <div className="flex-[2] relative">
+                <input
+                  type="text"
+                  placeholder={searchType === "labour" ? "Kaun sa kaam chahiye? (e.g. Mason, Plumber)" : "Kaisa contractor chahiye?"}
+                  className="w-full h-full min-h-[56px] px-2 text-sm bg-transparent text-gray-900 dark:text-white font-medium focus:outline-none placeholder:text-gray-600"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                />
+                <button
+                  onClick={handleSearch}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 h-[42px] px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-md active:scale-95"
+                >
+                  Search
+                </button>
+              </div>
             </div>
-            <input
-              type="text"
-              className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white text-sm sm:text-base transition-all"
-              placeholder={`Search by skills, name, location...`}
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleSearch()}
-            />
-            <button
-              onClick={handleSearch}
-              className={`px-6 sm:px-8 py-3 bg-linear-to-r text-white rounded-lg font-bold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 text-sm sm:text-base whitespace-nowrap ${
-                searchType === "contractor"
-                  ? "from-green-600 to-green-700"
-                  : "from-blue-600 to-indigo-600"
-              }`}
-            >
-              {searchType === "labour" ? t(locale, "home.exploreLabours") : t(locale, "home.exploreContractors")}
-            </button>
+          </div>
+
+          <div className="mt-10 flex flex-wrap justify-center gap-6 text-white/60 font-medium">
+            <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span> 
+              Aadhaar Verified Workers
+            </span>
+            <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> 
+              Trusted Contractors
+            </span>
+            <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span> 
+              100% Direct Connection
+            </span>
           </div>
         </div>
-      </div>
-
-      {/* Create Profile Section */}
-      <div className="w-full max-w-6xl mt-2 sm:mt-12 md:mt-10">
-        <div className="text-center mb-2 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 sm:mb-4">
-            {t(locale, "home.contactTitle")}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
-            {t(locale, "home.contactDesc")}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          {/* Labour Profile Card */}
-          <button
-            type="button"
-            onClick={() => handleRegisterClick("labour")}
-            className="group relative z-20 touch-manipulation hover:shadow-2xl transition-all duration-300 cursor-pointer"
-          >
-            <div className="bg-linear-to-r from-blue-500 to-blue-600 p-6 sm:p-8 text-center rounded-2xl shadow-lg hover:shadow-xl">
-              <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white bg-opacity-20 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-3xl sm:text-4xl">👷</span>
-              </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-white">
-                {t(locale, "labour.joinAs")}
-              </h3>
-            </div>
-          </button>
-
-          {/* Contractor Profile Card */}
-          <button
-            type="button"
-            onClick={() => handleRegisterClick("contractor")}
-            className="group relative z-20 touch-manipulation hover:shadow-2xl transition-all duration-300 cursor-pointer"
-          >
-            <div className="bg-linear-to-r from-green-500 to-green-600 p-6 sm:p-8 text-center rounded-2xl shadow-lg hover:shadow-xl">
-              <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white bg-opacity-20 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-3xl sm:text-4xl">🏢</span>
-              </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-white">
-                {t(locale, "contractor.joinAs")}
-              </h3>
-            </div>
-          </button>
-        </div>
-      </div>
       </div>
     </section>
   );

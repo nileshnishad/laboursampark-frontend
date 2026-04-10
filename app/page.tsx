@@ -5,16 +5,15 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { buildUserDashboardPath } from "@/lib/user-route";
-import Menu from "./components/Menu";
 import HeroSection from "./components/HeroSection";
 import LaboursSection from "./components/LaboursSection";
 import ContractorsSection from "./components/ContractorsSection";
 import AboutSection from "./components/AboutSection";
-import ContactSection from "./components/ContactSection";
-import Footer from "./components/Footer";
-import LanguageSelector from "./components/LanguageSelector";
 import { primaryKeywords, secondaryKeywords, metaDescriptions } from "@/lib/seo-config";
 import SEOHead from "./components/SEOHead";
+import QuickActions from "./components/QuickActions";
+import CallToAction from "./components/CallToAction";
+import TrustSection from "./components/TrustSection";
 
 export default function Home() {
   const router = useRouter();
@@ -39,19 +38,25 @@ export default function Home() {
         ogImage="https://laboursampark.com/images/logo.jpg"
         ogUrl="https://laboursampark.com"
       />
-      <main className="bg-zinc-50 dark:bg-black min-h-screen w-full font-sans">
-        {/* Language Selector - Floating in Top Right */}
-        <div className="hidden md:block fixed top-4 right-4 z-50">
-          <LanguageSelector />
-        </div>
-        
-        <Menu />
+      <main className="bg-zinc-50 dark:bg-black w-full font-sans">
         <HeroSection />
-        <LaboursSection />
-        <ContractorsSection />
-        <AboutSection />
-        <ContactSection />
-        <Footer />
+        <div className="max-w-7xl mx-auto space-y-16 pb-20">
+          <QuickActions />
+          <CallToAction />
+          <TrustSection />
+          
+          <div className="px-4">
+            <LaboursSection />
+          </div>
+          
+          <div className="px-4">
+            <ContractorsSection />
+          </div>
+          
+          <div className="px-4">
+            <AboutSection />
+          </div>
+        </div>
       </main>
     </>
   );

@@ -1,6 +1,4 @@
 import SEOHead from "@/app/components/SEOHead";
-import Menu from "@/app/components/Menu";
-import Footer from "@/app/components/Footer";
 
 export default function PrivacyPolicy() {
   return (
@@ -12,11 +10,8 @@ export default function PrivacyPolicy() {
         keywords={["privacy policy", "data protection", "personal information"]}
         ogUrl="https://laboursampark.com/privacy-policy"
       />
-      <main className="bg-zinc-50 dark:bg-black min-h-screen w-full font-sans">
-        <Menu />
-        
-        <div className="pt-24 md:pt-32 pb-16 px-4 max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-blue-900 dark:text-white mb-8">Privacy Policy</h1>
+      <div className="pt-24 md:pt-32 pb-16 px-4 max-w-4xl mx-auto">
+        <h1 className="text-4xl md:text-5xl font-bold text-blue-900 dark:text-white mb-8">Privacy Policy</h1>
           
           <div className="prose dark:prose-invert max-w-full">
             <div className="text-gray-700 dark:text-gray-300 space-y-6">
@@ -201,9 +196,6 @@ export default function PrivacyPolicy() {
             </div>
           </div>
         </div>
-
-        <Footer />
-      </main>
     </>
   );
 }
