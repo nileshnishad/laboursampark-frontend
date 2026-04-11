@@ -9,6 +9,8 @@ import { showInfoToast } from "@/lib/toast-utils";
 import Skeleton from "./Skeleton";
 import IDCard from "./common/IdCard";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { t } from "@/lib/i18n";
 
 type Labour = {
   _id: string;
@@ -39,6 +41,7 @@ type Labour = {
 
 export default function LaboursSection() {
   const router = useRouter();
+  const { locale } = useLanguage();
   const [labours, setLabours] = useState<Labour[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -139,17 +142,17 @@ export default function LaboursSection() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4">
-              Top <span className="text-blue-600">Skilled</span> Labours
+              {t(locale, "home.laboursSection.titlePart1")} <span className="text-blue-600">{t(locale, "home.laboursSection.titlePart2")}</span> {t(locale, "home.laboursSection.titlePart3")}
             </h2>
             <p className="text-lg text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-              Explore verified and highly-rated labourers across India. Connect directly for your next project.
+              {t(locale, "home.laboursSection.subtitle")}
             </p>
           </div>
           <button 
             onClick={() => router.push("/labours")}
             className="group flex items-center gap-2 px-8 py-4 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl font-bold shadow-sm hover:shadow-xl transition-all active:scale-95"
           >
-            Sare Labours Dekho
+            {t(locale, "home.laboursSection.viewAll")}
             <span className="group-hover:translate-x-1 transition-transform">→</span>
           </button>
         </div>
@@ -193,7 +196,7 @@ export default function LaboursSection() {
 
         {!loading && !error && labours.length === 0 && (
           <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-3xl border border-gray-100 dark:border-zinc-800">
-            <p className="text-gray-500 font-medium">Koi labour nahi mila.</p>
+            <p className="text-gray-500 font-medium">{t(locale, "home.laboursSection.noData")}</p>
           </div>
         )}
       </div>

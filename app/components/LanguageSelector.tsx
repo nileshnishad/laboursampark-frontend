@@ -26,7 +26,7 @@ export default function LanguageSelector({ compact = false }: LanguageSelectorPr
           <button
             key={code}
             onClick={() => setLocale(code)}
-            className={`sm:px-2 sm:py-1.5 p-1 rounded text-xs font-medium transition-all whitespace-nowrap ${
+            className={`sm:px-1 sm:py-1 p-0.5 rounded text-[10px] font-medium transition-all whitespace-nowrap ${
               locale === code
                 ? "bg-linear-to-br from-green-400 to-green-600 text-white shadow-md"
                 : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"

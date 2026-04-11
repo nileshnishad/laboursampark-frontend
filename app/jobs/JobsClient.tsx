@@ -16,7 +16,7 @@ const mockJobs = [
     workersNeeded: "5+",
     category: "Furniture/Carpenter",
     createdAt: new Date().toISOString(),
-    createdBy: { fullName: "Rakesh construction", email: "rakesh@const.com", mobile: "+91 9876543210" }
+    createdBy: { fullName: "Rakesh construction", email: "rakesh@const.com", mobile: "+91 9172272305" }
   },
   {
     _id: "2",
@@ -93,15 +93,15 @@ export default function JobsClient() {
 
   return (
     <main className="min-h-screen bg-white dark:bg-zinc-950 pt-10 md:pt-10">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto">
         <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl p-6 md:p-10 border border-zinc-100 dark:border-zinc-800 shadow-sm mb-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10">
             <div className="flex items-center gap-5">
-              <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
                 <Briefcase size={32} />
               </div>
               <div>
-                <h1 className="text-3xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tight leading-none mb-2">
+                <h1 className="text-2xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tight leading-none mb-2">
                   All <span className="text-blue-600">Jobs</span>
                 </h1>
                 <p className="text-zinc-500 dark:text-zinc-400 font-medium">Opportunities for local skilled workers.</p>

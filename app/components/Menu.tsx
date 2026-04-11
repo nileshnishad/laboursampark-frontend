@@ -76,7 +76,12 @@ export default function Menu() {
         <img
           src="/images/logo.jpg"
           alt="LabourSampark"
-          className="w-35 h-10 rounded-lg"
+          className="w-35 h-10 rounded-lg dark:hidden"
+        />
+        <img
+          src="/images/dark-logo.png"
+          alt="LabourSampark"
+          className="w-35 h-10 rounded-lg hidden dark:block"
         />
       </div>
       {/* Hamburger for mobile */}

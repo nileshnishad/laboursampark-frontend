@@ -109,7 +109,7 @@ function AllContractorsContent() {
 
   return (
     <main className="min-h-screen bg-white dark:bg-zinc-950 md:pt-4">
-      <div className="max-w-7xl mx-auto px-2 py-4">
+      <div className="max-w-7xl mx-auto">
         <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl p-2 md:p-10 border border-zinc-100 dark:border-zinc-800 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
             <div className="flex items-start gap-4">
@@ -122,7 +122,7 @@ function AllContractorsContent() {
                 <span className="text-xl">←</span>
               </button>
               <div>
-                <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tight">
+                <h1 className="text-2xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tight">
                   Verified <span className="text-green-600">Contractors</span>
                 </h1>
                 <p className="text-zinc-500 dark:text-zinc-400 font-medium mt-1">

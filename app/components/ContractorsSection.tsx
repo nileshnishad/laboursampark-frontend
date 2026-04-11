@@ -9,6 +9,8 @@ import { showInfoToast } from "@/lib/toast-utils";
 import Skeleton from "./Skeleton";
 import VisitingCard from "./common/VisitingCard";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { t } from "@/lib/i18n";
 
 type Contractor = {
   _id: string;
@@ -37,6 +39,7 @@ type Contractor = {
 
 export default function ContractorsSection() {
   const router = useRouter();
+  const { locale } = useLanguage();
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -114,17 +117,17 @@ export default function ContractorsSection() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4">
-              Trusted <span className="text-green-600">Contractors</span>
+              {t(locale, "home.contractorsSection.titlePart1")} <span className="text-green-600">{t(locale, "home.contractorsSection.titlePart2")}</span>
             </h2>
             <p className="text-lg text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-              Find verified project managers and contractors for your next big construction or renovation.
+              {t(locale, "home.contractorsSection.subtitle")}
             </p>
           </div>
           <button 
             onClick={() => router.push("/contractors")}
             className="group flex items-center gap-2 px-8 py-4 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl font-bold shadow-sm hover:shadow-xl transition-all active:scale-95"
           >
-            Sare Contractors Dekho
+            {t(locale, "home.contractorsSection.viewAll")}
             <span className="group-hover:translate-x-1 transition-transform">→</span>
           </button>
         </div>
@@ -168,7 +171,7 @@ export default function ContractorsSection() {
 
         {!loading && !error && contractors.length === 0 && (
           <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-3xl border border-gray-100 dark:border-zinc-800">
-            <p className="text-gray-500 font-medium font-sans">Koi contractor nahi mila.</p>
+            <p className="text-gray-500 font-medium font-sans">{t(locale, "home.contractorsSection.noData")}</p>
           </div>
         )}
       </div>

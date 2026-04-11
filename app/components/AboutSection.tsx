@@ -29,7 +29,7 @@ export default function AboutSection() {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header - Premium Alignment */}
         <div className="text-center mb-20">
-          <span className="text-blue-600 font-bold tracking-widest text-sm uppercase mb-4 block">Hamari Kahani</span>
+          <span className="text-blue-600 font-bold tracking-widest text-sm uppercase mb-4 block">{t(locale, "home.aboutSection.badge")}</span>
           <h2 className="text-4xl md:text-6xl font-black mb-6 text-gray-900 dark:text-white tracking-tight">
             {t(locale, "home.aboutSection.title")}
           </h2>
@@ -103,13 +103,13 @@ export default function AboutSection() {
                 onClick={() => router.push("/register")}
                 className="px-10 py-5 bg-white text-blue-700 rounded-2xl font-black text-lg hover:shadow-2xl hover:-translate-y-1 transition-all"
               >
-                Abhi Shuru Karein
+                {t(locale, "home.aboutSection.ctaStart")}
               </button>
               <button 
                 onClick={() => router.push("/contact")}
                 className="px-10 py-5 bg-blue-500/20 backdrop-blur-md border-2 border-white/30 hover:border-white rounded-2xl font-black text-lg transition-all"
               >
-                Humein Sampark Karein
+                {t(locale, "home.aboutSection.ctaContact")}
               </button>
             </div>
           </div>

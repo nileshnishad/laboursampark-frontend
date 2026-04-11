@@ -8,7 +8,8 @@ export default function MainNav() {
   return (
     <nav className="fixed top-0 left-0 w-full bg-white/80 dark:bg-black/80 shadow z-50 backdrop-blur flex items-center justify-between px-4 md:px-8 py-3">
       <div className="flex items-center gap-2 cursor-pointer">
-        <img src="/images/logo.jpg" alt="LabourSampark" onClick={()=>router.push("/")} className="w-35 h-10 rounded-lg" />
+        <img src="/images/logo.jpg" alt="LabourSampark" onClick={()=>router.push("/")} className="w-35 h-10 rounded-lg dark:hidden" />
+        <img src="/images/dark-logo.png" alt="LabourSampark" onClick={()=>router.push("/")} className="w-35 h-10 rounded-lg hidden dark:block" />
       </div>
       {/* Hamburger for mobile */}
       <button

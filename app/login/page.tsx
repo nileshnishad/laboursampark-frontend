@@ -116,8 +116,8 @@ function LoginContent() {
   return (
     <div className="min-h-screen relative py-10 px-2" style={{
       backgroundImage: "url('/images/labourimg.jpg')",
-      backgroundSize: 'contain',
-      backgroundPosition: 'bottom',
+      backgroundSize: 'cover',
+      backgroundPosition: 'left Bottom',
       backgroundAttachment: 'fixed',
       backgroundRepeat: 'no-repeat',
     }}>

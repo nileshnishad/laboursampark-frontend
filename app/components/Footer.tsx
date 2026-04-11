@@ -45,7 +45,8 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-6">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/")}>
-              <img src="/images/logo.jpg" alt="LabourSampark" className="w-40 h-12 rounded-xl object-cover shadow-sm" />
+              <img src="/images/logo.jpg" alt="LabourSampark" className="w-40 h-12 rounded-xl object-cover shadow-sm dark:hidden" />
+              <img src="/images/dark-logo.png" alt="LabourSampark" className="w-40 h-12 rounded-xl object-cover shadow-sm hidden dark:block" />
             </div>
             <p className="text-gray-500 dark:text-gray-400 text-md leading-relaxed font-medium">
               India's most trusted platform connecting skilled labourers and verified contractors. We believe in direct connections and transparent work.
@@ -123,8 +124,8 @@ export default function Footer() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Call Us</div>
-                  <a href="tel:+918956271911" className="text-gray-900 dark:text-white font-bold hover:text-green-600 transition-colors">
-                    +91 8956271911
+                  <a href="tel:+919172272305" className="text-gray-900 dark:text-white font-bold hover:text-green-600 transition-colors">
+                    +91 9172272305
                   </a>
                 </div>
               </li>

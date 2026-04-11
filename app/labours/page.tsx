@@ -101,7 +101,7 @@ function AllLaboursContent() {
 
   return (
     <main className=" bg-white dark:bg-zinc-950">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto">
         <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl p-2 md:p-10 border border-zinc-100 dark:border-zinc-800 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
             <div className="flex items-start gap-4">

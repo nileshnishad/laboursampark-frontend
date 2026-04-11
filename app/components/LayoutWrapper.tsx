@@ -24,7 +24,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   return (
     <div className="flex flex-col min-h-screen">
       <Menu />
-      <main className="flex-grow min-h-screen bg-zinc-50 dark:bg-black pt-16 md:pt-20">
+      <main className="flex-grow min-h-screen bg-zinc-50 dark:bg-black">
         {children}
       </main>
       <Footer />

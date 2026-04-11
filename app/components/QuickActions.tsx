@@ -2,9 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { Briefcase, Users } from "lucide-react";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { t } from "@/lib/i18n";
 
 export default function QuickActions() {
   const router = useRouter();
+  const { locale } = useLanguage();
 
   return (
     <section className="px-4 mt-12 bg-zinc-50 dark:bg-black">
@@ -21,9 +24,11 @@ export default function QuickActions() {
               <Briefcase className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-green-600 transition-colors">Kaam Dhoondo</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-green-600 transition-colors">
+                {t(locale, "home.quickActions.findJobTitle")}
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Apne skill ke hisaab se kaam dhundo
+                {t(locale, "home.quickActions.findJobDesc")}
               </p>
             </div>
           </div>
@@ -40,9 +45,11 @@ export default function QuickActions() {
               <Users className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">Labour Hire Karo</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
+                {t(locale, "home.quickActions.hireLabourTitle")}
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Trusted labour turant hire karo
+                {t(locale, "home.quickActions.hireLabourDesc")}
               </p>
             </div>
           </div>

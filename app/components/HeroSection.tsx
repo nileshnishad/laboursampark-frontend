@@ -6,14 +6,55 @@ import { t } from "@/lib/i18n";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { buildUserDashboardPath } from "@/lib/user-route";
+import { Volume2 } from "lucide-react";
 
 export default function HeroSection() {
   const { locale } = useLanguage();
   const [searchType, setSearchType] = useState<"labour" | "contractor">("labour");
   const [query, setQuery] = useState("");
   const [useFixedBackground, setUseFixedBackground] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const handleSpeak = (text: string) => {
+    if (!window.speechSynthesis) return;
+    
+    // Stop any current speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Find the best voice for the language
+    const voices = window.speechSynthesis.getVoices();
+    let selectedVoice = null;
+
+    if (locale === "hi") {
+      utterance.lang = "hi-IN";
+      selectedVoice = voices.find(v => v.lang.includes("hi") || v.lang.includes("HI"));
+    } else if (locale === "mr") {
+      utterance.lang = "mr-IN";
+      // Marathi is often under-supported; try to find it or fallback slightly differently
+      selectedVoice = voices.find(v => v.lang.includes("mr") || v.lang.includes("MR"));
+    } else {
+      utterance.lang = "en-IN";
+      selectedVoice = voices.find(v => v.lang.includes("en-IN") || v.lang.includes("en-GB"));
+    }
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
+
+    // Adjust rate and pitch for better clarity in regional languages
+    utterance.rate = 0.9; 
+    utterance.pitch = 1.0;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+  };
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
@@ -55,7 +96,7 @@ export default function HeroSection() {
   return (
     <section 
       id="hero" 
-      className="flex flex-col items-center justify-center min-h-[90vh] w-full  pt-16 md:pt-14 relative overflow-hidden"
+      className="flex flex-col items-center justify-center min-h-[90vh] w-full pt-16 md:p-1 relative overflow-hidden"
       style={{
         backgroundImage: 'url(/images/heroimg.jpg)',
         backgroundSize: 'cover',
@@ -121,8 +162,8 @@ export default function HeroSection() {
               <div className="flex-[2] relative">
                 <input
                   type="text"
-                  placeholder={searchType === "labour" ? "Kaun sa kaam chahiye? (e.g. Mason, Plumber)" : "Kaisa contractor chahiye?"}
-                  className="w-full h-full min-h-[56px] px-2 text-sm bg-transparent text-gray-900 dark:text-white font-medium focus:outline-none placeholder:text-gray-600"
+                  placeholder={searchType === "labour" ? t(locale, "home.heroPlaceholderLabour") : t(locale, "home.heroPlaceholderContractor")}
+                  className="w-full h-full min-h-[56px] px-2 text-sm bg-transparent text-gray-900 dark:text-white font-medium focus:outline-none placeholder:text-gray-600 dark:placeholder:text-gray-400"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -131,24 +172,46 @@ export default function HeroSection() {
                   onClick={handleSearch}
                   className="absolute right-0 top-1/2 -translate-y-1/2 h-[42px] px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-md active:scale-95"
                 >
-                  Search
+                  {t(locale, "home.heroSearchBtn")}
                 </button>
               </div>
             </div>
           </div>
 
+          <div 
+            onClick={() => handleSpeak(t(locale, "home.heroHelpline"))}
+            className={`mt-8 max-w-2xl mx-auto px-4 py-3 bg-gradient-to-r from-blue-600/20 to-emerald-600/20 backdrop-blur-md rounded-2xl border border-white/10 text-white/90 font-bold text-center transition-all cursor-pointer hover:bg-white/20 hover:scale-[1.02] group ${isSpeaking ? 'ring-2 ring-emerald-400 border-transparent shadow-[0_0_20px_rgba(52,211,153,0.3)]' : 'animate-pulse'}`}
+          >
+            <div className="flex items-center justify-center gap-3">
+              <span className="inline-block text-xl">📢</span>
+              <p className="flex-1">
+                {t(locale, "home.heroHelpline")}
+              </p>
+              <div className={`p-2 rounded-full transition-all ${isSpeaking ? 'bg-emerald-500 animate-bounce' : 'bg-white/10 group-hover:bg-white/20'}`}>
+                <Volume2 className={`w-5 h-5 ${isSpeaking ? 'text-white' : 'text-emerald-400'}`} />
+              </div>
+            </div>
+            {isSpeaking && (
+              <div className="mt-2 flex justify-center gap-1">
+                <span className="w-1 h-3 bg-emerald-400 rounded-full animate-[bounce_1s_infinite_0ms]"></span>
+                <span className="w-1 h-4 bg-emerald-400 rounded-full animate-[bounce_1s_infinite_200ms]"></span>
+                <span className="w-1 h-3 bg-emerald-400 rounded-full animate-[bounce_1s_infinite_400ms]"></span>
+              </div>
+            )}
+          </div>
+
           <div className="mt-10 flex flex-wrap justify-center gap-6 text-white/60 font-medium">
             <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
               <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span> 
-              Aadhaar Verified Workers
+              {t(locale, "home.heroBadgeAadhaar")}
             </span>
             <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> 
-              Trusted Contractors
+              {t(locale, "home.heroBadgeTrusted")}
             </span>
             <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
               <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span> 
-              100% Direct Connection
+              {t(locale, "home.heroBadgeDirect")}
             </span>
           </div>
         </div>

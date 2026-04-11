@@ -40,7 +40,7 @@ export default function JobsPage() {
       
       <Suspense fallback={
         <main className="min-h-screen bg-white dark:bg-zinc-950 pt-16 md:pt-4">
-          <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="max-w-7xl mx-auto">
             <div className="h-64 bg-zinc-100 dark:bg-zinc-800 rounded-3xl animate-pulse mb-8"></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
