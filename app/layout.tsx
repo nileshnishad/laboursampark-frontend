@@ -70,11 +70,33 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Analytics - Production Only */}
-        {/* Site structured data */}
-        <SEOHead />
+        {/* External Scripts - Production Only */}
         {process.env.NODE_ENV === "production" && (
           <>
+            {/* OneSignal Push Notifications */}
+            <Script
+              src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+              strategy="afterInteractive"
+            />
+            <Script
+              id="onesignal-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.OneSignalDeferred = window.OneSignalDeferred || [];
+                  OneSignalDeferred.push(async function(OneSignal) {
+                    await OneSignal.init({
+                      appId: "aeaf7310-6fd6-46e2-9742-c4e5d978fe39",
+                      safari_web_id: "web.onesignal.auto.24e91fba-47ec-4183-a873-89e8fb838de6",
+                      notifyButton: {
+                        enable: true,
+                      },
+                    });
+                  });
+                `,
+              }}
+            />
+            {/* Google Analytics */}
             <Script
               src="https://www.googletagmanager.com/gtag/js?id=G-5YQR1DQWB1"
               strategy="afterInteractive"
@@ -91,6 +113,7 @@ export default function RootLayout({
                 `,
               }}
             />
+            {/* Microsoft Clarity */}
             <Script
               id="microsoft-clarity"
               strategy="afterInteractive"
@@ -106,6 +129,8 @@ export default function RootLayout({
             />
           </>
         )}
+        {/* Site structured data */}
+        <SEOHead />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
