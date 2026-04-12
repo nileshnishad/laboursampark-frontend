@@ -64,49 +64,31 @@ function getNavGroups(userType: DashboardUserType): NavGroup[] {
 
 const COLOR_SCHEMES = {
   labour: {
-    active: "bg-blue-600 text-white",
-    activeNav: "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400",
-    hover: "hover:text-blue-600 dark:hover:text-blue-400",
-    dropdownActive: "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
-    dropdownHover: "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300",
-    statusBadge: "bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200",
-    statusDot: "bg-blue-500",
-    profileBorder: "border-blue-500 dark:border-blue-400",
-    visibleBadge: "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300",
-    visibleDot: "bg-blue-500",
-    mobileActive: "bg-blue-600 text-white",
-    mobileHover: "hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300",
-    mobileSectionText: "text-blue-600 dark:text-blue-400",
+    active: "bg-blue-600 text-white shadow-lg shadow-blue-500/20",
+    activeNav: "bg-blue-600 text-white shadow-lg shadow-blue-500/30",
+    hover: "hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400",
+    text: "text-blue-600 dark:text-blue-400",
+    border: "border-blue-100 dark:border-blue-900/30",
+    profileBg: "bg-blue-50 dark:bg-blue-900/10",
+    profileBorder: "border-blue-200 dark:border-blue-800",
   },
   contractor: {
-    active: "bg-indigo-600 text-white",
-    activeNav: "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400",
-    hover: "hover:text-indigo-600 dark:hover:text-indigo-400",
-    dropdownActive: "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300",
-    dropdownHover: "hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-700 dark:hover:text-indigo-300",
-    statusBadge: "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200",
-    statusDot: "bg-indigo-500",
-    profileBorder: "border-indigo-500 dark:border-indigo-400",
-    visibleBadge: "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300",
-    visibleDot: "bg-indigo-500",
-    mobileActive: "bg-indigo-600 text-white",
-    mobileHover: "hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300",
-    mobileSectionText: "text-indigo-600 dark:text-indigo-400",
+    active: "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20",
+    activeNav: "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30",
+    hover: "hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400",
+    text: "text-indigo-600 dark:text-indigo-400",
+    border: "border-indigo-100 dark:border-indigo-900/30",
+    profileBg: "bg-indigo-50 dark:bg-indigo-900/10",
+    profileBorder: "border-indigo-200 dark:border-indigo-800",
   },
   sub_contractor: {
-    active: "bg-emerald-600 text-white",
-    activeNav: "text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-600 dark:border-emerald-400",
-    hover: "hover:text-emerald-600 dark:hover:text-emerald-400",
-    dropdownActive: "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
-    dropdownHover: "hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-300",
-    statusBadge: "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200",
-    statusDot: "bg-emerald-500",
-    profileBorder: "border-emerald-500 dark:border-emerald-400",
-    visibleBadge: "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300",
-    visibleDot: "bg-emerald-500",
-    mobileActive: "bg-emerald-600 text-white",
-    mobileHover: "hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-300",
-    mobileSectionText: "text-emerald-600 dark:text-emerald-400",
+    active: "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20",
+    activeNav: "bg-emerald-600 text-white shadow-lg shadow-emerald-500/30",
+    hover: "hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
+    text: "text-emerald-600 dark:text-emerald-400",
+    border: "border-emerald-100 dark:border-emerald-900/30",
+    profileBg: "bg-emerald-50 dark:bg-emerald-900/10",
+    profileBorder: "border-emerald-200 dark:border-emerald-800",
   },
 };
 
@@ -139,313 +121,189 @@ export default function UserDashboardLayout({
     setSidebarOpen(false);
   };
 
-  // Desktop header nav items — all flat direct buttons, no dropdowns
-  const renderDesktopNav = () => {
-    const allItems = navGroups.flatMap((group) => group.items);
-    return (
-      <nav className="flex items-center gap-0.5">
-        {allItems.map((item) => (
-          <button
-            key={item.value}
-            onClick={() => handleNavClick(item.value)}
-            className={`flex items-center gap-1.5 px-3 py-5 text-sm font-medium transition-colors whitespace-nowrap
-              ${
-                activeFilter === item.value
-                  ? colors.activeNav
-                  : `text-gray-600 dark:text-gray-400 ${colors.hover}`
-              }
-            `}
-          >
-            <span>{item.icon}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </nav>
-    );
-  };
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col lg:flex-row">
+      {/* ── Desktop Sidebar (lg+) ────────────────────────────────── */}
+      <aside className="hidden lg:flex flex-col w-72 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 sticky top-0 h-screen z-40">
+        {/* Brand/Logo Area */}
+        <div className="p-4 pb-4">
+          <div className="flex items-center gap-3 mb-8">
+            <div className={`w-10 h-10 rounded-xl ${colors.active} flex items-center justify-center text-xl font-black italic`}>
+              LS
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-zinc-900 dark:text-white leading-none">LabourSampark</h1>
+              <span className={`text-[10px] font-black uppercase tracking-widest ${colors.text}`}>
+                {userType.replace("_", " ")} Portal
+              </span>
+            </div>
+          </div>
 
-  // Mobile drawer sidebar content
-  const renderMobileSidebar = () => (
-    <>
-      {/* Profile */}
-      <div className="p-5 border-b border-gray-200 dark:border-gray-700 shrink-0">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <img
-            src={profileImageUrl}
-            alt={username}
-            className={`w-20 h-20 rounded-full object-cover border-4 ${colors.profileBorder} shadow-lg`}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random&rounded=true`;
-            }}
-          />
-          <div>
-            <p className="font-bold text-gray-900 dark:text-white text-sm capitalize">
-              {username.replace(/-/g, " ")}
+          {/* User Profile Mini Card */}
+          <div className={`p-4 rounded-[1.5rem] ${colors.profileBg} border ${colors.profileBorder} mb-6`}>
+            <div className="flex items-center gap-3 mb-3">
+              <img
+                src={profileImageUrl}
+                alt={username}
+                className="w-10 h-10 rounded-xl object-cover border-2 border-white dark:border-zinc-800 shadow-md"
+              />
+              <div className="min-w-0">
+                <p className="text-xs font-black text-zinc-900 dark:text-white truncate capitalize">
+                  {username.split("-").join(" ")}
+                </p>
+                <p className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400">Verified Member</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter bg-white/80 dark:bg-zinc-800/80 ${colors.text}`}>
+                {user?.display !== false ? "Visible" : "Hidden"}
+              </div>
+              <div className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter bg-emerald-500 text-white">
+                Active
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+          {navGroups.flatMap(g => g.items).map((item) => (
+            <button
+              key={item.value}
+              onClick={() => handleNavClick(item.value)}
+              className={`
+                w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-black transition-all duration-200
+                ${activeFilter === item.value
+                  ? colors.activeNav
+                  : `text-zinc-500 dark:text-zinc-400 ${colors.hover}`}
+              `}
+            >
+              <span className="text-lg">{item.icon}</span>
+              <span className="tracking-wide">{item.label}</span>
+              {activeFilter === item.value && (
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* Support/Ads Area - Optional compact design */}
+        <div className="p-6">
+
+
+          <button
+            onClick={onLogout}
+            className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-2xl text-xs font-black uppercase tracking-widest transition-all"
+          >
+            <span>Logout</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" />
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Mobile Header & Sticky Nav (sm/md) ────────────────────── */}
+      <div className="lg:hidden sticky top-0 z-50 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 shadow-sm px-4 h-14 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className={`w-8 h-8 rounded-lg ${colors.active} flex items-center justify-center text-sm font-black italic`}>LS</div>
+          <span className="text-sm font-black text-zinc-900 dark:text-white">LabourSampark</span>
+        </div>
+
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+      {/* ── Main Content Area ───────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-w-0 bg-zinc-50 dark:bg-zinc-950 overflow-x-hidden">
+        {/* Top Fixed Search/Context Bar (Desktop) */}
+        <header className="hidden lg:flex items-center justify-between px-10 h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-black text-zinc-900 dark:text-white capitalize tracking-tight">
+              {activeFilter.split("_").join(" ")}
+            </h2>
+            <div className="h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-2" />
+            <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+              Welcome back, <span className="text-zinc-900 dark:text-white capitalize">{username.replace(/-/g, " ")}</span>
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{dashboardLabel}</p>
           </div>
-          <div className="flex items-center gap-2 flex-wrap justify-center">
-            <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                user?.isBlocked !== true
-                  ? colors.statusBadge
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-              }`}
+
+          <div className="flex items-center gap-6">
+
+
+            <div className="h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
+
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${user?.isBlocked !== true ? colors.statusDot : "bg-gray-500"}`} />
-              {user?.isBlocked !== true ? "Active" : "Blocked"}
-            </span>
-            <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                user?.display === true
-                  ? colors.visibleBadge
-                  : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
-              }`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${user?.display === true ? colors.visibleDot : "bg-orange-500"}`} />
-              {user?.display === true ? "Visible" : "Hidden"}
-            </span>
+              <span>Logout</span>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" />
+              </svg>
+            </button>
           </div>
+        </header>
+
+
+
+        {/* Dashboard Dynamic View */}
+        <div className="flex-1">
+          {children}
         </div>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-3">
-        {navGroups.map((group, idx) => (
-          <div key={idx} className="mb-1">
-            {group.groupLabel && group.items.length > 1 && (
-              <div className="px-3 pt-4 pb-1">
-                <span className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${colors.mobileSectionText}`}>
-                  💼 {group.groupLabel}
-                </span>
+      {/* ── Mobile Sidebar Drawer ───────────────────────────────── */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-[100] lg:hidden animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+          <div className="absolute inset-y-0 left-0 w-72 bg-white dark:bg-zinc-900 shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col">
+            <div className="p-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-lg ${colors.active} flex items-center justify-center text-sm font-black italic text-white`}>LS</div>
+                <span className="text-sm font-black text-zinc-900 dark:text-white">Menu</span>
               </div>
-            )}
-            <div className="space-y-0.5">
-              {group.items.map((item) => (
+              <button onClick={() => setSidebarOpen(false)} className="p-2 text-zinc-400"><X size={24} /></button>
+            </div>
+
+            <div className="flex-1 px-4 space-y-1">
+              {navGroups.flatMap(g => g.items).map((item) => (
                 <button
                   key={item.value}
                   onClick={() => handleNavClick(item.value)}
                   className={`
-                    w-full text-left flex items-center gap-2.5 rounded-lg text-sm font-medium transition-colors px-3 py-2.5
-                    ${item.isSubItem ? "pl-8" : ""}
-                    ${
-                      activeFilter === item.value
-                        ? colors.mobileActive
-                        : `text-gray-700 dark:text-gray-300 ${colors.mobileHover}`
-                    }
-                  `}
+                      w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-black transition-all
+                      ${activeFilter === item.value
+                      ? colors.activeNav
+                      : `text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50`}
+                    `}
                 >
                   <span>{item.icon}</span>
                   <span>{item.label}</span>
                 </button>
               ))}
             </div>
-          </div>
-        ))}
-      </nav>
 
-      {/* Logout */}
-      <div className="p-3 border-t border-gray-200 dark:border-gray-700 shrink-0">
-        <button
-          onClick={onLogout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          <span>Logout</span>
-        </button>
-      </div>
-    </>
-  );
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* ── Desktop Header (lg+) ───────────────────────────────── */}
-      <header className="hidden lg:block sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="max-w-screen-xl mx-auto px-6">
-          <div className="flex items-center gap-4 h-16">
-            {/* Profile */}
-            <div className="flex items-center gap-3 shrink-0">
-              <img
-                src={profileImageUrl}
-                alt={username}
-                className={`w-10 h-10 rounded-full object-cover border-2 ${colors.profileBorder}`}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random&rounded=true`;
-                }}
-              />
-              <div>
-                <p className="text-sm font-bold text-gray-900 dark:text-white capitalize leading-tight">
-                  {username.replace(/-/g, " ")}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span
-                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-semibold ${
-                      user?.isBlocked !== true
-                        ? colors.statusBadge
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                    }`}
-                  >
-                    <span className={`w-1.5 h-1.5 rounded-full ${user?.isBlocked !== true ? colors.statusDot : "bg-gray-500"}`} />
-                    {user?.isBlocked !== true ? "Active" : "Blocked"}
-                  </span>
-                  <span
-                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-semibold ${
-                      user?.display === true
-                        ? colors.visibleBadge
-                        : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
-                    }`}
-                  >
-                    <span className={`w-1.5 h-1.5 rounded-full ${user?.display === true ? colors.visibleDot : "bg-orange-500"}`} />
-                    {user?.display === true ? "Visible" : "Hidden"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="w-px h-8 bg-gray-200 dark:bg-gray-700 shrink-0" />
-
-            {/* Nav */}
-            <div className="flex-1 overflow-hidden">
-              {renderDesktopNav()}
-            </div>
-
-            {/* Logout */}
-            <button
-              onClick={onLogout}
-              className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* ── Mobile Header ──────────────────────────────────────── */}
-      <header className="lg:hidden sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <img
-              src={profileImageUrl}
-              alt={username}
-              className={`w-10 h-10 rounded-full object-cover border-2 ${colors.profileBorder} shrink-0`}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random&rounded=true`;
-              }}
-            />
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 dark:text-white capitalize truncate leading-tight">
-                {username.replace(/-/g, " ")}
-              </p>
-              <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                <span
-                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-semibold ${
-                    user?.isBlocked !== true
-                      ? colors.statusBadge
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full ${user?.isBlocked !== true ? colors.statusDot : "bg-gray-500"}`} />
-                  {user?.isBlocked !== true ? "Active" : "Blocked"}
-                </span>
-                <span
-                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-semibold ${
-                    user?.display === true
-                      ? colors.visibleBadge
-                      : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
-                  }`}
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full ${user?.display === true ? colors.visibleDot : "bg-orange-500"}`} />
-                  {user?.display === true ? "Visible" : "Hidden"}
-                </span>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors shrink-0 ml-2"
-            aria-label="Open menu"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-      </header>
-
-      {/* ── Mobile Drawer ──────────────────────────────────────── */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <aside className="absolute inset-y-0 left-0 w-72 flex flex-col bg-white dark:bg-gray-800 shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Menu</span>
+            <div className="p-6 border-t border-zinc-100 dark:border-zinc-800">
               <button
-                onClick={() => setSidebarOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
-                aria-label="Close menu"
+                onClick={onLogout}
+                className="w-full flex items-center justify-center gap-2 px-4 py-4 text-red-500 rounded-2xl text-sm dark:text-whiteuppercase tracking-widest shadow-lg shadow-red-500/20"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            {renderMobileSidebar()}
-          </aside>
-        </div>
-      )}
-
-      {/* ── Page Body ──────────────────────────────────────────── */}
-      {user?.display === false && (
-        <div className="px-4 py-3 bg-orange-50 dark:bg-orange-900/20 border-b-2 border-orange-300 dark:border-orange-700">
-          <div className="max-w-screen-xl mx-auto flex items-start sm:items-center gap-3">
-            <span className="text-xl shrink-0">⚠️</span>
-            <div className="flex-1">
-              <p className="text-sm text-orange-800 dark:text-orange-200 font-semibold">
-                Your profile is{" "}
-                <span className="font-bold">
-                  hidden from {isLabour ? "Contractors" : userType === "sub_contractor" ? "Contractors" : "Labourers"}
-                </span>
-                .
-              </p>
-              <p className="text-xs text-orange-700 dark:text-orange-300 mt-0.5">
-                Make payment to make your profile visible and start receiving connections.
-              </p>
-              <button
-                onClick={onGoToPayment}
-                className="mt-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-xs transition-colors"
-              >
-                Pay Now
+                Logout
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {searchMeta.showSearch && (
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3">
-          <div className="max-w-screen-xl mx-auto">
-            <UnifiedSearchInput
-              value={searchQuery}
-              onChange={onSearchChange}
-              label={`🔍 ${searchMeta.label}`}
-              placeholder={searchMeta.placeholder}
-            />
-          </div>
-        </div>
-      )}
-
-      {children}
     </div>
   );
 }
+
+// Simple Icon Import for mobile drawer
+import { X } from "lucide-react";

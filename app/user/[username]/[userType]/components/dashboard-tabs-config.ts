@@ -53,7 +53,7 @@ export const getSearchMetaForTab = (tabValue: DashboardTabValue): DashboardSearc
     contractors: {
       label: "Search Contractors",
       placeholder: "Search contractors by name, location, or expertise...",
-      showSearch: true,
+      showSearch: false,
     },
     requests: {
       label: "Search Requests",

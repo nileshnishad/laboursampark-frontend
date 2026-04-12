@@ -11,7 +11,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const hideHeaderFooter = 
     pathname === "/login" || 
     pathname === "/register" || 
-    pathname?.startsWith("/reset-password");
+    pathname?.startsWith("/reset-password") ||
+    pathname?.startsWith("/user/");
 
   if (hideHeaderFooter) {
     return (
