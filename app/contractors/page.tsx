@@ -116,16 +116,16 @@ function AllContractorsContent() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="inline-flex items-center justify-center w-16 h-8 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm active:scale-95"
+                className="inline-flex items-center justify-center w-12 h-6 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm active:scale-95"
                 aria-label="Go back"
               >
                 <span className="text-xl">←</span>
               </button>
               <div>
-                <h1 className="text-2xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tight">
+                <h1 className="text-xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tight">
                   Verified <span className="text-green-600">Contractors</span>
                 </h1>
-                <p className="text-zinc-500 dark:text-zinc-400 font-medium mt-1">
+                <p className="text-zinc-500 text-xs dark:text-zinc-400 font-medium mt-1">
                   Browse verified professionals for your next project.
                 </p>
               </div>
@@ -161,9 +161,9 @@ function AllContractorsContent() {
 
             {/* Contractors Grid */}
             {!loading && !error && filteredContractors.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
                 {filteredContractors.map((c) => (
-                  <div key={c._id} className="h-full">
+                  <div key={c._id} className="w-full max-w-[360px]">
                     <VisitingCard
                       contractor={c}
                       onViewProfile={isLoggedIn ? undefined : () => handleGuestViewAttempt()}

@@ -153,9 +153,9 @@ function AllLaboursContent() {
 
             {/* Labours Grid */}
             {!loading && !error && filteredLabours.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
                 {filteredLabours.map((l) => (
-                  <div key={l._id} className="h-full">
+                  <div key={l._id} className="w-full max-w-[320px]">
                     <IDCard
                       labour={l}
                       onViewProfile={

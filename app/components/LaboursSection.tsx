@@ -113,23 +113,26 @@ export default function LaboursSection() {
     autoplaySpeed: 4000,
     responsive: [
       {
-        breakpoint: 768,
+        breakpoint: 1280,
         settings: {
-          dots: labourCount > 1,
-          infinite: labourCount > tabletSlides,
-          slidesToShow: tabletSlides,
+          slidesToShow: Math.min(labourCount, 3),
           slidesToScroll: 1,
-          autoplay: labourCount > 1,
         },
       },
       {
-        breakpoint: 468,
+        breakpoint: 1024,
         settings: {
-          dots: labourCount > 1,
-          infinite: labourCount > mobileSlides,
-          slidesToShow: mobileSlides,
+          slidesToShow: Math.min(labourCount, 2),
           slidesToScroll: 1,
-          autoplay: labourCount > 1,
+        },
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          centerMode: true,
+          centerPadding: "0px",
         },
       },
     ],

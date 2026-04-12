@@ -78,33 +78,37 @@ export default function ContractorsSection() {
   }, []);
 
   const slickSettings = {
-    dots: true,
-    infinite: true,
+    dots: contractors.length > 1,
+    infinite: contractors.length > 3,
     speed: 500,
-    slidesToShow: 4,
+    slidesToShow: Math.min(contractors.length, 3),
     slidesToScroll: 1,
-    autoplay: true,
+    autoplay: contractors.length > 1,
     autoplaySpeed: 4000,
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 1280,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: Math.min(contractors.length, 2),
           slidesToScroll: 1,
         },
       },
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 1,
           slidesToScroll: 1,
+          centerMode: true,
+          centerPadding: "20px",
         },
       },
       {
-        breakpoint: 468,
+        breakpoint: 480,
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
+          centerMode: true,
+          centerPadding: "0px",
         },
       },
     ],

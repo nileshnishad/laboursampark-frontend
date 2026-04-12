@@ -3,6 +3,18 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { getToken } from "@/lib/api-service";
+import { 
+  Building2, 
+  User, 
+  MapPin, 
+  Briefcase, 
+  Star, 
+  CheckCircle2, 
+  ArrowRight,
+  Phone,
+  Mail,
+  Trophy
+} from "lucide-react";
 import ContractorProfileModal from "./ContractorProfileModal";
 import type { RootState } from "@/store/store";
 
@@ -95,94 +107,79 @@ export default function VisitingCard({
   };
 
   const handleViewProfile = () => {
+    setIsModalOpen(true);
     if (onViewProfile) {
       onViewProfile(contractor._id || contractor.id || "");
-      return;
     }
-    setIsModalOpen(true);
   };
 
   return (
     <div
-      className={`w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm ${className}`}
+      className={`group relative min-w-[280px] h-[200px] mx-auto overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl transition-all duration-300 hover:shadow-2xl ${className}`}
     >
-      <div className="p-1 sm:p-1.5 bg-white dark:bg-gray-900">
-        <div className="rounded-lg p-1 bg-white dark:bg-gray-900">
-          <div className="flex items-start gap-2.5">
-            <div className="w-24 sm:w-28 shrink-0">
-              <div className="h-18 sm:h-18 rounded-md bg-linear-to-br from-emerald-50 to-white dark:from-emerald-900/30 dark:to-gray-900 flex items-center justify-center overflow-hidden">
-                {profilePic ? (
-                  <img
-                    src={profilePic}
-                    alt={name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-center leading-tight">
-                    <p className="text-[11px] font-bold tracking-wide text-emerald-700 dark:text-emerald-300">{getInitials(name)}</p>
-                    <p className="text-[9px] text-emerald-600 dark:text-emerald-400">{type}</p>
-                  </div>
-                )}
+      {/* Business Card Texture */}
+      <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
+        style={{ backgroundImage: "linear-gradient(45deg, #10b981 1px, transparent 1px), linear-gradient(-45deg, #10b981 1px, transparent 1px)", backgroundSize: "20px 20px" }} 
+      />
+
+      {/* Decorative Brand Accent */}
+      <div className="absolute top-0 right-0 w-32 h-full bg-emerald-500/5 -skew-x-12 translate-x-16 pointer-events-none" />
+
+      <div className="relative z-10 p-6 h-full flex flex-col justify-between">
+        {/* Main Brand Section */}
+        <div className="flex items-start justify-between">
+          <div className="min-w-0 flex-1">
+             <h3 className="text-xl font-black text-slate-900 dark:text-white truncate tracking-tight uppercase group-hover:text-emerald-600 transition-colors">
+                {companyName || name}
+              </h3>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="h-0.5 w-8 bg-emerald-500 rounded-full" />
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">{type}</span>
               </div>
-             
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <h3 className="text-sm sm:text-base font-bold text-red-700 dark:text-red-400 line-clamp-1">
-                    {companyName}
-                  </h3>
-                  <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-1">
-                    {name}
-                  </p>
-                   <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-1">
-                    {experience} experience
-                  </p>
-                </div>
-               
-              </div>
-
-              <div className="mt-1 border-t border-gray-300 dark:border-gray-600" />
+          </div>
+          
+          {/* Logo - Circular Brand Mark */}
+          <div className="shrink-0 ml-4">
+            <div className="h-14 w-14 rounded-full bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center p-0.5 overflow-hidden">
+               {profilePic ? (
+                <img src={profilePic} alt={name} className="w-full h-full object-cover rounded-full" />
+              ) : (
+                <Building2 className="h-6 w-6 text-emerald-500" />
+              )}
             </div>
           </div>
-
-          <div className="mt-2 rounded-md bg-lime-50 dark:bg-lime-900/20 px-2 py-1 text-[10px] sm:text-[11px] text-center text-gray-800 dark:text-gray-200 leading-4">
-            {specializationList.length > 0
-              ? specializationList.slice(0, 5).join(" | ")
-              : "Planning | Supervision | Estimation"}
-          </div>
-
-          <div className="mt-2 grid grid-cols-[1fr_auto] gap-2 items-end">
-            <div className="min-w-0 text-[10px] sm:text-[11px] text-gray-700 dark:text-gray-300 leading-4">
-              <p className="truncate">
-                <span className="font-semibold">Contact:</span> {displayPhone}
-              </p>
-              <p className="break-all">
-                <span className="font-semibold">Email:</span> {displayEmail}
-              </p>
-              <p className="line-clamp-1">
-                <span className="font-semibold">Location:</span> {location}
-              </p>
-            </div>
-
-            <div className="text-right text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 leading-4">
-              <p>
-                ★ {rating} | {projects} projects
-              </p>
-            </div>
-          </div>
-
-        
         </div>
-         <div className="w-full">
-            <button
-              onClick={handleViewProfile}
-              className="px-2 py-1.5 text-[11px] w-full font-semibold rounded-md  bg-green-600 text-white dark:bg-gray-800 dark:text-gray-100 hover:bg-green-500 dark:hover:bg-gray-700"
-            >
-              View Profile
-            </button>
+
+        {/* Professional Details Section */}
+        <div className="grid grid-cols-2 gap-4 items-end">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+              <User className="h-3 w-3 text-emerald-500" />
+              <span className="truncate">{name}</span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-medium text-slate-500">
+              <Phone className="h-3 w-3" />
+              <span className="font-mono tracking-tighter">{displayPhone}</span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-medium text-slate-500">
+              <MapPin className="h-3 w-3" />
+              <span className="truncate">{location}</span>
+            </div>
           </div>
+
+          <div className="flex flex-col items-end gap-2">
+             <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-100 dark:border-slate-700">
+                <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+                <span className="text-xs font-black text-slate-900 dark:text-white">{rating || "4.5"}</span>
+             </div>
+             <button 
+                onClick={handleViewProfile}
+                className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 flex items-center gap-1 uppercase tracking-tighter"
+             >
+                BUSINESS PROFILE <ArrowRight className="h-3 w-3" />
+             </button>
+          </div>
+        </div>
       </div>
 
       <ContractorProfileModal
