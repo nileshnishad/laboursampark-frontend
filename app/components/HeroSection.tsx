@@ -96,7 +96,7 @@ export default function HeroSection() {
   return (
     <section 
       id="hero" 
-      className="flex flex-col items-center justify-center min-h-[90vh] w-full pt-16 md:p-1 relative overflow-hidden"
+      className="flex flex-col items-center justify-center min-h-[90vh] w-full pt-16 md:p-16 relative overflow-hidden"
       style={{
         backgroundImage: 'url(/images/heroimg.jpg)',
         backgroundSize: 'cover',
