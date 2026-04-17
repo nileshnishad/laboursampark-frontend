@@ -5,7 +5,7 @@ import type { DashboardTabValue, DashboardUserType } from "./dashboard-tabs-conf
 import JobsTabContent from "./tab-content/JobsTabContent";
 import ContractorsTabContent from "./tab-content/ContractorsTabContent";
 import RequestsTabContent from "./tab-content/RequestsTabContent";
-import JobRequirementsTabContent from "./tab-content/JobRequirementsTabContent";
+import CreateJobTabContent from "./tab-content/CreateJobTabContent";
 import SubContractorsTabContent from "./tab-content/SubContractorsTabContent";
 import LaboursTabContent from "./tab-content/LaboursTabContent";
 import JobPostingsTabContent from "./tab-content/JobPostingsTabContent";
@@ -27,7 +27,7 @@ export const TAB_CONTENT_COMPONENTS: Record<NonProfileTabValue, React.ComponentT
   contractors: ContractorsTabContent,
   requests: RequestsTabContent,
   history: HistoryTabContent,
-  job_requirements: JobRequirementsTabContent,
+  job_requirements: CreateJobTabContent,
   sub_contractors: SubContractorsTabContent,
   labours: LaboursTabContent,
   job_postings: JobPostingsTabContent,

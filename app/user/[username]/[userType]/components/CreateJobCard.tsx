@@ -7,13 +7,13 @@ import { useAppDispatch } from "@/store/hooks";
 import { submitJobEnquiry, resetJobEnquiryState } from "@/store/slices/jobEnquirySlice";
 import { showSuccessToast, showErrorToast } from "@/lib/toast-utils";
 
-interface JobPostingCardProps {
+interface CreateJobCardProps {
   job: any;
   onApply?: (jobId: string) => void;
   onView?: (jobId: string) => void;
 }
 
-export default function JobPostingCard({ job, onApply, onView }: JobPostingCardProps) {
+export default function CreateJobCard({ job, onApply, onView }: CreateJobCardProps) {
   const { user } = useSelector((state: RootState) => state.auth);
   const { loading: enquiryLoading, success: enquirySuccess, error: enquiryError, appliedJobs } = useSelector(
     (state: RootState) => state.jobEnquiry

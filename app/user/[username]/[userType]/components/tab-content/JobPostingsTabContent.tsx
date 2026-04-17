@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import JobPostingCard from "../JobPostingCard";
+import CreateJobCard from "../CreateJobCard";
 import JobViewModal from "../JobViewModal";
 import type { TabContentProps } from "../TabValueContentMap";
 import { apiGet } from "@/lib/api-service";
@@ -83,7 +83,7 @@ export default function JobPostingsTabContent(props: TabContentProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {jobs.length > 0 ? (
               jobs.map((job: any) => (
-                <JobPostingCard
+                <CreateJobCard
                   key={job.id || job._id}
                   job={job}
                   onApply={onConnect}

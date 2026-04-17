@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/store/hooks";
 import type { RootState } from "@/store/store";
-import { fetchJobHistoryDashboard } from "@/store/slices/jobEnquirySlice";
+import { fetchJobHistoryDashboard, fetchAppliedJobs } from "@/store/slices/jobEnquirySlice";
 import type { TabContentProps } from "../TabValueContentMap";
+import JobStatCards, { type JobCardKey } from "../JobStatCards";
 
 const statusClassMap: Record<string, string> = {
   accepted: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
@@ -21,19 +22,39 @@ const formatDate = (value?: string) => {
   return d.toLocaleString();
 };
 
-export default function HistoryTabContent(_: TabContentProps) {
+export default function HistoryTabContent({ userType }: TabContentProps) {
   const dispatch = useAppDispatch();
   const { jobHistoryDashboard } = useSelector((state: RootState) => state.jobEnquiry);
+  const [activeCardKey, setActiveCardKey] = useState<JobCardKey | null>(null);
 
   useEffect(() => {
     dispatch(fetchJobHistoryDashboard({ page: 1, limit: 20 }));
+    dispatch(fetchAppliedJobs());
   }, [dispatch]);
+
+  // Filter history entries by status when a card is clicked
+  const filteredEntries = activeCardKey
+    ? jobHistoryDashboard.entries.filter((entry: any) => {
+        const status = (entry.status || "").toLowerCase();
+        if (activeCardKey === "applied") return status === "applied" || status === "pending";
+        return status === activeCardKey;
+      })
+    : jobHistoryDashboard.entries;
 
   return (
     <div className="max-w-7xl mx-auto">
+      <div className="px-4 sm:px-6 pt-5">
+        <JobStatCards
+          userType={userType}
+          activeCardKey={activeCardKey}
+          onCardClick={(key) => setActiveCardKey(activeCardKey === key ? null : key)}
+        />
+      </div>
+
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-4">
         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           Job history for your dashboard activity.
+          {activeCardKey && <span className="ml-1 font-semibold text-indigo-600 dark:text-indigo-400">(Filtered: {activeCardKey})</span>}
         </p>
       </div>
 
@@ -41,11 +62,11 @@ export default function HistoryTabContent(_: TabContentProps) {
         <div className="text-center py-10 text-gray-600 dark:text-gray-400">Loading history...</div>
       ) : jobHistoryDashboard.error ? (
         <div className="text-center py-10 text-red-600 dark:text-red-400">{jobHistoryDashboard.error}</div>
-      ) : jobHistoryDashboard.entries.length === 0 ? (
-        <div className="text-center py-10 text-gray-600 dark:text-gray-400">No history found.</div>
+      ) : filteredEntries.length === 0 ? (
+        <div className="text-center py-10 text-gray-600 dark:text-gray-400">{activeCardKey ? "No records found for this filter." : "No history found."}</div>
       ) : (
         <div className="space-y-3 sm:space-y-4">
-          {jobHistoryDashboard.entries.map((entry: any, index: number) => {
+          {filteredEntries.map((entry: any, index: number) => {
             const entryId = entry._id || entry.enquiryId || `history-${index}`;
             const workTitle = entry.jobDetails?.workTitle || entry.jobId?.workTitle || "Untitled Job";
             const description = entry.jobDetails?.description || entry.jobId?.description || "No description";

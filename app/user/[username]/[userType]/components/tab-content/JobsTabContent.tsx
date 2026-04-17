@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import JobPostingCard from "../JobPostingCard";
+import CreateJobCard from "../CreateJobCard";
 import JobViewModal from "../JobViewModal";
 import JobStatCards, { type JobCardKey } from "../JobStatCards";
 import type { TabContentProps } from "../TabValueContentMap";
@@ -212,7 +212,7 @@ export default function JobsTabContent(props: TabContentProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6">
                 {jobs.length > 0 ? (
                   jobs.map((job: any) => (
-                    <JobPostingCard
+                    <CreateJobCard
                       key={job.id || job._id}
                       job={job}
                       onApply={onConnect}
@@ -385,7 +385,7 @@ export default function JobsTabContent(props: TabContentProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6">
                 {postedJobs.length > 0 ? (
                   postedJobs.map((job: any) => (
-                    <JobPostingCard
+                    <CreateJobCard
                       key={job.id || job._id}
                       job={job}
                       onView={() => setSelectedJob(job)}
@@ -450,7 +450,7 @@ export default function JobsTabContent(props: TabContentProps) {
         return (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6 pb-6">
             {filtered.map((job: any) => (
-              <JobPostingCard
+              <CreateJobCard
                 key={job.id || job._id || job.jobId}
                 job={job?.jobDetails || job}
                 onApply={onConnect}

@@ -56,6 +56,10 @@ export interface JobEnquiryState {
     loadingByJobId: Record<string, boolean>;
     errorByJobId: Record<string, string | null>;
   };
+  enquiryCompletion: {
+    loadingByEnquiryId: Record<string, boolean>;
+    errorByEnquiryId: Record<string, string | null>;
+  };
   reviewSubmission: {
     loading: boolean;
     error: string | null;
@@ -86,6 +90,10 @@ const initialState: JobEnquiryState = {
   jobCompletion: {
     loadingByJobId: {},
     errorByJobId: {},
+  },
+  enquiryCompletion: {
+    loadingByEnquiryId: {},
+    errorByEnquiryId: {},
   },
   reviewSubmission: {
     loading: false,
@@ -340,6 +348,71 @@ export const fetchJobEnquiries = createAsyncThunk(
   }
 );
 
+export const fetchJobApplications = createAsyncThunk(
+  "jobEnquiry/fetchJobApplications",
+  async ({ jobId }: { jobId: string }, { rejectWithValue }) => {
+    try {
+      const response = await apiGet(`/api/jobs/getApplication?jobId=${jobId}`);
+      if (!response.success) {
+        return rejectWithValue(response.error || response.message || "Failed to fetch job applications");
+      }
+
+      const data = response.data?.data || response.data || {};
+      const applications = data.applications || [];
+
+      return { jobId, enquiries: Array.isArray(applications) ? applications : [] };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch job applications";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const connectApplicant = createAsyncThunk(
+  "jobEnquiry/connectApplicant",
+  async ({ enquiryId, jobId }: { enquiryId: string; jobId: string }, { rejectWithValue }) => {
+    try {
+      const response = await apiPost(
+        `/api/job-enquiries/${enquiryId}/connect`,
+        {}
+      );
+
+      if (!response.success) {
+        return rejectWithValue(response.error || response.message || "Failed to connect with applicant");
+      }
+
+      return { enquiryId, jobId, data: response.data };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to connect with applicant";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const completeEnquiryWithFeedback = createAsyncThunk(
+  "jobEnquiry/completeEnquiryWithFeedback",
+  async (
+    { enquiryId, jobId, rating, feedback }: { enquiryId: string; jobId: string; rating: number; feedback: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await apiPost(
+        `/api/job-enquiries/${enquiryId}/complete`,
+        { rating, feedback }
+      );
+
+      if (!response.success) {
+        return rejectWithValue(response.error || response.message || "Failed to mark as completed");
+      }
+
+      return { enquiryId, jobId, data: response.data };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to mark as completed";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const fetchReceivedRequests = createAsyncThunk(
   "jobEnquiry/fetchReceivedRequests",
   async (_, { rejectWithValue }) => {
@@ -541,6 +614,72 @@ const jobEnquirySlice = createSlice({
       .addCase(fetchJobEnquiries.rejected, (state, action) => {
         state.jobEnquiries.loading = false;
         state.jobEnquiries.error = action.payload as string;
+      })
+
+    // fetchJobApplications handlers
+    builder
+      .addCase(fetchJobApplications.pending, (state) => {
+        state.jobEnquiries.loading = true;
+        state.jobEnquiries.error = null;
+      })
+      .addCase(fetchJobApplications.fulfilled, (state, action) => {
+        state.jobEnquiries.loading = false;
+        state.jobEnquiries.enquiries[action.payload.jobId] = action.payload.enquiries;
+      })
+      .addCase(fetchJobApplications.rejected, (state, action) => {
+        state.jobEnquiries.loading = false;
+        state.jobEnquiries.error = action.payload as string;
+      });
+
+    // connectApplicant handlers
+    builder
+      .addCase(connectApplicant.pending, (state, action) => {
+        const enquiryId = action.meta.arg.enquiryId;
+        state.enquiryAcceptance.loadingByEnquiryId[enquiryId] = true;
+        state.enquiryAcceptance.errorByEnquiryId[enquiryId] = null;
+      })
+      .addCase(connectApplicant.fulfilled, (state, action) => {
+        const { enquiryId, jobId, data } = action.payload;
+        state.enquiryAcceptance.loadingByEnquiryId[enquiryId] = false;
+        state.enquiryAcceptance.errorByEnquiryId[enquiryId] = null;
+        // Update the enquiry status in jobEnquiries
+        const enquiries = state.jobEnquiries.enquiries[jobId];
+        if (enquiries) {
+          const idx = enquiries.findIndex((e: any) => (e.enquiryId || e._id || e.id) === enquiryId);
+          if (idx !== -1) {
+            enquiries[idx] = { ...enquiries[idx], status: data?.status || "accepted" };
+          }
+        }
+      })
+      .addCase(connectApplicant.rejected, (state, action) => {
+        const enquiryId = action.meta.arg.enquiryId;
+        state.enquiryAcceptance.loadingByEnquiryId[enquiryId] = false;
+        state.enquiryAcceptance.errorByEnquiryId[enquiryId] = action.payload as string;
+      });
+
+    // completeEnquiryWithFeedback handlers
+    builder
+      .addCase(completeEnquiryWithFeedback.pending, (state, action) => {
+        const enquiryId = action.meta.arg.enquiryId;
+        state.enquiryCompletion.loadingByEnquiryId[enquiryId] = true;
+        state.enquiryCompletion.errorByEnquiryId[enquiryId] = null;
+      })
+      .addCase(completeEnquiryWithFeedback.fulfilled, (state, action) => {
+        const { enquiryId, jobId } = action.payload;
+        state.enquiryCompletion.loadingByEnquiryId[enquiryId] = false;
+        state.enquiryCompletion.errorByEnquiryId[enquiryId] = null;
+        const enquiries = state.jobEnquiries.enquiries[jobId];
+        if (enquiries) {
+          const idx = enquiries.findIndex((e: any) => (e.enquiryId || e._id || e.id) === enquiryId);
+          if (idx !== -1) {
+            enquiries[idx] = { ...enquiries[idx], status: "completed" };
+          }
+        }
+      })
+      .addCase(completeEnquiryWithFeedback.rejected, (state, action) => {
+        const enquiryId = action.meta.arg.enquiryId;
+        state.enquiryCompletion.loadingByEnquiryId[enquiryId] = false;
+        state.enquiryCompletion.errorByEnquiryId[enquiryId] = action.payload as string;
       });
 
     // fetchReceivedRequests handlers
