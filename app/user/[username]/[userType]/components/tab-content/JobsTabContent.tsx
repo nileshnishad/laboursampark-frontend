@@ -1,21 +1,36 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import CreateJobCard from "../CreateJobCard";
 import JobViewModal from "../JobViewModal";
 import JobStatCards, { type JobCardKey } from "../JobStatCards";
+import PublishedJobCard, { type PublishedRequirement, type RequirementFormState, type ApiJob, mapApiJobToPublishedRequirement } from "../PublishedJobCard";
+import { JobApplicationsModal, JobDetailsModal } from "./CreateJobTabContent";
 import type { TabContentProps } from "../TabValueContentMap";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-import { apiGet, apiPost } from "@/lib/api-service";
+import { apiGet, apiPost, apiPatch, apiPut } from "@/lib/api-service";
 import { showSuccessToast, showErrorToast, showWarningToast } from "@/lib/toast-utils";
 import { useAppDispatch } from "@/store/hooks";
-import { fetchAppliedJobs } from "@/store/slices/jobEnquirySlice";
+import { fetchAppliedJobs, fetchAcceptedJobs, fetchCompletedJobs, toggleJobActivation, fetchJobEnquiries, fetchJobApplications, submitEnquiryFeedback } from "@/store/slices/jobEnquirySlice";
+import { uploadFile } from "@/lib/s3-client";
+import { UploadCloud, X, MapPin, Briefcase, Calendar, Users, Clock, CheckCircle, XCircle, Phone, MessageSquare, ImageIcon, Star } from "lucide-react";
+
+const INITIAL_FORM: RequirementFormState = {
+  title: "",
+  target: ["labour"],
+  description: "",
+  location: "",
+  workersNeeded: "",
+  skills: "",
+  images: [],
+  locationDetails: { city: "", state: "", area: "", pincode: "", address: "" },
+};
 
 export default function JobsTabContent(props: TabContentProps) {
   const { onConnect, userType } = props;
   const dispatch = useAppDispatch();
-  const { appliedJobs } = useSelector((state: RootState) => state.jobEnquiry);
+  const { appliedJobs, acceptedJobs, completedJobs, jobActivation, jobEnquiries } = useSelector((state: RootState) => state.jobEnquiry);
   const { user } = useSelector((state: RootState) => state.auth);
   const [jobs, setJobs] = useState<any[]>([]);
   const [jobsLoading, setJobsLoading] = useState(false);
@@ -26,15 +41,27 @@ export default function JobsTabContent(props: TabContentProps) {
   const [limit] = useState(10);
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [activeCardKey, setActiveCardKey] = useState<JobCardKey>("available");
-  const [postedJobs, setPostedJobs] = useState<any[]>([]);
+  const [publishedRequirements, setPublishedRequirements] = useState<PublishedRequirement[]>([]);
   const [postedJobsLoading, setPostedJobsLoading] = useState(false);
   const [postedJobsPage, setPostedJobsPage] = useState(1);
   const [postedJobsTotalPages, setPostedJobsTotalPages] = useState(1);
   const [totalPostedJobs, setTotalPostedJobs] = useState(0);
-  const [createForm, setCreateForm] = useState({ title: "", description: "", location: "", workersNeeded: "", skills: "" });
+  const [form, setForm] = useState<RequirementFormState>(INITIAL_FORM);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  const [viewingApplicationsJob, setViewingApplicationsJob] = useState<PublishedRequirement | null>(null);
+  const [editingJob, setEditingJob] = useState<PublishedRequirement | null>(null);
+  const [updatingJob, setUpdatingJob] = useState(false);
+  const [acceptedPage, setAcceptedPage] = useState(1);
+  const [completedPage, setCompletedPage] = useState(1);
+  const [feedbackModal, setFeedbackModal] = useState<{ enquiryId: string; jobId: string; userId: string; posterName: string } | null>(null);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackHover, setFeedbackHover] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
 
   const getJobId = (job: any) => String(job?.id || job?._id || "");
 
@@ -43,7 +70,7 @@ export default function JobsTabContent(props: TabContentProps) {
       setJobsLoading(true);
       setJobsError(null);
 
-      const response = await apiGet(`/api/jobs?status=open&page=${pageToLoad}&limit=${limit}`);
+      const response = await apiGet(`/api/jobs/getalljobs?page=${pageToLoad}&limit=${limit}`);
       if (!response.success) {
         throw new Error(response.error || response.message || "Failed to fetch jobs.");
       }
@@ -68,7 +95,7 @@ export default function JobsTabContent(props: TabContentProps) {
     fetchOpenJobs(page);
   }, [page, limit]);
 
-  const fetchPostedJobs = async (pageToLoad: number) => {
+  const fetchPostedJobs = useCallback(async (pageToLoad: number) => {
     try {
       setPostedJobsLoading(true);
       const response = await apiGet(`/api/jobs/my-jobs?status=open&page=${pageToLoad}&limit=${limit}`);
@@ -78,46 +105,101 @@ export default function JobsTabContent(props: TabContentProps) {
       const pagination = container?.pagination || container?.meta;
       const total = Number(pagination?.totalPages || pagination?.pages || 1);
       const count = Number(pagination?.total || pagination?.totalItems || 0);
-      setPostedJobs(Array.isArray(list) ? list : []);
+      const mapped = (Array.isArray(list) ? list : []).map(mapApiJobToPublishedRequirement);
+      setPublishedRequirements(mapped);
       setPostedJobsTotalPages(Number.isFinite(total) && total > 0 ? total : 1);
-      setTotalPostedJobs(count > 0 ? count : Array.isArray(list) ? list.length : 0);
+      setTotalPostedJobs(count > 0 ? count : mapped.length);
+      // Fetch enquiries for each job so stats work
+      mapped.forEach((job) => {
+        if (job.id) dispatch(fetchJobEnquiries({ jobId: job.id }));
+      });
     } catch (_e) {
       // silent fail
     } finally {
       setPostedJobsLoading(false);
     }
-  };
+  }, [limit, dispatch]);
 
   useEffect(() => {
     if (userType === "sub_contractor") fetchPostedJobs(postedJobsPage);
   }, [userType, postedJobsPage]);
 
-  // Fetch applied jobs on mount using Redux
+  // Fetch applied jobs and accepted jobs count on mount
   useEffect(() => {
     dispatch(fetchAppliedJobs());
+    dispatch(fetchAcceptedJobs({ page: 1, limit: 10 }));
+    dispatch(fetchCompletedJobs({ page: 1, limit: 10 }));
   }, [dispatch]);
 
   const isProfileHidden = user?.display === false;
-  const canCreateSubmit = !!(createForm.title.trim() && createForm.description.trim() && createForm.location.trim() && createForm.workersNeeded.trim() && createForm.skills.trim());
-  const updateCreateField = (field: string, value: string) => setCreateForm((prev) => ({ ...prev, [field]: value }));
+
+  const updateField = <K extends keyof RequirementFormState>(field: K, value: RequirementFormState[K]) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const updateLocationField = (field: keyof RequirementFormState["locationDetails"], value: string) => {
+    setForm((prev) => ({ ...prev, locationDetails: { ...prev.locationDetails, [field]: value } }));
+  };
+
+  const canSubmit = !!(form.title.trim() && form.target.length > 0 && form.description.trim() && form.locationDetails.city.trim() && form.locationDetails.area.trim() && form.locationDetails.pincode.trim() && form.workersNeeded.trim() && form.skills.trim());
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setIsUploading(true);
+    const uploadedUrls: string[] = [];
+    try {
+      await Promise.all(
+        Array.from(files).map(async (file) => {
+          try {
+            const cleanName = file.name.replace(/\s+/g, "_");
+            const url = await uploadFile(cleanName, file, "contractor");
+            uploadedUrls.push(url);
+          } catch (err) {
+            console.error(`Failed to upload ${file.name}:`, err);
+          }
+        })
+      );
+      if (uploadedUrls.length > 0) {
+        updateField("images", [...form.images, ...uploadedUrls]);
+        showSuccessToast(`Uploaded ${uploadedUrls.length} image(s)`);
+      }
+    } catch (error) {
+      showErrorToast("An error occurred during upload.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeImage = (index: number) => {
+    updateField("images", form.images.filter((_, i) => i !== index));
+  };
 
   const handlePublishJob = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isProfileHidden) { showWarningToast("Make profile visible to create a job."); return; }
-    if (!canCreateSubmit) return;
+    if (!canSubmit) return;
     const payload = {
-      workTitle: createForm.title.trim(),
-      target: ["labour"],
-      description: createForm.description.trim(),
-      location: createForm.location.trim(),
-      workersNeeded: createForm.workersNeeded.trim(),
-      requiredSkills: createForm.skills.split(",").map((s: string) => s.trim()).filter(Boolean),
+      workTitle: form.title.trim(),
+      target: form.target,
+      description: form.description.trim(),
+      workersNeeded: parseInt(form.workersNeeded) || 0,
+      requiredSkills: form.skills.split(",").map((s: string) => s.trim()).filter(Boolean),
+      images: form.images,
+      location: {
+        city: form.locationDetails.city.trim(),
+        area: form.locationDetails.area.trim(),
+        pincode: form.locationDetails.pincode.trim(),
+        state: form.locationDetails.state.trim(),
+        address: form.locationDetails.address.trim(),
+      },
     };
     try {
       setPublishing(true);
-      const response = await apiPost("/api/jobs/create", payload);
+      const response = await apiPost("/api/jobs/create-job", payload);
       if (!response.success) throw new Error(response.error || response.message || "Failed to publish job.");
-      setCreateForm({ title: "", description: "", location: "", workersNeeded: "", skills: "" });
+      setForm(INITIAL_FORM);
       setIsCreateModalOpen(false);
       showSuccessToast("Job published successfully.");
       setPostedJobsPage(1);
@@ -132,12 +214,101 @@ export default function JobsTabContent(props: TabContentProps) {
   const handleCardClick = (key: JobCardKey) => {
     setActiveCardKey(key);
     setMobileDetailOpen(true);
+    if (key === "accepted") {
+      dispatch(fetchAcceptedJobs({ page: acceptedPage, limit: 10 }));
+    }
+    if (key === "completed") {
+      dispatch(fetchCompletedJobs({ page: completedPage, limit: 10 }));
+    }
+  };
+
+  const formatTarget = (targets: string[]) => {
+    return targets.map((item) => (item === "sub_contractor" ? "Sub_Contractor" : "Labour")).join(" + ");
+  };
+
+  const handleToggleJobVisibility = async (jobId: string, currentVisibility: boolean) => {
+    try {
+      const result = await dispatch(toggleJobActivation({ jobId, currentVisibility })).unwrap();
+      setPublishedRequirements((prev) =>
+        prev.map((job) =>
+          job.id === jobId ? { ...job, visibility: result.visibility } : job
+        )
+      );
+      showSuccessToast(result.visibility ? "Job made visible successfully." : "Job hidden successfully.");
+    } catch (error) {
+      showErrorToast(typeof error === "string" ? error : "Failed to update job visibility.");
+    }
+  };
+
+  const updateJobOnServer = async (jobId: string, payload: any) => {
+    const endpoints = [`/api/jobs/update/${jobId}`, `/api/jobs/${jobId}`];
+    for (const endpoint of endpoints) {
+      const patchResponse = await apiPatch(endpoint, payload);
+      if (patchResponse.success) return patchResponse;
+      const putResponse = await apiPut(endpoint, payload);
+      if (putResponse.success) return putResponse;
+    }
+    throw new Error("Failed to update job.");
+  };
+
+  const handleSaveJobDetails = async (updated: RequirementFormState) => {
+    if (!editingJob) return;
+    const payload = {
+      workTitle: updated.title.trim(),
+      target: updated.target,
+      description: updated.description.trim(),
+      workersNeeded: parseInt(updated.workersNeeded) || 0,
+      requiredSkills: updated.skills.split(",").map((s) => s.trim()).filter(Boolean),
+      images: updated.images,
+      location: {
+        city: updated.locationDetails.city.trim(),
+        area: updated.locationDetails.area.trim(),
+        pincode: updated.locationDetails.pincode.trim(),
+        state: updated.locationDetails.state.trim(),
+        address: updated.locationDetails.address.trim(),
+      },
+    };
+    try {
+      setUpdatingJob(true);
+      const response = await updateJobOnServer(editingJob.id, payload);
+      if (!response.success) throw new Error(response.error || response.message || "Failed to update job.");
+      showSuccessToast("Job updated successfully.");
+      setEditingJob(null);
+      fetchPostedJobs(postedJobsPage);
+    } catch (error) {
+      showErrorToast(error instanceof Error ? error.message : "Failed to update job.");
+    } finally {
+      setUpdatingJob(false);
+    }
   };
 
   const handleView = (jobId: string) => {
     const found = jobs.find((job: any) => getJobId(job) === String(jobId));
     if (found) {
       setSelectedJob(found);
+    }
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (!feedbackModal || feedbackRating === 0 || !feedbackText.trim()) return;
+    try {
+      setFeedbackSubmitting(true);
+      await dispatch(submitEnquiryFeedback({
+        enquiryId: feedbackModal.enquiryId,
+        rating: feedbackRating,
+        feedback: feedbackText.trim(),
+      })).unwrap();
+      showSuccessToast("Feedback submitted successfully!");
+      setFeedbackModal(null);
+      setFeedbackRating(0);
+      setFeedbackHover(0);
+      setFeedbackText("");
+      dispatch(fetchCompletedJobs({ page: completedPage, limit: 10 }));
+    } catch (error) {
+      const message = typeof error === "string" ? error : "Failed to submit feedback.";
+      showErrorToast(message);
+    } finally {
+      setFeedbackSubmitting(false);
     }
   };
 
@@ -148,6 +319,8 @@ export default function JobsTabContent(props: TabContentProps) {
           userType={userType}
           totalAvailableJobs={totalJobs}
           totalPostedJobs={userType === "sub_contractor" ? totalPostedJobs : 0}
+          totalAcceptedJobs={acceptedJobs.total}
+          totalCompletedJobs={completedJobs.total}
           activeCardKey={activeCardKey}
           onCardClick={handleCardClick}
         />
@@ -178,7 +351,6 @@ export default function JobsTabContent(props: TabContentProps) {
               {activeCardKey === "pending" && "Requests Received"}
               {activeCardKey === "accepted" && "Accepted Jobs"}
               {activeCardKey === "completed" && "Completed Jobs"}
-              {activeCardKey === "rejected" && "Rejected Jobs"}
             </h2>
           </div>
         )}
@@ -192,7 +364,6 @@ export default function JobsTabContent(props: TabContentProps) {
               {activeCardKey === "pending" && "Requests Received"}
               {activeCardKey === "accepted" && "Accepted Jobs"}
               {activeCardKey === "completed" && "Completed Jobs"}
-              {activeCardKey === "rejected" && "Rejected Jobs"}
             </h3>
           </div>
 
@@ -213,10 +384,11 @@ export default function JobsTabContent(props: TabContentProps) {
                 {jobs.length > 0 ? (
                   jobs.map((job: any) => (
                     <CreateJobCard
-                      key={job.id || job._id}
+                      key={job.jobId || job.id || job._id}
                       job={job}
                       onApply={onConnect}
                       onView={handleView}
+                      onSuccess={() => { fetchOpenJobs(page); dispatch(fetchAppliedJobs()); }}
                     />
                   ))
                 ) : (
@@ -249,37 +421,44 @@ export default function JobsTabContent(props: TabContentProps) {
         </>
       )}
 
-      {/* Posted jobs section (sub_contractor only) */}
+      {/* Posted jobs section (sub_contractor only) — same UI as contractor */}
       {activeCardKey === "posted" && userType === "sub_contractor" && (
         <>
-          {/* Create New Job banner */}
+          {/* Create Job Banner — matching contractor style */}
           <div className="px-4 sm:px-6 mb-4">
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Create New Job</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                    Post a labour requirement and track all published jobs below.
-                  </p>
+            <div className="relative overflow-hidden rounded-2xl border border-indigo-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-2 sm:p-3 shadow-sm">
+              <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-64 h-64 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+                  <h3 className="text-md sm:text-xl font-black text-zinc-900 dark:text-white tracking-tight">
+                    Post New <span className="text-indigo-600 dark:text-indigo-400">Requirement</span>
+                  </h3>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(true)}
-                  disabled={isProfileHidden}
-                  className="shrink-0 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold"
-                >
-                  Create Job
-                </button>
+                <div className="flex flex-col items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateModalOpen(true)}
+                    disabled={isProfileHidden}
+                    className="group relative flex items-center gap-3 px-4 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/25 active:scale-95 overflow-hidden"
+                  >
+                    <div className="absolute inset-x-0 bottom-0 bg-white/20 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+                    <UploadCloud size={20} className="group-hover:-translate-y-1 transition-transform" />
+                    Create Job
+                  </button>
+                  {isProfileHidden && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/30">
+                      <span className="text-[10px] font-bold text-orange-700 dark:text-orange-400 uppercase tracking-tight">
+                        Profile Hidden
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-              {isProfileHidden && (
-                <p className="mt-3 text-xs text-orange-700 dark:text-orange-300">
-                  Make profile visible to create a job.
-                </p>
-              )}
             </div>
           </div>
 
-          {/* Create Job Modal */}
+          {/* Create Job Modal — full form with image upload & location details */}
           {isCreateModalOpen && (
             <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-3 sm:p-4">
               <div className="w-full max-w-2xl rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl max-h-[88vh] overflow-y-auto">
@@ -293,67 +472,106 @@ export default function JobsTabContent(props: TabContentProps) {
                     Close
                   </button>
                 </div>
-                <form onSubmit={handlePublishJob} className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="sm:col-span-2">
-                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Work Title *</label>
-                    <input
-                      value={createForm.title}
-                      onChange={(e) => updateCreateField("title", e.target.value)}
-                      placeholder="e.g., Basement slab and beam casting"
-                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
+
+                <form onSubmit={handlePublishJob} className="p-3 sm:p-4 flex flex-col gap-3">
+                  {/* Title */}
                   <div>
-                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Location *</label>
+                    <label className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Work Title *</label>
                     <input
-                      value={createForm.location}
-                      onChange={(e) => updateCreateField("location", e.target.value)}
-                      placeholder="e.g., Pune, Kharadi"
-                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      value={form.title}
+                      onChange={(e) => updateField("title", e.target.value)}
+                      placeholder="e.g., Building Renovation Work"
+                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none"
                     />
                   </div>
+
+                  {/* Workers */}
                   <div>
-                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Workers Needed *</label>
+                    <label className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Workers Needed *</label>
                     <input
-                      value={createForm.workersNeeded}
-                      onChange={(e) => updateCreateField("workersNeeded", e.target.value)}
-                      placeholder="e.g., 12"
-                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      type="number"
+                      value={form.workersNeeded}
+                      onChange={(e) => updateField("workersNeeded", e.target.value)}
+                      placeholder="e.g., 5"
+                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none"
                     />
                   </div>
-                  <div className="sm:col-span-2">
-                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Required Skills *</label>
+
+                  {/* Skills */}
+                  <div>
+                    <label className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Required Skills *</label>
                     <input
-                      value={createForm.skills}
-                      onChange={(e) => updateCreateField("skills", e.target.value)}
-                      placeholder="e.g., Shuttering, RCC, Steel Fixing"
-                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      value={form.skills}
+                      onChange={(e) => updateField("skills", e.target.value)}
+                      placeholder="e.g., Mason, Carpenter"
+                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none"
                     />
                   </div>
-                  <div className="sm:col-span-2">
-                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Requirement Details *</label>
+
+                  {/* Description */}
+                  <div>
+                    <label className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Description *</label>
                     <textarea
-                      value={createForm.description}
-                      onChange={(e) => updateCreateField("description", e.target.value)}
-                      rows={4}
-                      placeholder="Explain work scope, quality expectations, start date, and completion terms."
-                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      value={form.description}
+                      onChange={(e) => updateField("description", e.target.value)}
+                      rows={2}
+                      placeholder="Explain work scope..."
+                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none resize-none"
                     />
                   </div>
-                  <div className="sm:col-span-2 flex items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsCreateModalOpen(false)}
-                      className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-semibold"
-                    >
+
+                  {/* Location */}
+                  <div className="p-3 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                    <p className="text-[11px] font-black uppercase text-zinc-400 mb-2">Location</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">City *</label>
+                        <input value={form.locationDetails.city} onChange={(e) => updateLocationField("city", e.target.value)} placeholder="Mumbai" className="mt-0.5 w-full px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none" />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">Area *</label>
+                        <input value={form.locationDetails.area} onChange={(e) => updateLocationField("area", e.target.value)} placeholder="Bandra" className="mt-0.5 w-full px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none" />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">Pincode *</label>
+                        <input value={form.locationDetails.pincode} onChange={(e) => updateLocationField("pincode", e.target.value)} placeholder="400050" className="mt-0.5 w-full px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none" />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">State <span className="text-zinc-400 font-normal">(opt)</span></label>
+                        <input value={form.locationDetails.state} onChange={(e) => updateLocationField("state", e.target.value)} placeholder="Maharashtra" className="mt-0.5 w-full px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">Address <span className="text-zinc-400 font-normal">(opt)</span></label>
+                        <input value={form.locationDetails.address} onChange={(e) => updateLocationField("address", e.target.value)} placeholder="Plot 12, Bandra West" className="mt-0.5 w-full px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Images */}
+                  <div>
+                    <label className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Site Images</label>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {form.images.map((url, idx) => (
+                        <div key={idx} className="relative w-14 h-14 group shrink-0">
+                          <img src={url} alt="Site" className="w-full h-full object-cover rounded-lg border border-zinc-200" />
+                          <button type="button" onClick={() => removeImage(idx)} className="absolute -top-1.5 -right-1.5 p-0.5 bg-red-500 text-white rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity">
+                            <X size={10} />
+                          </button>
+                        </div>
+                      ))}
+                      <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="w-14 h-14 flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors shrink-0">
+                        {isUploading ? <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" /> : <><UploadCloud className="text-zinc-400" size={16} /><span className="text-[9px] font-bold text-zinc-500 mt-0.5">Add</span></>}
+                      </button>
+                    </div>
+                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" multiple />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-sm font-semibold transition-all">
                       Cancel
                     </button>
-                    <button
-                      type="submit"
-                      disabled={!canCreateSubmit || isProfileHidden || publishing}
-                      className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-semibold"
-                    >
-                      {publishing ? "Publishing..." : "Publish Job"}
+                    <button type="submit" disabled={!canSubmit || isProfileHidden || publishing || isUploading} className="px-5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold transition-all">
+                      {publishing ? "Publishing..." : "Post Job"}
                     </button>
                   </div>
                 </form>
@@ -361,43 +579,61 @@ export default function JobsTabContent(props: TabContentProps) {
             </div>
           )}
 
-          {/* Published jobs grid */}
-          <div className="px-4 sm:px-6 mb-2">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Published Jobs</h3>
-              <button
-                type="button"
-                onClick={() => fetchPostedJobs(postedJobsPage)}
-                disabled={postedJobsLoading}
-                className="text-xs px-2.5 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-60"
-              >
-                Refresh
-              </button>
-            </div>
-          </div>
-
-          {postedJobsLoading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400 text-lg">Loading...</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6">
-                {postedJobs.length > 0 ? (
-                  postedJobs.map((job: any) => (
-                    <CreateJobCard
-                      key={job.id || job._id}
-                      job={job}
-                      onView={() => setSelectedJob(job)}
-                    />
-                  ))
-                ) : (
-                  <div className="sm:col-span-2 lg:col-span-3 text-center py-12">
-                    <p className="text-gray-600 dark:text-gray-400 text-lg">No posted jobs found.</p>
-                  </div>
-                )}
+          {/* Published Jobs Grid — same card style as contractor */}
+          <div className="px-4 sm:px-6">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sm:p-5 mb-5">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Published Jobs</h3>
+                <button
+                  type="button"
+                  onClick={() => fetchPostedJobs(postedJobsPage)}
+                  disabled={postedJobsLoading}
+                  className="text-xs px-2.5 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-60"
+                >
+                  Refresh
+                </button>
               </div>
-              <div className="mt-4 px-4 sm:px-6 flex items-center justify-between">
+
+              {postedJobsLoading ? (
+                <div className="space-y-3" aria-live="polite">
+                  {[...Array(3)].map((_, idx) => (
+                    <div key={idx} className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 animate-pulse">
+                      <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded" />
+                      <div className="h-3 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mt-2" />
+                      <div className="flex gap-2 mt-3">
+                        <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full" />
+                        <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : publishedRequirements.length === 0 ? (
+                <p className="text-sm text-gray-600 dark:text-gray-400">No Jobs published yet.</p>
+              ) : (
+                <div className="max-h-130 overflow-y-auto pr-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {publishedRequirements.map((item) => (
+                      <PublishedJobCard
+                        key={item.id}
+                        item={item}
+                        formatTarget={formatTarget}
+                        onShowDetails={() => setEditingJob(item)}
+                        onToggleVisibility={handleToggleJobVisibility}
+                        onViewApplications={(jobId) => {
+                          const found = publishedRequirements.find((j) => j.id === jobId);
+                          if (found) {
+                            dispatch(fetchJobApplications({ jobId }));
+                            setViewingApplicationsJob(found);
+                          }
+                        }}
+                        toggling={Boolean(jobActivation.loadingByJobId[item.id])}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setPostedJobsPage((prev) => Math.max(1, prev - 1))}
@@ -416,20 +652,401 @@ export default function JobsTabContent(props: TabContentProps) {
                   Next
                 </button>
               </div>
-            </>
-          )}
+            </div>
+          </div>
         </>
       )}
 
+      {/* Accepted Jobs — from dedicated API */}
+      {activeCardKey === "accepted" && (() => {
+        const acceptedList = acceptedJobs.jobs;
+        if (acceptedJobs.loading) {
+          return (
+            <div className="text-center py-12 px-4 sm:px-6">
+              <p className="text-gray-600 dark:text-gray-400">Loading accepted jobs...</p>
+            </div>
+          );
+        }
+        if (acceptedJobs.error) {
+          return (
+            <div className="text-center py-12 px-4 sm:px-6">
+              <p className="text-red-600 dark:text-red-400 text-sm">{acceptedJobs.error}</p>
+              <button type="button" onClick={() => dispatch(fetchAcceptedJobs({ page: acceptedPage, limit: 10 }))} className="mt-2 text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200">
+                Retry
+              </button>
+            </div>
+          );
+        }
+        if (acceptedList.length === 0) {
+          return (
+            <div className="text-center py-12 px-4 sm:px-6">
+              <p className="text-gray-500 dark:text-gray-400 text-sm">No accepted jobs found.</p>
+            </div>
+          );
+        }
+
+        const statusConfig: Record<string, { bg: string; text: string; border: string; icon: React.ReactNode; label: string }> = {
+          accepted: { bg: "bg-green-50 dark:bg-green-900/15", text: "text-green-600 dark:text-green-400", border: "border-green-100 dark:border-green-800/30", icon: <CheckCircle size={10} />, label: "Accepted" },
+          completed: { bg: "bg-teal-50 dark:bg-teal-900/15", text: "text-teal-600 dark:text-teal-400", border: "border-teal-100 dark:border-teal-800/30", icon: <CheckCircle size={10} />, label: "Completed" },
+        };
+        const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null;
+
+        return (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 sm:px-6 pb-4">
+              {acceptedList.map((item: any) => {
+                const jobData = item?.job || item?.jobDetails || item;
+                const appStatus = (item?.applicationStatus || item?.status || "accepted").toLowerCase();
+                const sc = statusConfig[appStatus] || statusConfig.accepted;
+                const title = jobData?.workTitle || jobData?.jobTitle || "Untitled Job";
+                const loc = jobData?.location;
+                const locText = typeof loc === "string" ? loc : [loc?.area, loc?.city].filter(Boolean).join(", ") || "Not specified";
+                const skills: string[] = Array.isArray(jobData?.requiredSkills) ? jobData.requiredSkills : Array.isArray(jobData?.skills) ? jobData.skills : [];
+                const images: string[] = Array.isArray(jobData?.images) ? jobData.images : [];
+                const poster = item?.postedBy || jobData?.createdBy;
+                const posterName = poster?.fullName || poster?.name || "Contractor";
+                const posterPhoto = poster?.profilePhoto || poster?.profileImage || null;
+                const posterType = poster?.userType || "contractor";
+                const posterMobile = poster?.mobile || poster?.phone || null;
+                const appliedDate = formatDate(item?.appliedAt);
+                const acceptedDate = formatDate(item?.acceptedAt);
+
+                return (
+                  <div
+                    key={item.enquiryId || item._id || item.id || jobData?.jobId || jobData?.id || jobData?._id}
+                    className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    {/* Image Banner or Color Header */}
+                    {images.length > 0 ? (
+                      <div className="relative h-24 sm:h-28 overflow-hidden">
+                        <img src={images[0]} alt={title} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                        <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
+                          <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-2 flex-1 mr-2">{title}</h3>
+                          <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${sc.bg} ${sc.text} border ${sc.border} backdrop-blur-sm`}>
+                            {sc.icon} {sc.label}
+                          </span>
+                        </div>
+                        {images.length > 1 && (
+                          <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm">
+                            <ImageIcon size={10} className="text-white/80" />
+                            <span className="text-[9px] font-bold text-white/90">{images.length}</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
+                        <h3 className="text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white leading-snug line-clamp-2 flex-1">{title}</h3>
+                        <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${sc.bg} ${sc.text} border ${sc.border}`}>
+                          {sc.icon} {sc.label}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Body */}
+                    <div className="px-3 py-2.5 space-y-2">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
+                          <MapPin size={11} className="text-indigo-400 shrink-0" />
+                          <span className="truncate max-w-[120px]">{locText}</span>
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
+                          <Users size={11} className="text-blue-400 shrink-0" />
+                          {jobData?.workersNeeded || "—"} workers
+                        </span>
+                      </div>
+
+                      {skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {skills.slice(0, 4).map((s: string, i: number) => (
+                            <span key={i} className="px-1.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[9px] font-semibold border border-indigo-100 dark:border-indigo-800/30">
+                              {s}
+                            </span>
+                          ))}
+                          {skills.length > 4 && <span className="px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[9px] font-semibold">+{skills.length - 4}</span>}
+                        </div>
+                      )}
+
+                      {item?.message && (
+                        <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
+                          <MessageSquare size={11} className="text-zinc-400 shrink-0 mt-0.5" />
+                          <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 italic line-clamp-2 leading-relaxed">&ldquo;{item.message}&rdquo;</p>
+                        </div>
+                      )}
+
+                      {/* Posted By */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <div className="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
+                          {posterPhoto ? (
+                            <img src={posterPhoto} className="w-full h-full object-cover" alt={posterName} />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-400 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
+                              {posterName[0]?.toUpperCase() || "C"}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] sm:text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 truncate">{posterName}</p>
+                          <p className="text-[9px] text-zinc-400 capitalize">{posterType === "sub_contractor" ? "Sub-Contractor" : posterType}</p>
+                        </div>
+                        {posterMobile && (
+                          <a href={`tel:+91${posterMobile}`} className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
+                            <Phone size={12} />
+                          </a>
+                        )}
+                      </div>
+
+                      {/* Timeline */}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                        {appliedDate && (
+                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-zinc-400">
+                            <Calendar size={10} className="shrink-0" />
+                            Applied {appliedDate}
+                          </span>
+                        )}
+                        {acceptedDate && (
+                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-green-500">
+                            <CheckCircle size={10} className="shrink-0" />
+                            Accepted {acceptedDate}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Accepted Pagination */}
+            <div className="mt-2 px-4 sm:px-6 flex items-center justify-between">
+              <button type="button" onClick={() => { const p = Math.max(1, acceptedPage - 1); setAcceptedPage(p); dispatch(fetchAcceptedJobs({ page: p, limit: 10 })); }} disabled={acceptedPage <= 1 || acceptedJobs.loading} className="text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-50">Previous</button>
+              <p className="text-xs text-gray-600 dark:text-gray-300">Page {acceptedPage} of {acceptedJobs.totalPages}</p>
+              <button type="button" onClick={() => { const p = Math.min(acceptedJobs.totalPages, acceptedPage + 1); setAcceptedPage(p); dispatch(fetchAcceptedJobs({ page: p, limit: 10 })); }} disabled={acceptedPage >= acceptedJobs.totalPages || acceptedJobs.loading} className="text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-50">Next</button>
+            </div>
+          </>
+        );
+      })()}
+
+      {/* Completed Jobs — from dedicated API */}
+      {activeCardKey === "completed" && (() => {
+        const completedList = completedJobs.jobs;
+        if (completedJobs.loading) {
+          return (
+            <div className="text-center py-12 px-4 sm:px-6">
+              <p className="text-gray-600 dark:text-gray-400">Loading completed jobs...</p>
+            </div>
+          );
+        }
+        if (completedJobs.error) {
+          return (
+            <div className="text-center py-12 px-4 sm:px-6">
+              <p className="text-red-600 dark:text-red-400 text-sm">{completedJobs.error}</p>
+              <button type="button" onClick={() => dispatch(fetchCompletedJobs({ page: completedPage, limit: 10 }))} className="mt-2 text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200">
+                Retry
+              </button>
+            </div>
+          );
+        }
+        if (completedList.length === 0) {
+          return (
+            <div className="text-center py-12 px-4 sm:px-6">
+              <p className="text-gray-500 dark:text-gray-400 text-sm">No completed jobs found.</p>
+            </div>
+          );
+        }
+
+        const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null;
+
+        return (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 sm:px-6 pb-4">
+              {completedList.map((item: any) => {
+                const jobData = item?.job || item?.jobDetails || item;
+                const title = jobData?.workTitle || jobData?.jobTitle || "Untitled Job";
+                const loc = jobData?.location;
+                const locText = typeof loc === "string" ? loc : [loc?.area, loc?.city].filter(Boolean).join(", ") || "Not specified";
+                const skills: string[] = Array.isArray(jobData?.requiredSkills) ? jobData.requiredSkills : Array.isArray(jobData?.skills) ? jobData.skills : [];
+                const images: string[] = Array.isArray(jobData?.images) ? jobData.images : [];
+                const poster = item?.postedBy || jobData?.createdBy;
+                const posterName = poster?.fullName || poster?.name || "Contractor";
+                const posterPhoto = poster?.profilePhoto || poster?.profileImage || null;
+                const posterType = poster?.userType || "contractor";
+                const posterMobile = poster?.mobile || poster?.phone || null;
+                const appliedDate = formatDate(item?.appliedAt);
+                const acceptedDate = formatDate(item?.acceptedAt);
+                const completedDate = formatDate(item?.completedAt);
+
+                return (
+                  <div
+                    key={item.enquiryId || item._id || item.id || jobData?.jobId || jobData?.id || jobData?._id}
+                    className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    {images.length > 0 ? (
+                      <div className="relative h-24 sm:h-28 overflow-hidden">
+                        <img src={images[0]} alt={title} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                        <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
+                          <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-2 flex-1 mr-2">{title}</h3>
+                          <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-teal-50 dark:bg-teal-900/15 text-teal-600 dark:text-teal-400 border border-teal-100 dark:border-teal-800/30 backdrop-blur-sm">
+                            <CheckCircle size={10} /> Completed
+                          </span>
+                        </div>
+                        {images.length > 1 && (
+                          <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm">
+                            <ImageIcon size={10} className="text-white/80" />
+                            <span className="text-[9px] font-bold text-white/90">{images.length}</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
+                        <h3 className="text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white leading-snug line-clamp-2 flex-1">{title}</h3>
+                        <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-teal-50 dark:bg-teal-900/15 text-teal-600 dark:text-teal-400 border border-teal-100 dark:border-teal-800/30">
+                          <CheckCircle size={10} /> Completed
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="px-3 py-2.5 space-y-2">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
+                          <MapPin size={11} className="text-indigo-400 shrink-0" />
+                          <span className="truncate max-w-[120px]">{locText}</span>
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
+                          <Users size={11} className="text-blue-400 shrink-0" />
+                          {jobData?.workersNeeded || "—"} workers
+                        </span>
+                      </div>
+
+                      {skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {skills.slice(0, 4).map((s: string, i: number) => (
+                            <span key={i} className="px-1.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[9px] font-semibold border border-indigo-100 dark:border-indigo-800/30">
+                              {s}
+                            </span>
+                          ))}
+                          {skills.length > 4 && <span className="px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[9px] font-semibold">+{skills.length - 4}</span>}
+                        </div>
+                      )}
+
+                      {item?.message && (
+                        <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
+                          <MessageSquare size={11} className="text-zinc-400 shrink-0 mt-0.5" />
+                          <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 italic line-clamp-2 leading-relaxed">&ldquo;{item.message}&rdquo;</p>
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-2 pt-1">
+                        <div className="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
+                          {posterPhoto ? (
+                            <img src={posterPhoto} className="w-full h-full object-cover" alt={posterName} />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-400 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
+                              {posterName[0]?.toUpperCase() || "C"}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] sm:text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 truncate">{posterName}</p>
+                          <p className="text-[9px] text-zinc-400 capitalize">{posterType === "sub_contractor" ? "Sub-Contractor" : posterType}</p>
+                        </div>
+                        {posterMobile && (
+                          <a href={`tel:+91${posterMobile}`} className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
+                            <Phone size={12} />
+                          </a>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                        {appliedDate && (
+                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-zinc-400">
+                            <Calendar size={10} className="shrink-0" />
+                            Applied {appliedDate}
+                          </span>
+                        )}
+                        {acceptedDate && (
+                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-green-500">
+                            <CheckCircle size={10} className="shrink-0" />
+                            Accepted {acceptedDate}
+                          </span>
+                        )}
+                        {completedDate && (
+                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-teal-500">
+                            <CheckCircle size={10} className="shrink-0" />
+                            Completed {completedDate}
+                          </span>
+                        )}
+                      </div>
+
+                      {item?.review && (
+                        <div className="px-2 py-1.5 rounded-lg bg-indigo-50/60 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/20">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="text-[9px] font-semibold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider">Contractor Review</span>
+                            <div className="flex items-center gap-px ml-auto">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <Star key={s} size={10} className={s <= (item.review.rating || 0) ? "text-amber-400 fill-amber-400" : "text-zinc-300 dark:text-zinc-600"} />
+                              ))}
+                            </div>
+                          </div>
+                          {item.review.feedback && (
+                            <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-1">&ldquo;{item.review.feedback}&rdquo;</p>
+                          )}
+                        </div>
+                      )}
+
+                      {item?.myFeedback && (
+                        <div className="px-2 py-1.5 rounded-lg bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="text-[9px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-wider">My Feedback</span>
+                            <div className="flex items-center gap-px ml-auto">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <Star key={s} size={10} className={s <= (item.myFeedback.rating || 0) ? "text-amber-400 fill-amber-400" : "text-zinc-300 dark:text-zinc-600"} />
+                              ))}
+                            </div>
+                          </div>
+                          {item.myFeedback.feedback && (
+                            <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-1">&ldquo;{item.myFeedback.feedback}&rdquo;</p>
+                          )}
+                        </div>
+                      )}
+
+                      {item?.feedbackSubmitted === false && (
+                        <button
+                          type="button"
+                          onClick={() => setFeedbackModal({
+                            enquiryId: item.enquiryId || item._id || item.id,
+                            jobId: jobData?.jobId || jobData?.id || jobData?._id || "",
+                            userId: poster?.userId || poster?._id || "",
+                            posterName,
+                          })}
+                          className="w-full mt-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[11px] sm:text-xs font-semibold border border-amber-200 dark:border-amber-800/30 transition-colors"
+                        >
+                          <Star size={12} /> Submit Feedback
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-2 px-4 sm:px-6 flex items-center justify-between">
+              <button type="button" onClick={() => { const p = Math.max(1, completedPage - 1); setCompletedPage(p); dispatch(fetchCompletedJobs({ page: p, limit: 10 })); }} disabled={completedPage <= 1 || completedJobs.loading} className="text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-50">Previous</button>
+              <p className="text-xs text-gray-600 dark:text-gray-300">Page {completedPage} of {completedJobs.totalPages}</p>
+              <button type="button" onClick={() => { const p = Math.min(completedJobs.totalPages, completedPage + 1); setCompletedPage(p); dispatch(fetchCompletedJobs({ page: p, limit: 10 })); }} disabled={completedPage >= completedJobs.totalPages || completedJobs.loading} className="text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-50">Next</button>
+            </div>
+          </>
+        );
+      })()}
+
       {/* Applied / status-filtered jobs from Redux */}
-      {activeCardKey !== "available" && activeCardKey !== "posted" && (() => {
+      {activeCardKey !== "available" && activeCardKey !== "posted" && activeCardKey !== "accepted" && activeCardKey !== "completed" && (() => {
         const all = appliedJobs.jobs;
         let filtered: any[];
         if (activeCardKey === "applied") {
           filtered = all;
         } else {
           filtered = all.filter((j: any) => {
-            const s = (j?.status || j?.enquiryStatus || "").toLowerCase();
+            const s = (j?.applicationStatus || j?.status || j?.enquiryStatus || "").toLowerCase();
             return s === activeCardKey;
           });
         }
@@ -447,19 +1064,148 @@ export default function JobsTabContent(props: TabContentProps) {
             </div>
           );
         }
+
+        const statusConfig: Record<string, { bg: string; text: string; border: string; icon: React.ReactNode; label: string }> = {
+          pending: { bg: "bg-amber-50 dark:bg-amber-900/15", text: "text-amber-600 dark:text-amber-400", border: "border-amber-100 dark:border-amber-800/30", icon: <Clock size={10} />, label: "Pending" },
+          accepted: { bg: "bg-green-50 dark:bg-green-900/15", text: "text-green-600 dark:text-green-400", border: "border-green-100 dark:border-green-800/30", icon: <CheckCircle size={10} />, label: "Accepted" },
+          rejected: { bg: "bg-red-50 dark:bg-red-900/15", text: "text-red-500 dark:text-red-400", border: "border-red-100 dark:border-red-800/30", icon: <XCircle size={10} />, label: "Rejected" },
+          completed: { bg: "bg-teal-50 dark:bg-teal-900/15", text: "text-teal-600 dark:text-teal-400", border: "border-teal-100 dark:border-teal-800/30", icon: <CheckCircle size={10} />, label: "Completed" },
+          withdrawn: { bg: "bg-zinc-50 dark:bg-zinc-800", text: "text-zinc-500 dark:text-zinc-400", border: "border-zinc-200 dark:border-zinc-700", icon: <XCircle size={10} />, label: "Withdrawn" },
+        };
+
+        const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null;
+
         return (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6 pb-6">
-            {filtered.map((job: any) => (
-              <CreateJobCard
-                key={job.id || job._id || job.jobId}
-                job={job?.jobDetails || job}
-                onApply={onConnect}
-                onView={(jobId) => {
-                  const detail = job?.jobDetails || job;
-                  setSelectedJob(detail);
-                }}
-              />
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 sm:px-6 pb-6">
+            {filtered.map((item: any) => {
+              const jobData = item?.job || item?.jobDetails || item;
+              const appStatus = (item?.applicationStatus || item?.status || "pending").toLowerCase();
+              const sc = statusConfig[appStatus] || statusConfig.pending;
+              const title = jobData?.workTitle || jobData?.jobTitle || "Untitled Job";
+              const loc = jobData?.location;
+              const locText = typeof loc === "string" ? loc : [loc?.area, loc?.city].filter(Boolean).join(", ") || "Not specified";
+              const skills: string[] = Array.isArray(jobData?.requiredSkills) ? jobData.requiredSkills : Array.isArray(jobData?.skills) ? jobData.skills : [];
+              const images: string[] = Array.isArray(jobData?.images) ? jobData.images : [];
+              const poster = item?.postedBy;
+              const appliedDate = formatDate(item?.appliedAt);
+              const acceptedDate = formatDate(item?.acceptedAt);
+              const completedDate = formatDate(item?.completedAt);
+
+              return (
+                <div
+                  key={item.enquiryId || jobData.jobId || jobData.id || jobData._id}
+                  className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Image Banner or Color Header */}
+                  {images.length > 0 ? (
+                    <div className="relative h-24 sm:h-28 overflow-hidden">
+                      <img src={images[0]} alt={title} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
+                        <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-2 flex-1 mr-2">{title}</h3>
+                        <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${sc.bg} ${sc.text} border ${sc.border} backdrop-blur-sm`}>
+                          {sc.icon} {sc.label}
+                        </span>
+                      </div>
+                      {images.length > 1 && (
+                        <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm">
+                          <ImageIcon size={10} className="text-white/80" />
+                          <span className="text-[9px] font-bold text-white/90">{images.length}</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
+                      <h3 className="text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white leading-snug line-clamp-2 flex-1">{title}</h3>
+                      <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${sc.bg} ${sc.text} border ${sc.border}`}>
+                        {sc.icon} {sc.label}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Body */}
+                  <div className="px-3 py-2.5 space-y-2">
+                    {/* Meta Row */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
+                        <MapPin size={11} className="text-indigo-400 shrink-0" />
+                        <span className="truncate max-w-[120px]">{locText}</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
+                        <Users size={11} className="text-blue-400 shrink-0" />
+                        {jobData?.workersNeeded || "—"} workers
+                      </span>
+                    </div>
+
+                    {/* Skills */}
+                    {skills.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {skills.slice(0, 4).map((s, i) => (
+                          <span key={i} className="px-1.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[9px] font-semibold border border-indigo-100 dark:border-indigo-800/30">
+                            {s}
+                          </span>
+                        ))}
+                        {skills.length > 4 && <span className="px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[9px] font-semibold">+{skills.length - 4}</span>}
+                      </div>
+                    )}
+
+                    {/* Message */}
+                    {item?.message && (
+                      <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
+                        <MessageSquare size={11} className="text-zinc-400 shrink-0 mt-0.5" />
+                        <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 italic line-clamp-2 leading-relaxed">&ldquo;{item.message}&rdquo;</p>
+                      </div>
+                    )}
+
+                    {/* Posted By */}
+                    {poster && (
+                      <div className="flex items-center gap-2 pt-1">
+                        <div className="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
+                          {poster.profilePhoto ? (
+                            <img src={poster.profilePhoto} className="w-full h-full object-cover" alt={poster.name} />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-400 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
+                              {(poster.name || "C")[0].toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] sm:text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 truncate">{poster.name}</p>
+                          <p className="text-[9px] text-zinc-400 capitalize">{poster.userType === "sub_contractor" ? "Sub-Contractor" : poster.userType}</p>
+                        </div>
+                        {poster.mobile && (
+                          <a href={`tel:+91${poster.mobile}`} className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
+                            <Phone size={12} />
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Timeline */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                      {appliedDate && (
+                        <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-zinc-400">
+                          <Calendar size={10} className="shrink-0" />
+                          Applied {appliedDate}
+                        </span>
+                      )}
+                      {acceptedDate && (
+                        <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-green-500">
+                          <CheckCircle size={10} className="shrink-0" />
+                          Accepted {acceptedDate}
+                        </span>
+                      )}
+                      {completedDate && (
+                        <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-teal-500">
+                          <CheckCircle size={10} className="shrink-0" />
+                          Completed {completedDate}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         );
       })()}
@@ -472,6 +1218,113 @@ export default function JobsTabContent(props: TabContentProps) {
         onClose={() => setSelectedJob(null)}
         onConnect={onConnect}
       />
+
+      <JobApplicationsModal
+        isOpen={Boolean(viewingApplicationsJob)}
+        job={viewingApplicationsJob}
+        onClose={() => setViewingApplicationsJob(null)}
+        onConnect={onConnect}
+      />
+
+      <JobDetailsModal
+        isOpen={Boolean(editingJob)}
+        job={editingJob}
+        saving={updatingJob}
+        userType={userType}
+        onClose={() => setEditingJob(null)}
+        onSave={handleSaveJobDetails}
+      />
+
+      {/* Feedback Modal */}
+      {feedbackModal && (
+        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Submit Feedback</h3>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Rate your experience with {feedbackModal.posterName}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setFeedbackModal(null); setFeedbackRating(0); setFeedbackHover(0); setFeedbackText(""); }}
+                  className="p-1.5 rounded-lg hover:bg-white/60 dark:hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-zinc-600"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            <div className="px-5 py-4 space-y-4">
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-2">Rating</label>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setFeedbackRating(star)}
+                      onMouseEnter={() => setFeedbackHover(star)}
+                      onMouseLeave={() => setFeedbackHover(0)}
+                      className="p-0.5 transition-transform hover:scale-110"
+                    >
+                      <Star
+                        size={24}
+                        className={`transition-colors ${
+                          star <= (feedbackHover || feedbackRating)
+                            ? "text-amber-400 fill-amber-400"
+                            : "text-zinc-300 dark:text-zinc-600"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  {feedbackRating > 0 && (
+                    <span className="ml-2 text-[11px] font-semibold text-amber-600 dark:text-amber-400">{feedbackRating}/5</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">Feedback</label>
+                <textarea
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  placeholder="Share your experience..."
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="px-5 py-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => { setFeedbackModal(null); setFeedbackRating(0); setFeedbackHover(0); setFeedbackText(""); }}
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitFeedback}
+                disabled={feedbackSubmitting || feedbackRating === 0 || !feedbackText.trim()}
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+              >
+                {feedbackSubmitting ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Star size={12} /> Submit
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

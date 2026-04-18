@@ -33,6 +33,10 @@ interface JobStatCardsProps {
   totalAvailableJobs?: number;
   /** For contractor: total posted jobs count */
   totalPostedJobs?: number;
+  /** Accepted jobs count from dedicated API */
+  totalAcceptedJobs?: number;
+  /** Completed jobs count from dedicated API */
+  totalCompletedJobs?: number;
   activeCardKey?: JobCardKey | null;
   onCardClick?: (key: JobCardKey) => void;
 }
@@ -41,6 +45,8 @@ export default function JobStatCards({
   userType,
   totalAvailableJobs = 0,
   totalPostedJobs = 0,
+  totalAcceptedJobs = 0,
+  totalCompletedJobs = 0,
   activeCardKey = null,
   onCardClick,
 }: JobStatCardsProps) {
@@ -53,22 +59,6 @@ export default function JobStatCards({
   if (userType === "labour") {
     const all = appliedJobs.jobs;
     const applied = all.length;
-    const pending = all.filter((j: any) => {
-      const s = (j?.status || j?.enquiryStatus || "pending").toLowerCase();
-      return s === "pending";
-    }).length;
-    const accepted = all.filter((j: any) => {
-      const s = (j?.status || j?.enquiryStatus || "").toLowerCase();
-      return s === "accepted";
-    }).length;
-    const completed = all.filter((j: any) => {
-      const s = (j?.status || j?.enquiryStatus || "").toLowerCase();
-      return s === "completed";
-    }).length;
-    const rejected = all.filter((j: any) => {
-      const s = (j?.status || j?.enquiryStatus || "").toLowerCase();
-      return s === "rejected";
-    }).length;
 
     cards = [
        
@@ -103,24 +93,9 @@ export default function JobStatCards({
         ringClass: "ring-2 ring-violet-500",
       },
       {
-        cardKey: "pending" as JobCardKey,
-        label: "Req. Received",
-        count: pending,
-        icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-          </svg>
-        ),
-        colorClass: "text-amber-600 dark:text-amber-400",
-        bgClass: "bg-amber-50 dark:bg-amber-900/30",
-        borderClass: "border-amber-200 dark:border-amber-700",
-        accentClass: "bg-amber-500",
-        ringClass: "ring-2 ring-amber-500",
-      },
-      {
         cardKey: "accepted" as JobCardKey,
         label: "Accepted",
-        count: accepted,
+        count: totalAcceptedJobs,
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -135,7 +110,7 @@ export default function JobStatCards({
       {
         cardKey: "completed" as JobCardKey,
         label: "Completed",
-        count: completed,
+        count: totalCompletedJobs,
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -147,41 +122,10 @@ export default function JobStatCards({
         accentClass: "bg-teal-500",
         ringClass: "ring-2 ring-teal-500",
       },
-      {
-        cardKey: "rejected" as JobCardKey,
-        label: "Rejected",
-        count: rejected,
-        icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-          </svg>
-        ),
-        colorClass: "text-red-600 dark:text-red-400",
-        bgClass: "bg-red-50 dark:bg-red-900/30",
-        borderClass: "border-red-200 dark:border-red-700",
-        accentClass: "bg-red-500",
-        ringClass: "ring-2 ring-red-500",
-      },
     ];
   } else if (userType === "sub_contractor") {
     const all = appliedJobs.jobs;
     const applied = all.length;
-    const pending = all.filter((j: any) => {
-      const s = (j?.status || j?.enquiryStatus || "pending").toLowerCase();
-      return s === "pending";
-    }).length;
-    const accepted = all.filter((j: any) => {
-      const s = (j?.status || j?.enquiryStatus || "").toLowerCase();
-      return s === "accepted";
-    }).length;
-    const completed = all.filter((j: any) => {
-      const s = (j?.status || j?.enquiryStatus || "").toLowerCase();
-      return s === "completed";
-    }).length;
-    const rejected = all.filter((j: any) => {
-      const s = (j?.status || j?.enquiryStatus || "").toLowerCase();
-      return s === "rejected";
-    }).length;
 
     cards = [
       {
@@ -230,24 +174,9 @@ export default function JobStatCards({
         ringClass: "ring-2 ring-violet-500",
       },
       {
-        cardKey: "pending" as JobCardKey,
-        label: "Req. Received",
-        count: pending,
-        icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-          </svg>
-        ),
-        colorClass: "text-amber-600 dark:text-amber-400",
-        bgClass: "bg-amber-50 dark:bg-amber-900/30",
-        borderClass: "border-amber-200 dark:border-amber-700",
-        accentClass: "bg-amber-500",
-        ringClass: "ring-2 ring-amber-500",
-      },
-      {
         cardKey: "accepted" as JobCardKey,
         label: "Accepted",
-        count: accepted,
+        count: totalAcceptedJobs,
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -262,7 +191,7 @@ export default function JobStatCards({
       {
         cardKey: "completed" as JobCardKey,
         label: "Completed",
-        count: completed,
+        count: totalCompletedJobs,
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -273,21 +202,6 @@ export default function JobStatCards({
         borderClass: "border-teal-200 dark:border-teal-700",
         accentClass: "bg-teal-500",
         ringClass: "ring-2 ring-teal-500",
-      },
-      {
-        cardKey: "rejected" as JobCardKey,
-        label: "Rejected",
-        count: rejected,
-        icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-          </svg>
-        ),
-        colorClass: "text-red-600 dark:text-red-400",
-        bgClass: "bg-red-50 dark:bg-red-900/30",
-        borderClass: "border-red-200 dark:border-red-700",
-        accentClass: "bg-red-500",
-        ringClass: "ring-2 ring-red-500",
       },
     ];
   } else {

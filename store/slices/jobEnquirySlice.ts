@@ -11,6 +11,22 @@ export interface AppliedJobsState {
   error: string | null;
 }
 
+export interface AcceptedJobsState {
+  jobs: any[];
+  loading: boolean;
+  error: string | null;
+  totalPages: number;
+  total: number;
+}
+
+export interface CompletedJobsState {
+  jobs: any[];
+  loading: boolean;
+  error: string | null;
+  totalPages: number;
+  total: number;
+}
+
 export interface JobEnquiriesState {
   enquiries: Record<string, any[]>; // jobId -> array of enquiries
   loading: boolean;
@@ -65,6 +81,8 @@ export interface JobEnquiryState {
     error: string | null;
   };
   appliedJobs: AppliedJobsState;
+  acceptedJobs: AcceptedJobsState;
+  completedJobs: CompletedJobsState;
   jobEnquiries: JobEnquiriesState;
   receivedRequests: ReceivedRequestsState;
   jobHistoryDashboard: JobHistoryDashboardState;
@@ -104,6 +122,20 @@ const initialState: JobEnquiryState = {
     jobs: [],
     loading: false,
     error: null,
+  },
+  acceptedJobs: {
+    jobs: [],
+    loading: false,
+    error: null,
+    totalPages: 1,
+    total: 0,
+  },
+  completedJobs: {
+    jobs: [],
+    loading: false,
+    error: null,
+    totalPages: 1,
+    total: 0,
   },
   jobEnquiries: {
     enquiries: {},
@@ -299,7 +331,7 @@ export const fetchAppliedJobs = createAsyncThunk(
   "jobEnquiry/fetchAppliedJobs",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiGet(`/api/job-enquiries/applied/jobs?page=1&limit=100`);
+      const response = await apiGet(`/api/jobs/getallappliedjobs?page=1&limit=100`);
       if (!response.success) {
         return rejectWithValue(response.error || response.message || "Failed to fetch applied jobs");
       }
@@ -309,20 +341,65 @@ export const fetchAppliedJobs = createAsyncThunk(
       const jobIds = appliedJobs
         .map((enquiry: any) => {
           return (
+            enquiry.job?.jobId ||
             enquiry.jobId ||
             enquiry.job?.id ||
             enquiry.job?._id ||
-            enquiry.jobDetails?.id ||
-            enquiry.jobDetails?._id ||
             ""
           );
         })
         .map((id: any) => String(id))
         .filter(Boolean);
 
-      return { jobs: appliedJobs, jobIds };
+      return { jobs: appliedJobs, jobIds, summary: data.summary || null };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to fetch applied jobs";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchAcceptedJobs = createAsyncThunk(
+  "jobEnquiry/fetchAcceptedJobs",
+  async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
+    try {
+      const response = await apiGet(`/api/jobs/getallacceptedjobs?page=${page}&limit=${limit}`);
+      if (!response.success) {
+        return rejectWithValue(response.error || response.message || "Failed to fetch accepted jobs");
+      }
+
+      const data = response.data?.data || response.data || {};
+      const jobs = data.acceptedJobs || data.jobs || data.items || [];
+      const pagination = data.pagination || data.meta || {};
+      const totalPages = Number(pagination.totalPages || pagination.pages || data.totalPages || 1);
+      const total = Number(pagination.total || pagination.totalItems || data.total || jobs.length || 0);
+
+      return { jobs, totalPages, total };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch accepted jobs";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchCompletedJobs = createAsyncThunk(
+  "jobEnquiry/fetchCompletedJobs",
+  async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
+    try {
+      const response = await apiGet(`/api/jobs/getallcompletedjobs?page=${page}&limit=${limit}`);
+      if (!response.success) {
+        return rejectWithValue(response.error || response.message || "Failed to fetch completed jobs");
+      }
+
+      const data = response.data?.data || response.data || {};
+      const jobs = data.completedJobs || data.jobs || data.items || [];
+      const pagination = data.pagination || data.meta || {};
+      const totalPages = Number(pagination.totalPages || pagination.pages || data.totalPages || 1);
+      const total = Number(pagination.total || pagination.totalItems || data.total || jobs.length || 0);
+
+      return { jobs, totalPages, total };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch completed jobs";
       return rejectWithValue(errorMessage);
     }
   }
@@ -408,6 +485,30 @@ export const completeEnquiryWithFeedback = createAsyncThunk(
       return { enquiryId, jobId, data: response.data };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to mark as completed";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const submitEnquiryFeedback = createAsyncThunk(
+  "jobEnquiry/submitEnquiryFeedback",
+  async (
+    { enquiryId, rating, feedback }: { enquiryId: string; rating: number; feedback: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await apiPost(
+        `/api/job-enquiries/${enquiryId}/submitfeedback`,
+        { rating, feedback }
+      );
+
+      if (!response.success) {
+        return rejectWithValue(response.error || response.message || "Failed to submit feedback");
+      }
+
+      return { enquiryId, data: response.data };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to submit feedback";
       return rejectWithValue(errorMessage);
     }
   }
@@ -599,6 +700,40 @@ const jobEnquirySlice = createSlice({
       .addCase(fetchAppliedJobs.rejected, (state, action) => {
         state.appliedJobs.loading = false;
         state.appliedJobs.error = action.payload as string;
+      });
+
+    // fetchAcceptedJobs handlers
+    builder
+      .addCase(fetchAcceptedJobs.pending, (state) => {
+        state.acceptedJobs.loading = true;
+        state.acceptedJobs.error = null;
+      })
+      .addCase(fetchAcceptedJobs.fulfilled, (state, action) => {
+        state.acceptedJobs.loading = false;
+        state.acceptedJobs.jobs = action.payload.jobs;
+        state.acceptedJobs.totalPages = action.payload.totalPages;
+        state.acceptedJobs.total = action.payload.total;
+      })
+      .addCase(fetchAcceptedJobs.rejected, (state, action) => {
+        state.acceptedJobs.loading = false;
+        state.acceptedJobs.error = action.payload as string;
+      });
+
+    // fetchCompletedJobs handlers
+    builder
+      .addCase(fetchCompletedJobs.pending, (state) => {
+        state.completedJobs.loading = true;
+        state.completedJobs.error = null;
+      })
+      .addCase(fetchCompletedJobs.fulfilled, (state, action) => {
+        state.completedJobs.loading = false;
+        state.completedJobs.jobs = action.payload.jobs;
+        state.completedJobs.totalPages = action.payload.totalPages;
+        state.completedJobs.total = action.payload.total;
+      })
+      .addCase(fetchCompletedJobs.rejected, (state, action) => {
+        state.completedJobs.loading = false;
+        state.completedJobs.error = action.payload as string;
       });
 
     // fetchJobEnquiries handlers
