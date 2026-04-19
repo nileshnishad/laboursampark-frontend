@@ -346,7 +346,7 @@ export default function CreateJobTabContent(props: TabContentProps) {
   return (
     <div className="max-w-7xl mx-auto">
       {userType !== "contractor" && (
-      <div className="px-4 sm:px-6 pt-5">
+      <div className="">
         <JobStatCards
           userType={userType}
           totalPostedJobs={publishedRequirements.length}

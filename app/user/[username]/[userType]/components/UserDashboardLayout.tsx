@@ -207,7 +207,16 @@ export default function UserDashboardLayout({
       <div className="lg:hidden sticky top-0 z-50 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 shadow-sm px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className={`w-8 h-8 rounded-lg ${colors.active} flex items-center justify-center text-sm font-black italic`}>LS</div>
-          <span className="text-sm font-black text-zinc-900 dark:text-white">LabourSampark</span>
+          <div className="flex flex-col">
+            <span className="flex items-center gap-1 text-sm font-black text-zinc-900 dark:text-white">
+             
+              • {username.replace(/-/g, " ")}
+            </span>
+            <span className={`text-[10px] font-black uppercase tracking-widest ${colors.text}`}>
+              {userType.replace("_", " ")} Portal
+            </span>
+          </div>
+
         </div>
 
         <button
@@ -221,7 +230,7 @@ export default function UserDashboardLayout({
       </div>
 
       {/* ── Main Content Area ───────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 bg-zinc-50 dark:bg-zinc-950 overflow-x-hidden">
+      <div className="flex-1 flex flex-col min-w-0 bg-zinc-100 dark:bg-zinc-900 overflow-x-hidden">
         {/* Top Fixed Search/Context Bar (Desktop) */}
         <header className="hidden lg:flex items-center justify-between px-10 h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-30">
           <div className="flex items-center gap-4">
@@ -235,10 +244,7 @@ export default function UserDashboardLayout({
           </div>
 
           <div className="flex items-center gap-6">
-
-
             <div className="h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
-
             <button
               onClick={onLogout}
               className="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
@@ -251,11 +257,12 @@ export default function UserDashboardLayout({
           </div>
         </header>
 
-
-
         {/* Dashboard Dynamic View */}
-        <div className="flex-1">
-          {children}
+        <div className="flex-1 px-0 sm:px-0 pt-4 sm:pt-6 lg:pt-8">
+          {/* Add margin-top for mobile, and use a subtle background for contrast */}
+          <div className="max-w-full mx-auto">
+            {children}
+          </div>
         </div>
       </div>
 

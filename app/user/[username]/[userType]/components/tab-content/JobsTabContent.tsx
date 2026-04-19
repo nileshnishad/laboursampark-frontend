@@ -318,7 +318,7 @@ export default function JobsTabContent(props: TabContentProps) {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="px-4 sm:px-6 pt-5">
+      <div className="">
         <JobStatCards
           userType={userType}
           totalAvailableJobs={totalJobs}
@@ -338,7 +338,7 @@ export default function JobsTabContent(props: TabContentProps) {
       }>
         {/* Mobile: back-navigation header */}
         {mobileDetailOpen && (
-          <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3 shrink-0">
+          <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 mb-4 flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={() => setMobileDetailOpen(false)}
