@@ -132,9 +132,9 @@ export default function PublishedJobCard({
   };
 
   return (
-    <div className="group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1">
+    <div className="group relative flex flex-col bg-white dark:bg-zinc-900 border-2 border-indigo-300 dark:border-indigo-700 rounded-3xl overflow-hidden transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-indigo-400/20 hover:-translate-y-1">
       {/* Top Image Banner */}
-      <div className="relative h-32 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+      <div className="relative h-40 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
         {item.images && item.images.length > 1 ? (
           <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 p-3">
             <div className="relative w-[75%] h-[90%]">
@@ -221,27 +221,26 @@ export default function PublishedJobCard({
         </div>
       </div>
 
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-2 flex flex-col flex-1">
         {/* Title & Metadata */}
-        <div className="mb-3">
-          <h4 className="text-sm font-bold text-zinc-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+        <div className="mb-4">
+          <h4 className="text-base md:text-lg font-extrabold text-zinc-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
             {item.title}
           </h4>
-          <div className="flex items-center gap-2 mt-1 text-zinc-400 dark:text-zinc-500">
+          <div className="flex items-center gap-2 mt-2 text-zinc-500 dark:text-zinc-400">
             <MapPin size={10} />
-            <span className="text-[10px] font-medium truncate">
+            <span className="text-xs font-medium truncate">
               {item.locationDetails.area}, {item.locationDetails.city}
             </span>
           </div>
         </div>
 
         {/* Features Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-2 gap-2 mb-4">
+        <div className="grid grid-cols-2 lg:grid-cols-2 gap-3 mb-5">
           <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 transition-colors">
             <Briefcase size={12} className="text-indigo-500 shrink-0" />
             <div className="flex flex-col min-w-0">
-              <span className="text-[8px] font-bold text-zinc-400 uppercase leading-none">Category</span>
-              <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 capitalize truncate">
+              <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 capitalize truncate">
                 {item.target[0] === 'labour' ? 'Labour' : 'Sub-Contractor'}
               </span>
             </div>
@@ -258,16 +257,15 @@ export default function PublishedJobCard({
         </div>
 
         {/* Skills Tags */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-3 min-h-[1.5rem]">
-          <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-tighter mr-1">Skills:</span>
+        <div className="flex flex-wrap items-center gap-2 mb-4 min-h-[1.5rem]">
           {item.skills.split(',').slice(0, 3).map((skill, i) => (
-            <span key={i} className="text-[9px] font-bold text-indigo-700 dark:text-indigo-400 px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800/50">
+            <span key={i} className="text-xs font-bold text-indigo-700 dark:text-indigo-400 px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800/50">
               {skill.trim()}
             </span>
           ))}
           {item.skills.split(',').length > 3 && (
             <div className="group/skills relative inline-block cursor-help">
-              <span className="text-[9px] font-bold text-zinc-400 hover:text-indigo-500 transition-colors bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold text-zinc-400 hover:text-indigo-500 transition-colors bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full">
                 +{item.skills.split(',').length - 3} more
               </span>
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/skills:block z-30">
@@ -280,24 +278,24 @@ export default function PublishedJobCard({
         </div>
 
         {/* Description Snippet */}
-        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate italic leading-relaxed mb-4" title={item.description}>
+        <p className="text-[12px] md:text-[14px] text-zinc-500 dark:text-zinc-400 truncate italic leading-relaxed mb-5" title={item.description}>
           &ldquo;{item.description}&rdquo;
         </p>
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800 gap-2">
+        <div className="flex items-center justify-between pt-4 border-t-2 border-indigo-100 dark:border-indigo-800 gap-1">
           <button
             onClick={() => onViewApplications(item.id)}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-green-100 hover:bg-green-200 dark:bg-green-800 dark:hover:bg-green-700 text-zinc-700 dark:text-zinc-200 text-[10px] font-black uppercase tracking-wider transition-all active:scale-95"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-2xl bg-green-50 hover:bg-green-100 dark:bg-green-900/40 dark:hover:bg-green-800 text-green-700 dark:text-green-200 text-xs md:text-sm font-extrabold uppercase tracking-wider transition-all border border-green-100 dark:border-green-800 active:scale-95 shadow-sm"
           >
             Applications
           </button>
           <button
             onClick={onShowDetails}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
+            className="flex-1 flex items-center justify-center px-2 py-1 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs md:text-sm font-extrabold uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/20 active:scale-95 border border-indigo-700"
           >
             Edit Job
-            <ArrowRight size={10} />
+            <ArrowRight size={12} />
           </button>
         </div>
       </div>
