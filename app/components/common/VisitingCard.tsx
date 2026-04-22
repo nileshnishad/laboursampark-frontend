@@ -18,6 +18,7 @@ import {
 import ContractorProfileModal from "./ContractorProfileModal";
 import type { RootState } from "@/store/store";
 
+
 interface VisitingCardProps {
   contractor: any;
   isConnected?: boolean;
@@ -45,7 +46,14 @@ export default function VisitingCard({
 
   const name = contractor.fullName || contractor.name || "Business";
   const companyName = contractor.businessName || contractor.companyName || "";
-  const type = contractor.userType || contractor.type || "Contractor";
+  let type = "Contractor";
+  if (contractor.userType === "sub_contractor") {
+    type = "Sub Contractor";
+  } else if (contractor.userType === "contractor") {
+    type = "Contractor";
+  } else if (contractor.userType) {
+    type = contractor.userType.charAt(0).toUpperCase() + contractor.userType.slice(1);
+  }
   const rawLocation = contractor.city || contractor.location || "Not specified";
   let location = "Not specified";
   if (typeof rawLocation === "string") {

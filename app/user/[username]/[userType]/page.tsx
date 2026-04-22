@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
-import { fetchVisibleUsers } from "@/store/slices/visibleUsersSlice";
 import UserProfile from "./components/UserProfile";
 import UserDashboardLayout from "./components/UserDashboardLayout";
 import { TAB_CONTENT_COMPONENTS } from "./components/TabValueContentMap";
@@ -59,9 +58,7 @@ export default function UserDashboardPage() {
     router.push(`/user/${username}/${userType}/payment`);
   };
 
-  useEffect(() => {
-    dispatch(fetchVisibleUsers());
-  }, [dispatch]);
+ 
 
   useEffect(() => {
     const roleTabs = getTabsForUserType(userType);

@@ -1,14 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import LabourCard from "../LabourCard";
 import UserProfileModal from "@/app/components/common/UserProfileModal";
 import type { TabContentProps } from "../TabValueContentMap";
+import { fetchVisibleUsers} from "@/store/slices/visibleUsersSlice";
+import type { RootState, AppDispatch } from "@/store/store";
 
 export default function LabourRequiredTabContent(props: TabContentProps) {
-  const { usersLoading, usersError, filteredData, onConnect } = props;
+  const dispatch = useDispatch<AppDispatch>();
+  const { users: labours, loading: usersLoading, error: usersError } = useSelector(
+    (state: RootState) => state.visibleUsers
+  );
+  const { onConnect } = props;
   const [selectedLabour, setSelectedLabour] = useState<any | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchVisibleUsers());
+  }, [dispatch]);
 
   const handleViewProfile = (labour: any) => {
     setSelectedLabour(labour);
@@ -39,10 +50,10 @@ export default function LabourRequiredTabContent(props: TabContentProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {filteredData.length > 0 ? (
-            filteredData.map((labour: any) => (
+          {labours.length > 0 ? (
+            labours.map((labour: any) => (
               <LabourCard
-                key={labour.id}
+                key={labour.id || labour._id}
                 labour={labour}
                 onConnect={onConnect}
                 onViewProfile={() => handleViewProfile(labour)}
