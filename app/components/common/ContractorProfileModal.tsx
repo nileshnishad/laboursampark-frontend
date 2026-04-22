@@ -14,7 +14,12 @@ export default function ContractorProfileModal({ user, isOpen, onClose }: Contra
   const name = user.fullName || user.name || "User";
   const email = user.email || "N/A";
   const phone = user.mobile || user.phone || "N/A";
-  const location = user.location || user.address || user.city || "N/A";
+  let location = user.location || user.address || user.city || "N/A";
+  if (typeof location === "object" && location !== null) {
+    location = [location.address, location.city, location.state, location.pincode]
+      .filter(Boolean)
+      .join(", ") || "N/A";
+  }
   const experience = user.experience || user.experienceRange || "N/A";
   const rating = user.rating || 0;
   const totalReviews = user.totalReviews || user.reviews?.length || 0;

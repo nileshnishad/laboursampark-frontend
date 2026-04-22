@@ -46,12 +46,15 @@ export default function VisitingCard({
   const name = contractor.fullName || contractor.name || "Business";
   const companyName = contractor.businessName || contractor.companyName || "";
   const type = contractor.userType || contractor.type || "Contractor";
-  const rawLocation =
-    contractor.city || contractor.location || "Not specified";
-  const location =
-    typeof rawLocation === "string"
-      ? rawLocation
-      : rawLocation?.city || rawLocation?.address || "Not specified";
+  const rawLocation = contractor.city || contractor.location || "Not specified";
+  let location = "Not specified";
+  if (typeof rawLocation === "string") {
+    location = rawLocation;
+  } else if (typeof rawLocation === "object" && rawLocation !== null) {
+    location = [rawLocation.address, rawLocation.city, rawLocation.state, rawLocation.pincode]
+      .filter(Boolean)
+      .join(", ") || "Not specified";
+  }
   const rating = contractor.rating || 0;
   const projects = contractor.completedJobs || contractor.projects || 0;
   const phone = contractor.mobile || contractor.phone || "N/A";

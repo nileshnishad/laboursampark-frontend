@@ -33,15 +33,16 @@ export default function IDCard({
   }, []);
 
   const name = labour.fullName || labour.name || "Labour";
-  const experience =
-    labour.experience || labour.experienceRange || "N/A";
+  const experience = labour.experience || labour.experienceRange || "N/A";
   const phone = labour.mobile || labour.phone || "N/A";
   const email = labour.email || "N/A";
   const rawLocation = labour.location || labour.address || labour.city || "N/A";
-  const location =
-    typeof rawLocation === "string"
-      ? rawLocation
-      : rawLocation?.address || rawLocation?.city || "N/A";
+  let location = "N/A";
+  if (typeof rawLocation === "string") {
+    location = rawLocation;
+  } else if (typeof rawLocation === "object" && rawLocation !== null) {
+    location = [rawLocation.address, rawLocation.city].filter(Boolean).join(", ") || "N/A";
+  }
   const rating = labour.rating || 4.5;
   const completedJobs = labour.completedJobs || labour.projects || 0;
   const skills = Array.isArray(labour.skills) ? labour.skills : [];
