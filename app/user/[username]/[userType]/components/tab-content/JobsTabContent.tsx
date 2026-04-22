@@ -810,6 +810,10 @@ export default function JobsTabContent(props: TabContentProps) {
           );
         }
 
+<<<<<<< HEAD
+=======
+        
+>>>>>>> d6c7435ebd80a31c1d6b101adec6d17acdd13d62
         const appliedStatusConfig: Record<string, StatusBadgeConfig> = {
           pending: { bg: "bg-amber-50 dark:bg-amber-900/15", text: "text-amber-600 dark:text-amber-400", border: "border-amber-100 dark:border-amber-800/30", icon: <Clock size={10} />, label: "Pending" },
           accepted: { bg: "bg-green-50 dark:bg-green-900/15", text: "text-green-600 dark:text-green-400", border: "border-green-100 dark:border-green-800/30", icon: <CheckCircle size={10} />, label: "Accepted" },
