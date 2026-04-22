@@ -1,11 +1,24 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import LabourCard from "../LabourCard";
+import UserProfileModal from "@/app/components/common/UserProfileModal";
 import type { TabContentProps } from "../TabValueContentMap";
 
 export default function LabourRequiredTabContent(props: TabContentProps) {
   const { usersLoading, usersError, filteredData, onConnect } = props;
+  const [selectedLabour, setSelectedLabour] = useState<any | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleViewProfile = (labour: any) => {
+    setSelectedLabour(labour);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedLabour(null);
+  };
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -28,7 +41,12 @@ export default function LabourRequiredTabContent(props: TabContentProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {filteredData.length > 0 ? (
             filteredData.map((labour: any) => (
-              <LabourCard key={labour.id} labour={labour} onConnect={onConnect} />
+              <LabourCard
+                key={labour.id}
+                labour={labour}
+                onConnect={onConnect}
+                onViewProfile={() => handleViewProfile(labour)}
+              />
             ))
           ) : (
             <div className="sm:col-span-2 lg:col-span-3 text-center py-12">
@@ -36,6 +54,15 @@ export default function LabourRequiredTabContent(props: TabContentProps) {
             </div>
           )}
         </div>
+      )}
+
+      {/* Top-level Modal for Labour Details */}
+      {modalOpen && selectedLabour && (
+        <UserProfileModal
+          isOpen={modalOpen}
+          onClose={handleCloseModal}
+          user={{ ...selectedLabour, userType: "labour" }}
+        />
       )}
     </div>
   );

@@ -16,6 +16,7 @@ interface IDCardProps {
   className?: string;
 }
 
+
 export default function IDCard({
   labour,
   onConnect,
@@ -23,9 +24,7 @@ export default function IDCard({
   className = "",
 }: IDCardProps) {
   const { user } = useSelector((state: RootState) => state.auth);
-
   const [sending, setSending] = React.useState(false);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
   React.useEffect(() => {
@@ -82,10 +81,11 @@ export default function IDCard({
       .toUpperCase();
   };
 
-  const handleViewProfile = () => {
-    setIsModalOpen(true);
+  // Only call onViewProfile, let parent handle modal
+  const handleViewProfile = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (onViewProfile) {
-      onViewProfile(labour._id || labour.id);
+      onViewProfile(labour);
     }
   };
 
@@ -191,13 +191,7 @@ export default function IDCard({
       </div>
 
 
-      {isModalOpen && (
-        <UserProfileModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          user={{ ...labour, userType: "labour" }}
-        />
-      )}
+      {/* Modal removed from card, handled by parent */}
     </div>
   );
 }
