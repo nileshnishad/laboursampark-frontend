@@ -1,5 +1,5 @@
 "use client";
-
+import FeedbackModal from "@/app/components/common/FeedbackModal";
 import React, { useCallback, useEffect, useState } from "react";
 import CreateJobCard from "../CreateJobCard";
 import JobViewModal from "../JobViewModal";
@@ -15,6 +15,10 @@ import { useAppDispatch } from "@/store/hooks";
 import { fetchAppliedJobs, fetchAcceptedJobs, fetchCompletedJobs, toggleJobActivation, fetchJobEnquiries, fetchJobApplications, submitEnquiryFeedback } from "@/store/slices/jobEnquirySlice";
 import { uploadFile } from "@/lib/s3-client";
 import { UploadCloud, X, MapPin, Briefcase, Calendar, Users, Clock, CheckCircle, XCircle, Phone, MessageSquare, ImageIcon, Star } from "lucide-react";
+import JobStatusCard, { extractJobCardData, formatJobDate } from "@/app/components/common/JobStatusCard";
+import type { StatusBadgeConfig } from "@/app/components/common/StatusBadge";
+import Pagination from "@/app/components/common/Pagination";
+import { StarRatingInput } from "@/app/components/common/StarRating";
 
 const INITIAL_FORM: RequirementFormState = {
   title: "",
@@ -314,7 +318,7 @@ export default function JobsTabContent(props: TabContentProps) {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="px-4 sm:px-6 pt-5">
+      <div className="">
         <JobStatCards
           userType={userType}
           totalAvailableJobs={totalJobs}
@@ -334,7 +338,7 @@ export default function JobsTabContent(props: TabContentProps) {
       }>
         {/* Mobile: back-navigation header */}
         {mobileDetailOpen && (
-          <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3 shrink-0">
+          <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 mb-4 flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={() => setMobileDetailOpen(false)}
@@ -685,143 +689,25 @@ export default function JobsTabContent(props: TabContentProps) {
           );
         }
 
-        const statusConfig: Record<string, { bg: string; text: string; border: string; icon: React.ReactNode; label: string }> = {
-          accepted: { bg: "bg-green-50 dark:bg-green-900/15", text: "text-green-600 dark:text-green-400", border: "border-green-100 dark:border-green-800/30", icon: <CheckCircle size={10} />, label: "Accepted" },
-          completed: { bg: "bg-teal-50 dark:bg-teal-900/15", text: "text-teal-600 dark:text-teal-400", border: "border-teal-100 dark:border-teal-800/30", icon: <CheckCircle size={10} />, label: "Completed" },
-        };
-        const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null;
+        const acceptedStatusConfig: StatusBadgeConfig = { bg: "bg-green-50 dark:bg-green-900/15", text: "text-green-600 dark:text-green-400", border: "border-green-100 dark:border-green-800/30", icon: <CheckCircle size={10} />, label: "Accepted" };
 
         return (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 sm:px-6 pb-4">
-              {acceptedList.map((item: any) => {
-                const jobData = item?.job || item?.jobDetails || item;
-                const appStatus = (item?.applicationStatus || item?.status || "accepted").toLowerCase();
-                const sc = statusConfig[appStatus] || statusConfig.accepted;
-                const title = jobData?.workTitle || jobData?.jobTitle || "Untitled Job";
-                const loc = jobData?.location;
-                const locText = typeof loc === "string" ? loc : [loc?.area, loc?.city].filter(Boolean).join(", ") || "Not specified";
-                const skills: string[] = Array.isArray(jobData?.requiredSkills) ? jobData.requiredSkills : Array.isArray(jobData?.skills) ? jobData.skills : [];
-                const images: string[] = Array.isArray(jobData?.images) ? jobData.images : [];
-                const poster = item?.postedBy || jobData?.createdBy;
-                const posterName = poster?.fullName || poster?.name || "Contractor";
-                const posterPhoto = poster?.profilePhoto || poster?.profileImage || null;
-                const posterType = poster?.userType || "contractor";
-                const posterMobile = poster?.mobile || poster?.phone || null;
-                const appliedDate = formatDate(item?.appliedAt);
-                const acceptedDate = formatDate(item?.acceptedAt);
-
-                return (
-                  <div
-                    key={item.enquiryId || item._id || item.id || jobData?.jobId || jobData?.id || jobData?._id}
-                    className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    {/* Image Banner or Color Header */}
-                    {images.length > 0 ? (
-                      <div className="relative h-24 sm:h-28 overflow-hidden">
-                        <img src={images[0]} alt={title} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                        <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
-                          <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-2 flex-1 mr-2">{title}</h3>
-                          <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${sc.bg} ${sc.text} border ${sc.border} backdrop-blur-sm`}>
-                            {sc.icon} {sc.label}
-                          </span>
-                        </div>
-                        {images.length > 1 && (
-                          <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm">
-                            <ImageIcon size={10} className="text-white/80" />
-                            <span className="text-[9px] font-bold text-white/90">{images.length}</span>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
-                        <h3 className="text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white leading-snug line-clamp-2 flex-1">{title}</h3>
-                        <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${sc.bg} ${sc.text} border ${sc.border}`}>
-                          {sc.icon} {sc.label}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Body */}
-                    <div className="px-3 py-2.5 space-y-2">
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
-                          <MapPin size={11} className="text-indigo-400 shrink-0" />
-                          <span className="truncate max-w-[120px]">{locText}</span>
-                        </span>
-                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
-                          <Users size={11} className="text-blue-400 shrink-0" />
-                          {jobData?.workersNeeded || "—"} workers
-                        </span>
-                      </div>
-
-                      {skills.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {skills.slice(0, 4).map((s: string, i: number) => (
-                            <span key={i} className="px-1.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[9px] font-semibold border border-indigo-100 dark:border-indigo-800/30">
-                              {s}
-                            </span>
-                          ))}
-                          {skills.length > 4 && <span className="px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[9px] font-semibold">+{skills.length - 4}</span>}
-                        </div>
-                      )}
-
-                      {item?.message && (
-                        <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                          <MessageSquare size={11} className="text-zinc-400 shrink-0 mt-0.5" />
-                          <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 italic line-clamp-2 leading-relaxed">&ldquo;{item.message}&rdquo;</p>
-                        </div>
-                      )}
-
-                      {/* Posted By */}
-                      <div className="flex items-center gap-2 pt-1">
-                        <div className="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
-                          {posterPhoto ? (
-                            <img src={posterPhoto} className="w-full h-full object-cover" alt={posterName} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-400 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
-                              {posterName[0]?.toUpperCase() || "C"}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] sm:text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 truncate">{posterName}</p>
-                          <p className="text-[9px] text-zinc-400 capitalize">{posterType === "sub_contractor" ? "Sub-Contractor" : posterType}</p>
-                        </div>
-                        {posterMobile && (
-                          <a href={`tel:+91${posterMobile}`} className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
-                            <Phone size={12} />
-                          </a>
-                        )}
-                      </div>
-
-                      {/* Timeline */}
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                        {appliedDate && (
-                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-zinc-400">
-                            <Calendar size={10} className="shrink-0" />
-                            Applied {appliedDate}
-                          </span>
-                        )}
-                        {acceptedDate && (
-                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-green-500">
-                            <CheckCircle size={10} className="shrink-0" />
-                            Accepted {acceptedDate}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {acceptedList.map((item: any) => (
+                <JobStatusCard
+                  key={item.enquiryId || item._id || item.id}
+                  item={item}
+                  statusConfig={acceptedStatusConfig}
+                />
+              ))}
             </div>
-            {/* Accepted Pagination */}
-            <div className="mt-2 px-4 sm:px-6 flex items-center justify-between">
-              <button type="button" onClick={() => { const p = Math.max(1, acceptedPage - 1); setAcceptedPage(p); dispatch(fetchAcceptedJobs({ page: p, limit: 10 })); }} disabled={acceptedPage <= 1 || acceptedJobs.loading} className="text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-50">Previous</button>
-              <p className="text-xs text-gray-600 dark:text-gray-300">Page {acceptedPage} of {acceptedJobs.totalPages}</p>
-              <button type="button" onClick={() => { const p = Math.min(acceptedJobs.totalPages, acceptedPage + 1); setAcceptedPage(p); dispatch(fetchAcceptedJobs({ page: p, limit: 10 })); }} disabled={acceptedPage >= acceptedJobs.totalPages || acceptedJobs.loading} className="text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-50">Next</button>
-            </div>
+            <Pagination
+              currentPage={acceptedPage}
+              totalPages={acceptedJobs.totalPages}
+              loading={acceptedJobs.loading}
+              onPageChange={(p) => { setAcceptedPage(p); dispatch(fetchAcceptedJobs({ page: p, limit: 10 })); }}
+            />
           </>
         );
       })()}
@@ -854,186 +740,45 @@ export default function JobsTabContent(props: TabContentProps) {
           );
         }
 
-        const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null;
+        const completedStatusConfig: StatusBadgeConfig = { bg: "bg-teal-50 dark:bg-teal-900/15", text: "text-teal-600 dark:text-teal-400", border: "border-teal-100 dark:border-teal-800/30", icon: <CheckCircle size={10} />, label: "Completed" };
 
         return (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 sm:px-6 pb-4">
               {completedList.map((item: any) => {
                 const jobData = item?.job || item?.jobDetails || item;
-                const title = jobData?.workTitle || jobData?.jobTitle || "Untitled Job";
-                const loc = jobData?.location;
-                const locText = typeof loc === "string" ? loc : [loc?.area, loc?.city].filter(Boolean).join(", ") || "Not specified";
-                const skills: string[] = Array.isArray(jobData?.requiredSkills) ? jobData.requiredSkills : Array.isArray(jobData?.skills) ? jobData.skills : [];
-                const images: string[] = Array.isArray(jobData?.images) ? jobData.images : [];
                 const poster = item?.postedBy || jobData?.createdBy;
                 const posterName = poster?.fullName || poster?.name || "Contractor";
-                const posterPhoto = poster?.profilePhoto || poster?.profileImage || null;
-                const posterType = poster?.userType || "contractor";
-                const posterMobile = poster?.mobile || poster?.phone || null;
-                const appliedDate = formatDate(item?.appliedAt);
-                const acceptedDate = formatDate(item?.acceptedAt);
-                const completedDate = formatDate(item?.completedAt);
-
                 return (
-                  <div
-                    key={item.enquiryId || item._id || item.id || jobData?.jobId || jobData?.id || jobData?._id}
-                    className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                  <JobStatusCard
+                    key={item.enquiryId || item._id || item.id}
+                    item={item}
+                    statusConfig={completedStatusConfig}
                   >
-                    {images.length > 0 ? (
-                      <div className="relative h-24 sm:h-28 overflow-hidden">
-                        <img src={images[0]} alt={title} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                        <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
-                          <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-2 flex-1 mr-2">{title}</h3>
-                          <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-teal-50 dark:bg-teal-900/15 text-teal-600 dark:text-teal-400 border border-teal-100 dark:border-teal-800/30 backdrop-blur-sm">
-                            <CheckCircle size={10} /> Completed
-                          </span>
-                        </div>
-                        {images.length > 1 && (
-                          <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm">
-                            <ImageIcon size={10} className="text-white/80" />
-                            <span className="text-[9px] font-bold text-white/90">{images.length}</span>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
-                        <h3 className="text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white leading-snug line-clamp-2 flex-1">{title}</h3>
-                        <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-teal-50 dark:bg-teal-900/15 text-teal-600 dark:text-teal-400 border border-teal-100 dark:border-teal-800/30">
-                          <CheckCircle size={10} /> Completed
-                        </span>
-                      </div>
+                    {item?.feedbackSubmitted === false && (
+                      <button
+                        type="button"
+                        onClick={() => setFeedbackModal({
+                          enquiryId: item.enquiryId || item._id || item.id,
+                          jobId: jobData?.jobId || jobData?.id || jobData?._id || "",
+                          userId: poster?.userId || poster?._id || "",
+                          posterName,
+                        })}
+                        className="w-full mt-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[11px] sm:text-xs font-semibold border border-amber-200 dark:border-amber-800/30 transition-colors"
+                      >
+                        <Star size={12} /> Submit Feedback
+                      </button>
                     )}
-
-                    <div className="px-3 py-2.5 space-y-2">
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
-                          <MapPin size={11} className="text-indigo-400 shrink-0" />
-                          <span className="truncate max-w-[120px]">{locText}</span>
-                        </span>
-                        <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
-                          <Users size={11} className="text-blue-400 shrink-0" />
-                          {jobData?.workersNeeded || "—"} workers
-                        </span>
-                      </div>
-
-                      {skills.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {skills.slice(0, 4).map((s: string, i: number) => (
-                            <span key={i} className="px-1.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[9px] font-semibold border border-indigo-100 dark:border-indigo-800/30">
-                              {s}
-                            </span>
-                          ))}
-                          {skills.length > 4 && <span className="px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[9px] font-semibold">+{skills.length - 4}</span>}
-                        </div>
-                      )}
-
-                      {item?.message && (
-                        <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                          <MessageSquare size={11} className="text-zinc-400 shrink-0 mt-0.5" />
-                          <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 italic line-clamp-2 leading-relaxed">&ldquo;{item.message}&rdquo;</p>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2 pt-1">
-                        <div className="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
-                          {posterPhoto ? (
-                            <img src={posterPhoto} className="w-full h-full object-cover" alt={posterName} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-400 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
-                              {posterName[0]?.toUpperCase() || "C"}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] sm:text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 truncate">{posterName}</p>
-                          <p className="text-[9px] text-zinc-400 capitalize">{posterType === "sub_contractor" ? "Sub-Contractor" : posterType}</p>
-                        </div>
-                        {posterMobile && (
-                          <a href={`tel:+91${posterMobile}`} className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
-                            <Phone size={12} />
-                          </a>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                        {appliedDate && (
-                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-zinc-400">
-                            <Calendar size={10} className="shrink-0" />
-                            Applied {appliedDate}
-                          </span>
-                        )}
-                        {acceptedDate && (
-                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-green-500">
-                            <CheckCircle size={10} className="shrink-0" />
-                            Accepted {acceptedDate}
-                          </span>
-                        )}
-                        {completedDate && (
-                          <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-teal-500">
-                            <CheckCircle size={10} className="shrink-0" />
-                            Completed {completedDate}
-                          </span>
-                        )}
-                      </div>
-
-                      {item?.review && (
-                        <div className="px-2 py-1.5 rounded-lg bg-indigo-50/60 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/20">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="text-[9px] font-semibold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider">Contractor Review</span>
-                            <div className="flex items-center gap-px ml-auto">
-                              {[1, 2, 3, 4, 5].map((s) => (
-                                <Star key={s} size={10} className={s <= (item.review.rating || 0) ? "text-amber-400 fill-amber-400" : "text-zinc-300 dark:text-zinc-600"} />
-                              ))}
-                            </div>
-                          </div>
-                          {item.review.feedback && (
-                            <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-1">&ldquo;{item.review.feedback}&rdquo;</p>
-                          )}
-                        </div>
-                      )}
-
-                      {item?.myFeedback && (
-                        <div className="px-2 py-1.5 rounded-lg bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="text-[9px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-wider">My Feedback</span>
-                            <div className="flex items-center gap-px ml-auto">
-                              {[1, 2, 3, 4, 5].map((s) => (
-                                <Star key={s} size={10} className={s <= (item.myFeedback.rating || 0) ? "text-amber-400 fill-amber-400" : "text-zinc-300 dark:text-zinc-600"} />
-                              ))}
-                            </div>
-                          </div>
-                          {item.myFeedback.feedback && (
-                            <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-1">&ldquo;{item.myFeedback.feedback}&rdquo;</p>
-                          )}
-                        </div>
-                      )}
-
-                      {item?.feedbackSubmitted === false && (
-                        <button
-                          type="button"
-                          onClick={() => setFeedbackModal({
-                            enquiryId: item.enquiryId || item._id || item.id,
-                            jobId: jobData?.jobId || jobData?.id || jobData?._id || "",
-                            userId: poster?.userId || poster?._id || "",
-                            posterName,
-                          })}
-                          className="w-full mt-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[11px] sm:text-xs font-semibold border border-amber-200 dark:border-amber-800/30 transition-colors"
-                        >
-                          <Star size={12} /> Submit Feedback
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                  </JobStatusCard>
                 );
               })}
             </div>
-            <div className="mt-2 px-4 sm:px-6 flex items-center justify-between">
-              <button type="button" onClick={() => { const p = Math.max(1, completedPage - 1); setCompletedPage(p); dispatch(fetchCompletedJobs({ page: p, limit: 10 })); }} disabled={completedPage <= 1 || completedJobs.loading} className="text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-50">Previous</button>
-              <p className="text-xs text-gray-600 dark:text-gray-300">Page {completedPage} of {completedJobs.totalPages}</p>
-              <button type="button" onClick={() => { const p = Math.min(completedJobs.totalPages, completedPage + 1); setCompletedPage(p); dispatch(fetchCompletedJobs({ page: p, limit: 10 })); }} disabled={completedPage >= completedJobs.totalPages || completedJobs.loading} className="text-xs px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-50">Next</button>
-            </div>
+            <Pagination
+              currentPage={completedPage}
+              totalPages={completedJobs.totalPages}
+              loading={completedJobs.loading}
+              onPageChange={(p) => { setCompletedPage(p); dispatch(fetchCompletedJobs({ page: p, limit: 10 })); }}
+            />
           </>
         );
       })()}
@@ -1065,7 +810,7 @@ export default function JobsTabContent(props: TabContentProps) {
           );
         }
 
-        const statusConfig: Record<string, { bg: string; text: string; border: string; icon: React.ReactNode; label: string }> = {
+        const appliedStatusConfig: Record<string, StatusBadgeConfig> = {
           pending: { bg: "bg-amber-50 dark:bg-amber-900/15", text: "text-amber-600 dark:text-amber-400", border: "border-amber-100 dark:border-amber-800/30", icon: <Clock size={10} />, label: "Pending" },
           accepted: { bg: "bg-green-50 dark:bg-green-900/15", text: "text-green-600 dark:text-green-400", border: "border-green-100 dark:border-green-800/30", icon: <CheckCircle size={10} />, label: "Accepted" },
           rejected: { bg: "bg-red-50 dark:bg-red-900/15", text: "text-red-500 dark:text-red-400", border: "border-red-100 dark:border-red-800/30", icon: <XCircle size={10} />, label: "Rejected" },
@@ -1073,137 +818,17 @@ export default function JobsTabContent(props: TabContentProps) {
           withdrawn: { bg: "bg-zinc-50 dark:bg-zinc-800", text: "text-zinc-500 dark:text-zinc-400", border: "border-zinc-200 dark:border-zinc-700", icon: <XCircle size={10} />, label: "Withdrawn" },
         };
 
-        const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null;
-
         return (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 sm:px-6 pb-6">
             {filtered.map((item: any) => {
-              const jobData = item?.job || item?.jobDetails || item;
               const appStatus = (item?.applicationStatus || item?.status || "pending").toLowerCase();
-              const sc = statusConfig[appStatus] || statusConfig.pending;
-              const title = jobData?.workTitle || jobData?.jobTitle || "Untitled Job";
-              const loc = jobData?.location;
-              const locText = typeof loc === "string" ? loc : [loc?.area, loc?.city].filter(Boolean).join(", ") || "Not specified";
-              const skills: string[] = Array.isArray(jobData?.requiredSkills) ? jobData.requiredSkills : Array.isArray(jobData?.skills) ? jobData.skills : [];
-              const images: string[] = Array.isArray(jobData?.images) ? jobData.images : [];
-              const poster = item?.postedBy;
-              const appliedDate = formatDate(item?.appliedAt);
-              const acceptedDate = formatDate(item?.acceptedAt);
-              const completedDate = formatDate(item?.completedAt);
-
+              const sc = appliedStatusConfig[appStatus] || appliedStatusConfig.pending;
               return (
-                <div
-                  key={item.enquiryId || jobData.jobId || jobData.id || jobData._id}
-                  className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                >
-                  {/* Image Banner or Color Header */}
-                  {images.length > 0 ? (
-                    <div className="relative h-24 sm:h-28 overflow-hidden">
-                      <img src={images[0]} alt={title} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                      <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
-                        <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-2 flex-1 mr-2">{title}</h3>
-                        <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${sc.bg} ${sc.text} border ${sc.border} backdrop-blur-sm`}>
-                          {sc.icon} {sc.label}
-                        </span>
-                      </div>
-                      {images.length > 1 && (
-                        <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm">
-                          <ImageIcon size={10} className="text-white/80" />
-                          <span className="text-[9px] font-bold text-white/90">{images.length}</span>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
-                      <h3 className="text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white leading-snug line-clamp-2 flex-1">{title}</h3>
-                      <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${sc.bg} ${sc.text} border ${sc.border}`}>
-                        {sc.icon} {sc.label}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Body */}
-                  <div className="px-3 py-2.5 space-y-2">
-                    {/* Meta Row */}
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
-                        <MapPin size={11} className="text-indigo-400 shrink-0" />
-                        <span className="truncate max-w-[120px]">{locText}</span>
-                      </span>
-                      <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
-                        <Users size={11} className="text-blue-400 shrink-0" />
-                        {jobData?.workersNeeded || "—"} workers
-                      </span>
-                    </div>
-
-                    {/* Skills */}
-                    {skills.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {skills.slice(0, 4).map((s, i) => (
-                          <span key={i} className="px-1.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[9px] font-semibold border border-indigo-100 dark:border-indigo-800/30">
-                            {s}
-                          </span>
-                        ))}
-                        {skills.length > 4 && <span className="px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[9px] font-semibold">+{skills.length - 4}</span>}
-                      </div>
-                    )}
-
-                    {/* Message */}
-                    {item?.message && (
-                      <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                        <MessageSquare size={11} className="text-zinc-400 shrink-0 mt-0.5" />
-                        <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 italic line-clamp-2 leading-relaxed">&ldquo;{item.message}&rdquo;</p>
-                      </div>
-                    )}
-
-                    {/* Posted By */}
-                    {poster && (
-                      <div className="flex items-center gap-2 pt-1">
-                        <div className="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
-                          {poster.profilePhoto ? (
-                            <img src={poster.profilePhoto} className="w-full h-full object-cover" alt={poster.name} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-400 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
-                              {(poster.name || "C")[0].toUpperCase()}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] sm:text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 truncate">{poster.name}</p>
-                          <p className="text-[9px] text-zinc-400 capitalize">{poster.userType === "sub_contractor" ? "Sub-Contractor" : poster.userType}</p>
-                        </div>
-                        {poster.mobile && (
-                          <a href={`tel:+91${poster.mobile}`} className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
-                            <Phone size={12} />
-                          </a>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Timeline */}
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                      {appliedDate && (
-                        <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-zinc-400">
-                          <Calendar size={10} className="shrink-0" />
-                          Applied {appliedDate}
-                        </span>
-                      )}
-                      {acceptedDate && (
-                        <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-green-500">
-                          <CheckCircle size={10} className="shrink-0" />
-                          Accepted {acceptedDate}
-                        </span>
-                      )}
-                      {completedDate && (
-                        <span className="flex items-center gap-1 text-[9px] sm:text-[10px] text-teal-500">
-                          <CheckCircle size={10} className="shrink-0" />
-                          Completed {completedDate}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <JobStatusCard
+                  key={item.enquiryId || item._id || item.id}
+                  item={item}
+                  statusConfig={sc}
+                />
               );
             })}
           </div>
@@ -1237,93 +862,18 @@ export default function JobsTabContent(props: TabContentProps) {
 
       {/* Feedback Modal */}
       {feedbackModal && (
-        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Submit Feedback</h3>
-                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Rate your experience with {feedbackModal.posterName}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => { setFeedbackModal(null); setFeedbackRating(0); setFeedbackHover(0); setFeedbackText(""); }}
-                  className="p-1.5 rounded-lg hover:bg-white/60 dark:hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-zinc-600"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            </div>
-
-            <div className="px-5 py-4 space-y-4">
-              <div>
-                <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-2">Rating</label>
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setFeedbackRating(star)}
-                      onMouseEnter={() => setFeedbackHover(star)}
-                      onMouseLeave={() => setFeedbackHover(0)}
-                      className="p-0.5 transition-transform hover:scale-110"
-                    >
-                      <Star
-                        size={24}
-                        className={`transition-colors ${
-                          star <= (feedbackHover || feedbackRating)
-                            ? "text-amber-400 fill-amber-400"
-                            : "text-zinc-300 dark:text-zinc-600"
-                        }`}
-                      />
-                    </button>
-                  ))}
-                  {feedbackRating > 0 && (
-                    <span className="ml-2 text-[11px] font-semibold text-amber-600 dark:text-amber-400">{feedbackRating}/5</span>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">Feedback</label>
-                <textarea
-                  value={feedbackText}
-                  onChange={(e) => setFeedbackText(e.target.value)}
-                  placeholder="Share your experience..."
-                  rows={3}
-                  className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="px-5 py-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => { setFeedbackModal(null); setFeedbackRating(0); setFeedbackHover(0); setFeedbackText(""); }}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmitFeedback}
-                disabled={feedbackSubmitting || feedbackRating === 0 || !feedbackText.trim()}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
-              >
-                {feedbackSubmitting ? (
-                  <>
-                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Star size={12} /> Submit
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
+        <FeedbackModal
+          posterName={feedbackModal.posterName}
+          rating={feedbackRating}
+          hover={feedbackHover}
+          text={feedbackText}
+          submitting={feedbackSubmitting}
+          onRate={setFeedbackRating}
+          onHover={setFeedbackHover}
+          onText={setFeedbackText}
+          onCancel={() => { setFeedbackModal(null); setFeedbackRating(0); setFeedbackHover(0); setFeedbackText(""); }}
+          onSubmit={handleSubmitFeedback}
+        />
       )}
     </div>
   );
