@@ -52,17 +52,6 @@ export default function JobStatusCard({ item, statusConfig, children }: JobStatu
   return (
     <div
       key={cardKey}
-<<<<<<< HEAD
-      className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-    >
-      {/* Image Banner or Plain Header */}
-      {images.length > 0 ? (
-        <div className="relative h-24 sm:h-28 overflow-hidden">
-          <img src={images[0]} alt={title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
-            <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-2 flex-1 mr-2">{title}</h3>
-=======
       className="group rounded-xl border-2 border-indigo-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
       {/* Image Banner or Plain Header */}
@@ -72,24 +61,11 @@ export default function JobStatusCard({ item, statusConfig, children }: JobStatu
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
             <h3 className="text-xs sm:text-sm font-bold text-white leading-snug line-clamp-2 flex-1 mr-2">{title}</h3>
->>>>>>> d6c7435ebd80a31c1d6b101adec6d17acdd13d62
             <StatusBadge config={statusConfig} withBackdrop />
           </div>
           {images.length > 1 && (
             <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm">
               <ImageIcon size={10} className="text-white/80" />
-<<<<<<< HEAD
-              <span className="text-[9px] font-bold text-white/90">{images.length}</span>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
-          <h3 className="text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white leading-snug line-clamp-2 flex-1">{title}</h3>
-          <StatusBadge config={statusConfig} />
-        </div>
-      )}
-=======
               <span className="text-xs font-bold text-white/90">{images.length}</span>
             </div>
           )}
@@ -102,25 +78,16 @@ export default function JobStatusCard({ item, statusConfig, children }: JobStatu
         </div>
       )}
       
->>>>>>> d6c7435ebd80a31c1d6b101adec6d17acdd13d62
 
       {/* Body */}
       <div className="px-3 py-2.5 space-y-2">
         {/* Meta Row */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-<<<<<<< HEAD
-          <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
-            <MapPin size={11} className="text-indigo-400 shrink-0" />
-            <span className="truncate max-w-[120px]">{locText}</span>
-          </span>
-          <span className="flex items-center gap-1 text-[10px] sm:text-[11px] text-zinc-500">
-=======
           <span className="flex items-center gap-1 text-xs sm:text-sm text-zinc-500">
             <MapPin size={11} className="text-indigo-400 shrink-0" />
             <span className="truncate max-w-[120px]">{locText}</span>
           </span>
           <span className="flex items-center gap-1 text-xs sm:text-sm text-zinc-500">
->>>>>>> d6c7435ebd80a31c1d6b101adec6d17acdd13d62
             <Users size={11} className="text-blue-400 shrink-0" />
             {jobData?.workersNeeded || "—"} workers
           </span>
@@ -133,11 +100,7 @@ export default function JobStatusCard({ item, statusConfig, children }: JobStatu
         {item?.message && (
           <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
             <MessageSquare size={11} className="text-zinc-400 shrink-0 mt-0.5" />
-<<<<<<< HEAD
-            <p className="text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 italic line-clamp-2 leading-relaxed">&ldquo;{item.message}&rdquo;</p>
-=======
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 italic line-clamp-2 leading-relaxed">&ldquo;{item.message}&rdquo;</p>
->>>>>>> d6c7435ebd80a31c1d6b101adec6d17acdd13d62
           </div>
         )}
 
