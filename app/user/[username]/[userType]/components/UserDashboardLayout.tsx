@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import UnifiedSearchInput from "@/app/components/common/UnifiedSearchInput";
 import type { DashboardSearchMeta, DashboardTabValue, DashboardUserType } from "./dashboard-tabs-config";
 
@@ -24,6 +25,7 @@ interface NavItem {
   label: string;
   value: DashboardTabValue;
   icon: string;
+  path?: string;
   isSubItem?: boolean;
 }
 
@@ -36,29 +38,29 @@ interface NavGroup {
 function getNavGroups(userType: DashboardUserType): NavGroup[] {
   if (userType === "labour") {
     return [
-      { items: [{ label: "Jobs", value: "jobs", icon: "📋" }] },
-      { items: [{ label: "Contractors", value: "contractors", icon: "🏗️" }] },
-      { items: [{ label: "History", value: "history", icon: "🕐" }] },
-      { items: [{ label: "Profile", value: "profile", icon: "👤" }] },
+      { items: [{ label: "Jobs", value: "jobs", icon: "📋", path: "#jobs" }] },
+      { items: [{ label: "Contractors", value: "contractors", icon: "🏗️", path: "#contractors" }] },
+      { items: [{ label: "History", value: "history", icon: "🕐", path: "#history" }] },
+      { items: [{ label: "Profile", value: "profile", icon: "👤", path: "#profile" }] },
     ];
   }
   if (userType === "contractor") {
     return [
-      { items: [{ label: "Jobs", value: "job_requirements", icon: "📋" }] },
-      { items: [{ label: "Contractors", value: "sub_contractors", icon: "🤝" }] },
-      { items: [{ label: "Find Labour", value: "labours", icon: "👷" }] },
-      { items: [{ label: "History", value: "history", icon: "🕐" }] },
-      { items: [{ label: "Profile", value: "profile", icon: "👤" }] },
+      { items: [{ label: "Jobs", value: "job_requirements", icon: "📋", path: "#job_requirements" }] },
+      { items: [{ label: "Contractors", value: "sub_contractors", icon: "🤝", path: "#sub_contractors" }] },
+      { items: [{ label: "Find Labour", value: "labours", icon: "👷", path: "#labours" }] },
+      { items: [{ label: "History", value: "history", icon: "🕐", path: "#history" }] },
+      { items: [{ label: "Profile", value: "profile", icon: "👤", path: "#profile" }] },
     ];
   }
   // sub_contractor
   return [
-    { items: [{ label: "Jobs", value: "jobs", icon: "📋" }] },
-    // { items: [{ label: "Create Jobs", value: "job_requirements", icon: "🛠️" }] },
-    { items: [{ label: "Contractors", value: "contractors", icon: "🤝" }] },
-    { items: [{ label: "Find Labour", value: "labour_required", icon: "👷" }] },
-    { items: [{ label: "History", value: "history", icon: "🕐" }] },
-    { items: [{ label: "Profile", value: "profile", icon: "👤" }] },
+    { items: [{ label: "Jobs", value: "jobs", icon: "📋", path: "#jobs" }] },
+    // { items: [{ label: "Create Jobs", value: "job_requirements", icon: "🛠️", path: "#job_requirements" }] },
+    { items: [{ label: "Contractors", value: "contractors", icon: "🤝", path: "#contractors" }] },
+    { items: [{ label: "Find Labour", value: "labour_required", icon: "👷", path: "#labour_required" }] },
+    { items: [{ label: "History", value: "history", icon: "🕐", path: "#history" }] },
+    { items: [{ label: "Profile", value: "profile", icon: "👤", path: "#profile" }] },
   ];
 }
 
@@ -110,6 +112,7 @@ export default function UserDashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navGroups = getNavGroups(userType);
   const colors = COLOR_SCHEMES[userType];
+  const router = useRouter();
 
   const profileImageUrl =
     user?.companyLogoUrl ||
@@ -117,6 +120,12 @@ export default function UserDashboardLayout({
     `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random&rounded=true`;
 
   const handleNavClick = (value: DashboardTabValue) => {
+    // Find the nav item with the given value
+    const allItems = navGroups.flatMap(g => g.items);
+    const navItem = allItems.find(item => item.value === value);
+    if (navItem && navItem.path) {
+      window.location.hash = navItem.path;
+    }
     onFilterChange(value);
     setSidebarOpen(false);
   };

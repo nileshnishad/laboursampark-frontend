@@ -60,11 +60,26 @@ export default function UserDashboardPage() {
 
  
 
+  // Set active tab from hash on load and hash change
   useEffect(() => {
-    const roleTabs = getTabsForUserType(userType);
-    if (roleTabs.length > 0) {
-      setActiveFilter(roleTabs[0].value);
-    }
+    const setTabFromHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      const roleTabs = getTabsForUserType(userType);
+      if (hash) {
+        const found = roleTabs.find(tab => tab.value === hash);
+        if (found) {
+          setActiveFilter(found.value);
+          return;
+        }
+      }
+      // fallback to first tab
+      if (roleTabs.length > 0) {
+        setActiveFilter(roleTabs[0].value);
+      }
+    };
+    setTabFromHash();
+    window.addEventListener('hashchange', setTabFromHash);
+    return () => window.removeEventListener('hashchange', setTabFromHash);
   }, [userType]);
 
   useEffect(() => {
