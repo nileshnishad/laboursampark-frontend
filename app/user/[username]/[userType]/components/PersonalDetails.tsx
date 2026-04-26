@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import UpdateProfileModal from "./UpdateProfileModal";
+import SubscriptionAttention from "@/app/components/common/SubscriptionAttention";
 import type { RootState } from "@/store/store";
 
 type UserType = "labour" | "contractor";
@@ -86,6 +87,9 @@ export default function PersonalDetails() {
     return null;
   }
 
+  // Show attention component if user.display is false
+  const showAttention = user.display === false;
+
   const basicDetails: DetailItem[] = [
     { label: "Full Name", value: user.fullName },
     { label: "Email", value: user.email },
@@ -97,6 +101,9 @@ export default function PersonalDetails() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-10">
+      {showAttention && (
+        <SubscriptionAttention onPay={() => window.location.hash = '#payment'} />
+      )}
       {/* Header Profile Card - Premium Style */}
       <div className="relative overflow-hidden bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none p-8">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full -mr-32 -mt-32 blur-3xl" />

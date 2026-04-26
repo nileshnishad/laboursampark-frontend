@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import UnifiedSearchInput from "@/app/components/common/UnifiedSearchInput";
+import SubscriptionTicker from "@/app/components/common/SubscriptionTicker";
 import type { DashboardSearchMeta, DashboardTabValue, DashboardUserType } from "./dashboard-tabs-config";
 
 interface UserDashboardLayoutProps {
@@ -240,6 +241,10 @@ export default function UserDashboardLayout({
 
       {/* ── Main Content Area ───────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 bg-zinc-100 dark:bg-zinc-900 overflow-x-hidden">
+        {/* Subscription Ticker */}
+        {user?.display === false && (
+          <SubscriptionTicker userType={userType} />
+        )}
         {/* Top Fixed Search/Context Bar (Desktop) */}
         <header className="hidden lg:flex items-center justify-between px-10 h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-30">
           <div className="flex items-center gap-4">

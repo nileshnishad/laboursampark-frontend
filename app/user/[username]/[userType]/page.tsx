@@ -13,6 +13,7 @@ import {
   type DashboardTabValue,
 } from "./components/dashboard-tabs-config";
 import type { AppDispatch, RootState } from "@/store/store";
+import OTPVerificationModal from "@/app/components/common/OTPVerificationModal";
 
 type UserType = "labour" | "contractor" | "sub_contractor";
 
@@ -58,7 +59,8 @@ export default function UserDashboardPage() {
     router.push(`/user/${username}/${userType}/payment`);
   };
 
- 
+  // OTP Modal state (always open if OTPstatus is inactive)
+  const showOTPModal = user && user.OTPstatus === "inactive";
 
   // Set active tab from hash on load and hash change
   useEffect(() => {
@@ -98,7 +100,7 @@ export default function UserDashboardPage() {
   const dashboardLabel = getDashboardLabel(userType);
   const isProfileView = activeFilter === "profile";
   const searchMeta = getSearchMetaForTab(activeFilter);
-  
+
   // Keep tab logic simple: list users and apply only search filtering.
   let filteredData = visibleUsers;
 
@@ -109,7 +111,7 @@ export default function UserDashboardPage() {
       const name = (item.fullName || "").toLowerCase();
       const location = (item.location || item.city || "").toLowerCase();
       const skills = (item.skills || []).map((s: string) => s.toLowerCase()).join(" ");
-      
+
       return (
         name.includes(query) ||
         location.includes(query) ||
@@ -130,29 +132,32 @@ export default function UserDashboardPage() {
     !isProfileView ? TAB_CONTENT_COMPONENTS[activeFilter as Exclude<DashboardTabValue, "profile">] : null;
 
   return (
-    <UserDashboardLayout
-      user={user}
-      username={username}
-      dashboardLabel={dashboardLabel}
-      userType={userType}
-      isLabour={isLabour}
-      activeFilter={activeFilter}
-      onFilterChange={setActiveFilter}
-      onLogout={handleLogout}
-      onGoToPayment={handleGoToPayment}
-      searchQuery={searchQuery}
-      onSearchChange={setSearchQuery}
-      searchMeta={searchMeta}
-    >
-      <main className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-5 pb-6">
-        {isProfileView ? (
-          <div className="max-w-7xl mx-auto">
-            <UserProfile />
-          </div>
-        ) : (
-          ActiveTabComponent ? <ActiveTabComponent {...tabContentProps} /> : null
-        )}
-      </main>
-    </UserDashboardLayout>
+    <>
+      <OTPVerificationModal isOpen={!!showOTPModal} mobile={user?.mobile || user?.phone || ""} />
+      <UserDashboardLayout
+        user={user}
+        username={username}
+        dashboardLabel={dashboardLabel}
+        userType={userType}
+        isLabour={isLabour}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        onLogout={handleLogout}
+        onGoToPayment={handleGoToPayment}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchMeta={searchMeta}
+      >
+        <main className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-5 pb-6">
+          {isProfileView ? (
+            <div className="max-w-7xl mx-auto">
+              <UserProfile />
+            </div>
+          ) : (
+            ActiveTabComponent ? <ActiveTabComponent {...tabContentProps} /> : null
+          )}
+        </main>
+      </UserDashboardLayout>
+    </>
   );
 }
