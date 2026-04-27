@@ -29,7 +29,7 @@ export default function PosterInfo({ name, photo, userType, mobile }: PosterInfo
       </div>
       {mobile && (
         <a
-          href={`tel:+91${mobile}`}
+          href={`tel:${mobile}`}
           className="p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
         >
           <Phone size={14} />

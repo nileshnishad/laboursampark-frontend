@@ -18,7 +18,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
     setError("");
     setInfo("");
     try {
-      const res = await apiPost("/api/twilio/send-verification", { to: `+91${mobile}` }, { includeToken: false });
+      const res = await apiPost("/api/twilio/send-verification", { to: `${mobile}` }, { includeToken: false });
       if (res.success) {
         setStep("input");
         setInfo("OTP sent to your registered mobile number.");
@@ -37,7 +37,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
     setError("");
     setInfo("");
     try {
-      const res = await apiPost("/api/twilio/verify-otp", { to: `+91${mobile}`, code: otp }, { includeToken: false });
+      const res = await apiPost("/api/twilio/verify-otp", { to: `${mobile}`, code: otp }, { includeToken: false });
       if (res.success) {
         setStep("success");
         setInfo("OTP verified successfully!");
