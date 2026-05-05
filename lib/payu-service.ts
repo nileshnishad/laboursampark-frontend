@@ -18,6 +18,26 @@ const getFailureUrl = (): string =>
   process.env.NEXT_PUBLIC_PAYU_FAILURE_URL ||
   `${typeof window !== "undefined" ? window.location.origin : ""}/payment/failure`;
 
+const appendSourceParamIfMobile = (url: string): string => {
+  if (typeof window === "undefined") {
+    return url;
+  }
+
+  const currentParams = new URLSearchParams(window.location.search);
+  if (currentParams.get("source") !== "mobile") {
+    return url;
+  }
+
+  try {
+    const absolute = new URL(url, window.location.origin);
+    absolute.searchParams.set("source", "mobile");
+    return absolute.toString();
+  } catch {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}source=mobile`;
+  }
+};
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type PayUPurpose = "subscription" | "renewal" | "upgrade";
@@ -99,13 +119,16 @@ export async function fetchPaymentStatus(
 export async function createPayULink(
   payload: PayUCreateLinkPayload
 ): Promise<PayUCreateLinkResponse> {
+  const successUrl = appendSourceParamIfMobile(payload.successUrl || getSuccessUrl());
+  const failureUrl = appendSourceParamIfMobile(payload.failureUrl || getFailureUrl());
+
   const body = {
     amount: payload.amount,
     productInfo: payload.productInfo,
     purpose: payload.purpose,
     description: payload.description || payload.productInfo,
-    successUrl: payload.successUrl || getSuccessUrl(),
-    failureUrl: payload.failureUrl || getFailureUrl(),
+    successUrl,
+    failureUrl,
   };
 
   const response = await apiPost<any>(

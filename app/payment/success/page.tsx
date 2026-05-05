@@ -22,6 +22,13 @@ function PaymentSuccessContent() {
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
+    let deepLinkTimer: ReturnType<typeof setTimeout> | null = null;
+
+    if (searchParams.get("source") === "mobile") {
+      deepLinkTimer = setTimeout(() => {
+        window.location.href = "laboursampark://payment/success";
+      }, 1500);
+    }
 
     // Call backend status API with the paymentId saved before redirect
     const paymentId = sessionStorage.getItem("payu_payment_id");
@@ -38,8 +45,13 @@ function PaymentSuccessContent() {
         .finally(() => setStatusLoading(false));
     }
 
-    return () => clearTimeout(t);
-  }, []);
+    return () => {
+      clearTimeout(t);
+      if (deepLinkTimer) {
+        clearTimeout(deepLinkTimer);
+      }
+    };
+  }, [searchParams]);
 
   const handleGoToDashboard = () => {
     router.push("/");
