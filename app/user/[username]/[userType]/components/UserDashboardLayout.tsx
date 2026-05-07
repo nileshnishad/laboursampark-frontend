@@ -138,8 +138,17 @@ export default function UserDashboardLayout({
         {/* Brand/Logo Area */}
         <div className="p-4 pb-4">
           <div className="flex items-center gap-3 mb-8">
-            <div className={`w-10 h-10 rounded-xl ${colors.active} flex items-center justify-center text-xl font-black italic`}>
-              LS
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex items-center justify-center">
+              <img
+                src="/images/app_logo.png"
+                alt="LabourSampark"
+                className="w-full h-full object-cover dark:hidden"
+              />
+              <img
+                src="/images/app_logo_dark.png"
+                alt="LabourSampark"
+                className="w-full h-full object-cover hidden dark:block"
+              />
             </div>
             <div>
               <h1 className="text-lg font-black text-zinc-900 dark:text-white leading-none">LabourSampark</h1>
@@ -216,7 +225,18 @@ export default function UserDashboardLayout({
       {/* ── Mobile Header & Sticky Nav (sm/md) ────────────────────── */}
       <div className="lg:hidden sticky top-0 z-50 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 shadow-sm px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-lg ${colors.active} flex items-center justify-center text-sm font-black italic`}>LS</div>
+          <div className="w-8 h-8 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex items-center justify-center">
+            <img
+              src="/images/app_logo.png"
+              alt="LabourSampark"
+              className="w-full h-full object-cover dark:hidden"
+            />
+            <img
+              src="/images/app_logo_dark.png"
+              alt="LabourSampark"
+              className="w-full h-full object-cover hidden dark:block"
+            />
+          </div>
           <div className="flex flex-col">
             <span className="flex items-center gap-1 text-sm font-black text-zinc-900 dark:text-white">
              

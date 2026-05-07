@@ -162,6 +162,7 @@ export default function HeroSection() {
               <div className="flex-[2] relative">
                 <input
                   type="text"
+                  autoFocus
                   placeholder={searchType === "labour" ? t(locale, "home.heroPlaceholderLabour") : t(locale, "home.heroPlaceholderContractor")}
                   className="w-full h-full min-h-[56px] px-2 text-sm bg-transparent text-gray-900 dark:text-white font-medium focus:outline-none placeholder:text-gray-600 dark:placeholder:text-gray-400"
                   value={query}

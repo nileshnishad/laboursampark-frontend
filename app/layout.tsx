@@ -50,9 +50,31 @@ export const metadata: Metadata = {
     creator: "@laboursampark",
   },
   icons: {
-    icon: "/images/logo.jpg",
-    shortcut: "/images/logo.jpg",
-    apple: "/images/logo.jpg",
+    icon: [
+      {
+        url: "/images/app_logo.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/images/app_logo_dark.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+    shortcut: "/images/app_logo.png",
+    apple: [
+      {
+        url: "/images/app_logo.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/images/app_logo_dark.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
   },
   manifest: "/manifest.json",
   verification: {

@@ -2,9 +2,12 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { buildUserDashboardPath } from "@/lib/user-route";
+import { getToken as getStoredToken } from "@/lib/api-service";
+import { setUser } from "@/store/slices/authSlice";
+import type { AppDispatch } from "@/store/store";
 import HeroSection from "./components/HeroSection";
 import LaboursSection from "./components/LaboursSection";
 import ContractorsSection from "./components/ContractorsSection";
@@ -17,13 +20,22 @@ import TrustSection from "./components/TrustSection";
 
 export default function Home() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (user) {
+    const hasAuthToken = Boolean(getStoredToken());
+
+    if (user && hasAuthToken) {
       router.replace(buildUserDashboardPath(user));
+      return;
     }
-  }, [user, router]);
+
+    // Clear stale local user to avoid being stuck between home and protected routes.
+    if (user && !hasAuthToken) {
+      dispatch(setUser(null));
+    }
+  }, [user, router, dispatch]);
 
   // Combine primary and secondary keywords for maximum coverage
   const allHomeKeywords = [...primaryKeywords, ...secondaryKeywords];
