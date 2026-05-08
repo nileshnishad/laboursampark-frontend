@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/store/hooks";
 import type { RootState } from "@/store/store";
 import { fetchJobHistoryDashboard, fetchAppliedJobs } from "@/store/slices/jobEnquirySlice";
+import { fetchSkills, skillIdToLabel } from "@/store/slices/skillsSlice";
 import type { TabContentProps } from "../TabValueContentMap";
 import type { JobCardKey } from "../JobStatCards";
 
@@ -25,6 +26,7 @@ const formatDate = (value?: string) => {
 export default function HistoryTabContent({ userType }: TabContentProps) {
   const dispatch = useAppDispatch();
   const { jobHistoryDashboard } = useSelector((state: RootState) => state.jobEnquiry);
+  const { skills: allSkills } = useSelector((state: RootState) => state.skills);
   const [activeCardKey, setActiveCardKey] = useState<JobCardKey | null>(null);
 
   useEffect(() => {
@@ -66,7 +68,9 @@ export default function HistoryTabContent({ userType }: TabContentProps) {
             const timeline = entry.timeline || {};
             const status = String(entry.status || "applied").toLowerCase();
             const address = job.location?.address || [job.location?.area, job.location?.city, job.location?.state].filter(Boolean).join(", ") || "Not specified";
-            const skills = (job.requiredSkills || user.skills || []).join(", ");
+            const skills = (job.requiredSkills || user.skills || [])
+              .map((id: string) => skillIdToLabel(id, allSkills))
+              .join(", ");
             const profilePhoto = user.profilePhotoUrl;
             const rating = user.rating;
             const experience = user.experience;

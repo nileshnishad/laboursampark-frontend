@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
+import { fetchSkills, skillIdsToSearchText } from "@/store/slices/skillsSlice";
 import UserProfile from "./components/UserProfile";
 import UserDashboardLayout from "./components/UserDashboardLayout";
 import { TAB_CONTENT_COMPONENTS } from "./components/TabValueContentMap";
@@ -39,6 +40,11 @@ export default function UserDashboardPage() {
   const { users: visibleUsers, loading: usersLoading, error: usersError } = useSelector(
     (state: RootState) => state.visibleUsers
   );
+  const { skills: allSkills } = useSelector((state: RootState) => state.skills);
+
+  useEffect(() => {
+    dispatch(fetchSkills());
+  }, [dispatch]);
 
   const username = params.username as string;
   const userType = normalizeUserType(params.userType as string);
@@ -110,7 +116,7 @@ export default function UserDashboardPage() {
     filteredData = filteredData.filter((item) => {
       const name = (item.fullName || "").toLowerCase();
       const location = (item.location || item.city || "").toLowerCase();
-      const skills = (item.skills || []).map((s: string) => s.toLowerCase()).join(" ");
+      const skills = skillIdsToSearchText(item.skills || [], allSkills);
 
       return (
         name.includes(query) ||

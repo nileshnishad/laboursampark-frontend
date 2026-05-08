@@ -6,6 +6,8 @@ import type { TabContentProps } from "../TabValueContentMap";
 import type { RootState } from "@/store/store";
 import { useAppDispatch } from "@/store/hooks";
 import { toggleJobActivation, fetchJobEnquiries, fetchJobApplications, connectApplicant, completeEnquiryWithFeedback } from "@/store/slices/jobEnquirySlice";
+import { skillIdToLabel } from "@/store/slices/skillsSlice";
+import SkillsPicker from "@/app/components/common/SkillsPicker";
 import { apiGet, apiPatch, apiPost, apiPut } from "@/lib/api-service";
 import { showErrorToast, showSuccessToast, showWarningToast } from "@/lib/toast-utils";
 import JobStatCards, { type JobCardKey } from "../JobStatCards";
@@ -30,7 +32,7 @@ const INITIAL_FORM: RequirementFormState = {
   description: "",
   location: "",
   workersNeeded: "",
-  skills: "",
+  skills: [] as string[],
   images: [],
   locationDetails: {
     city: "",
@@ -45,6 +47,7 @@ export default function CreateJobTabContent(props: TabContentProps) {
   const { usersLoading, usersError, filteredData, onConnect, userType } = props;
   const { user } = useSelector((state: RootState) => state.auth);
   const { jobActivation, jobEnquiries } = useSelector((state: RootState) => state.jobEnquiry);
+  const { skills: allSkills } = useSelector((state: RootState) => state.skills);
   const dispatch = useAppDispatch();
   const [form, setForm] = useState<RequirementFormState>(INITIAL_FORM);
   const [publishedRequirements, setPublishedRequirements] = useState<PublishedRequirement[]>([]);
@@ -137,7 +140,7 @@ export default function CreateJobTabContent(props: TabContentProps) {
       form.locationDetails.area.trim() &&
       form.locationDetails.pincode.trim() &&
       form.workersNeeded.trim() &&
-      form.skills.trim()
+      form.skills.length > 0
     );
   }, [form]);
 
@@ -228,7 +231,7 @@ export default function CreateJobTabContent(props: TabContentProps) {
       target: form.target,
       description: form.description.trim(),
       workersNeeded: parseInt(form.workersNeeded) || 0,
-      requiredSkills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
+      requiredSkills: form.skills,
       images: form.images,
       location: {
         city: form.locationDetails.city.trim(),
@@ -286,7 +289,7 @@ export default function CreateJobTabContent(props: TabContentProps) {
       target: updated.target,
       description: updated.description.trim(),
       workersNeeded: parseInt(updated.workersNeeded) || 0,
-      requiredSkills: updated.skills.split(",").map((s) => s.trim()).filter(Boolean),
+      requiredSkills: updated.skills,
       images: updated.images,
       location: {
         city: updated.locationDetails.city.trim(),
@@ -568,11 +571,10 @@ export default function CreateJobTabContent(props: TabContentProps) {
               {/* Row 3: Skills */}
               <div>
                 <label className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Required Skills *</label>
-                <input
-                  value={form.skills}
-                  onChange={(e) => updateField("skills", e.target.value)}
-                  placeholder="e.g., Mason, Carpenter"
-                  className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none"
+                <SkillsPicker
+                  selectedIds={form.skills}
+                  onChange={(ids) => updateField("skills", ids as any)}
+                  className="mt-1"
                 />
               </div>
 
@@ -1093,9 +1095,9 @@ export function JobApplicationsModal({
                         {/* Skills */}
                         {applicant.skills && applicant.skills.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-2">
-                            {(Array.isArray(applicant.skills) ? applicant.skills : [applicant.skills]).slice(0, 5).map((s: string, i: number) => (
+                            {(Array.isArray(applicant.skills) ? applicant.skills : [applicant.skills]).slice(0, 5).map((skillId: string, i: number) => (
                               <span key={i} className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[9px] sm:text-[10px] font-semibold border border-indigo-100 dark:border-indigo-800/30">
-                                {s}
+                                {skillIdToLabel(skillId, allSkills)}
                               </span>
                             ))}
                             {Array.isArray(applicant.skills) && applicant.skills.length > 5 && (
@@ -1246,7 +1248,7 @@ export function JobApplicationsModal({
 export function JobDetailsModal({ isOpen, job, saving, userType, onClose, onSave }: JobDetailsModalProps) {
   const [form, setForm] = useState<RequirementFormState>(INITIAL_FORM);
   const [isUploading, setIsUploading] = useState(false);
-  const modalFileInputRef = React.useRef<HTMLInputElement>(null);
+  const modalFileInputRef = React.useRef<HTMLInputElement>();
 
   const handleModalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -1298,7 +1300,7 @@ export function JobDetailsModal({ isOpen, job, saving, userType, onClose, onSave
     form.locationDetails.area.trim() &&
     form.locationDetails.pincode.trim() &&
     form.workersNeeded.trim() &&
-    form.skills.trim();
+    form.skills.length > 0;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3 sm:p-4">
@@ -1339,7 +1341,11 @@ export function JobDetailsModal({ isOpen, job, saving, userType, onClose, onSave
           {/* Skills */}
           <div>
             <label className="text-[11px] font-semibold text-gray-600 dark:text-gray-400">Required Skills *</label>
-            <input value={form.skills} onChange={(e) => setForm((prev) => ({ ...prev, skills: e.target.value }))} className="mt-0.5 w-full px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white outline-none" />
+            <SkillsPicker
+              selectedIds={form.skills}
+              onChange={(ids) => setForm((prev) => ({ ...prev, skills: ids }))}
+              className="mt-0.5"
+            />
           </div>
 
           {/* Description */}

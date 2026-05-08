@@ -13,6 +13,7 @@ import { apiGet, apiPost, apiPatch, apiPut } from "@/lib/api-service";
 import { showSuccessToast, showErrorToast, showWarningToast } from "@/lib/toast-utils";
 import { useAppDispatch } from "@/store/hooks";
 import { fetchAppliedJobs, fetchAcceptedJobs, fetchCompletedJobs, toggleJobActivation, fetchJobEnquiries, fetchJobApplications, submitEnquiryFeedback } from "@/store/slices/jobEnquirySlice";
+import SkillsPicker from "@/app/components/common/SkillsPicker";
 import { uploadFile } from "@/lib/s3-client";
 import { UploadCloud, X, MapPin, Briefcase, Calendar, Users, Clock, CheckCircle, XCircle, Phone, MessageSquare, ImageIcon, Star } from "lucide-react";
 import JobStatusCard, { extractJobCardData, formatJobDate } from "@/app/components/common/JobStatusCard";
@@ -26,7 +27,7 @@ const INITIAL_FORM: RequirementFormState = {
   description: "",
   location: "",
   workersNeeded: "",
-  skills: "",
+  skills: [] as string[],
   images: [],
   locationDetails: { city: "", state: "", area: "", pincode: "", address: "" },
 };
@@ -145,7 +146,7 @@ export default function JobsTabContent(props: TabContentProps) {
     setForm((prev) => ({ ...prev, locationDetails: { ...prev.locationDetails, [field]: value } }));
   };
 
-  const canSubmit = !!(form.title.trim() && form.target.length > 0 && form.description.trim() && form.locationDetails.city.trim() && form.locationDetails.area.trim() && form.locationDetails.pincode.trim() && form.workersNeeded.trim() && form.skills.trim());
+  const canSubmit = !!(form.title.trim() && form.target.length > 0 && form.description.trim() && form.locationDetails.city.trim() && form.locationDetails.area.trim() && form.locationDetails.pincode.trim() && form.workersNeeded.trim() && form.skills.length > 0);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -189,7 +190,7 @@ export default function JobsTabContent(props: TabContentProps) {
       target: form.target,
       description: form.description.trim(),
       workersNeeded: parseInt(form.workersNeeded) || 0,
-      requiredSkills: form.skills.split(",").map((s: string) => s.trim()).filter(Boolean),
+      requiredSkills: form.skills,
       images: form.images,
       location: {
         city: form.locationDetails.city.trim(),
@@ -262,7 +263,7 @@ export default function JobsTabContent(props: TabContentProps) {
       target: updated.target,
       description: updated.description.trim(),
       workersNeeded: parseInt(updated.workersNeeded) || 0,
-      requiredSkills: updated.skills.split(",").map((s) => s.trim()).filter(Boolean),
+      requiredSkills: updated.skills,
       images: updated.images,
       location: {
         city: updated.locationDetails.city.trim(),
@@ -504,11 +505,10 @@ export default function JobsTabContent(props: TabContentProps) {
                   {/* Skills */}
                   <div>
                     <label className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Required Skills *</label>
-                    <input
-                      value={form.skills}
-                      onChange={(e) => updateField("skills", e.target.value)}
-                      placeholder="e.g., Mason, Carpenter"
-                      className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white outline-none"
+                    <SkillsPicker
+                      selectedIds={form.skills}
+                      onChange={(ids) => updateField("skills", ids as any)}
+                      className="mt-1"
                     />
                   </div>
 

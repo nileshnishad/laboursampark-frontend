@@ -15,6 +15,7 @@ import {
   rejectJobEnquiry,
   submitUserReview,
 } from "@/store/slices/jobEnquirySlice";
+import { fetchSkills, skillIdToLabel } from "@/store/slices/skillsSlice";
 import type { TabContentProps } from "../TabValueContentMap";
 
 type RequestTab = "sent" | "received" | "accepted" | "completed" | "rejected";
@@ -23,6 +24,7 @@ type RequestDecision = "accepted" | "rejected";
 export default function RequestsTabContent(props: TabContentProps) {
   const { userType, usersLoading, usersError, filteredData } = props;
   const { user } = useSelector((state: RootState) => state.auth);
+  const { skills: allSkills } = useSelector((state: RootState) => state.skills);
   const { appliedJobs: appliedJobsFromRedux } = useSelector(
     (state: RootState) => state.jobEnquiry,
   );
@@ -1206,12 +1208,12 @@ export default function RequestsTabContent(props: TabContentProps) {
                     <div className="mt-3 flex flex-wrap gap-2">
                       {request.skills
                         .slice(0, 5)
-                        .map((skill: string, idx: number) => (
+                        .map((skillId: string, idx: number) => (
                           <span
-                            key={`${request.id}-${skill}-${idx}`}
+                            key={`${request.id}-${skillId}-${idx}`}
                             className="px-2 py-1 text-xs rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
                           >
-                            {skill}
+                            {skillIdToLabel(skillId, allSkills)}
                           </span>
                         ))}
                     </div>

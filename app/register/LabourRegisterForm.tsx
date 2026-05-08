@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { registerLabour, resetAuthState } from "@/store/slices/authSlice";
+import SkillsPicker from "@/app/components/common/SkillsPicker";
+
 import { uploadFile } from "@/lib/s3-client";
 import ImageCropperModal from "@/app/components/ImageCropperModal";
 import LocationSelector from "@/app/components/LocationSelector";
 import type { LocationData } from "@/lib/use-location";
 import dropdownsData from "@/data/dropdowns.json";
 
-const { skills: SKILLS_OPTIONS, experienceRange: EXPERIENCE_RANGE } =
-  dropdownsData.labour;
+const { experienceRange: EXPERIENCE_RANGE } = dropdownsData.labour;
 
 export default function LabourRegisterForm() {
   const router = useRouter();
@@ -30,9 +31,7 @@ export default function LabourRegisterForm() {
   // Professional Information
   const [experience, setExperience] = useState<string>("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [skillsDropdownOpen, setSkillsDropdownOpen] = useState<boolean>(false);
 
-  // Additional Info
   const [bio, setBio] = useState<string>("");
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string>("");
   const [termsAgreed, setTermsAgreed] = useState<boolean>(false);
@@ -48,17 +47,6 @@ export default function LabourRegisterForm() {
   const [tempImageSrc, setTempImageSrc] = useState<string>("");
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string>("");
 
-  const toggleSkill = (skill: string) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill],
-    );
-  };
-
-  const removeSkill = (skill: string) => {
-    setSelectedSkills((prev) => prev.filter((s) => s !== skill));
-  };
-
-  // Handle Profile Photo Upload - Show Cropper Instead
   const handleProfilePhotoUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -123,20 +111,7 @@ export default function LabourRegisterForm() {
     }
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('[data-dropdown="skills"]')) {
-        setSkillsDropdownOpen(false);
-      }
-    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Handle successful registration
   useEffect(() => {
     if (success && message) {
       alert(message);
@@ -463,79 +438,11 @@ export default function LabourRegisterForm() {
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Select Skills *
                 </label>
-                <div className="relative">
-                  {/* Dropdown Button */}
-                  <button
-                    type="button"
-                    onClick={() => setSkillsDropdownOpen(!skillsDropdownOpen)}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white bg-white text-left flex justify-between items-center"
-                  >
-                    <span>
-                      {selectedSkills.length > 0
-                        ? `${selectedSkills.length} selected`
-                        : "Select skills"}
-                    </span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${skillsDropdownOpen ? "rotate-180" : ""
-                        }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                      />
-                    </svg>
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {skillsDropdownOpen && (
-                    <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-                      <div className="max-h-48 overflow-y-auto p-2 space-y-2">
-                        {SKILLS_OPTIONS.map((skill) => (
-                          <label
-                            key={skill}
-                            className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedSkills.includes(skill)}
-                              onChange={() => toggleSkill(skill)}
-                              className="w-4 h-4 rounded"
-                            />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                              {skill}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Selected Skills Chips */}
-                {selectedSkills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-2 mt-2 bg-blue-50 dark:bg-blue-900 rounded">
-                    {selectedSkills.map((skill) => (
-                      <div
-                        key={skill}
-                        className="flex items-center gap-1 px-2 py-1 bg-blue-200 dark:bg-blue-700 text-blue-900 dark:text-blue-100 text-xs rounded-full"
-                      >
-                        <span>{skill}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeSkill(skill)}
-                          className="text-blue-900 dark:text-blue-100 hover:font-bold"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <SkillsPicker
+                  selectedIds={selectedSkills}
+                  onChange={setSelectedSkills}
+                  dropdownZIndex="z-20"
+                />
               </div>
 
               {/* Bio */}

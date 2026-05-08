@@ -1,15 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
+import { fetchSkills, skillIdToLabel } from "@/store/slices/skillsSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 
 export default function LabourPage() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { skills: allSkills } = useSelector((state: RootState) => state.skills);
+
+  useEffect(() => {
+    dispatch(fetchSkills());
+  }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -108,12 +114,12 @@ export default function LabourPage() {
                 </label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {user.skills && user.skills.length > 0 ? (
-                    user.skills.map((skill: string, idx: number) => (
+                    user.skills.map((skillId: string, idx: number) => (
                       <span
                         key={idx}
                         className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium"
                       >
-                        {skill}
+                        {skillIdToLabel(skillId, allSkills)}
                       </span>
                     ))
                   ) : (

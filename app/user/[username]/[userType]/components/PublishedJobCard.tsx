@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import { skillIdToLabel } from "@/store/slices/skillsSlice";
 import { ImageIcon, ArrowRight, MapPin, Briefcase, CheckCircle } from "lucide-react";
 
 // ─── Shared Types ────────────────────────────────────────────────────────────
@@ -13,7 +16,7 @@ export interface RequirementFormState {
   description: string;
   location: string;
   workersNeeded: string;
-  skills: string;
+  skills: string[];
   images: string[];
   locationDetails: {
     city: string;
@@ -78,7 +81,7 @@ export function mapApiJobToPublishedRequirement(job: ApiJob): PublishedRequireme
         ? `${job.location?.area || ""}, ${job.location?.city || ""}`.replace(/^, /, "")
         : "",
     workersNeeded: String(job.workersNeeded ?? ""),
-    skills: skillsArray.join(", "),
+    skills: skillsArray,
     images: Array.isArray(job.images) ? job.images : [],
     locationDetails:
       typeof job.location === "object" && job.location !== null
@@ -117,6 +120,7 @@ export default function PublishedJobCard({
   // Auto-cycle images: rotate which image is front/middle/back
   const [imgIndex, setImgIndex] = useState(0);
   const imageCount = item.images?.length || 0;
+  const { skills: allSkills } = useSelector((state: RootState) => state.skills);
 
   useEffect(() => {
     if (imageCount <= 1) return;
@@ -258,19 +262,19 @@ export default function PublishedJobCard({
 
         {/* Skills Tags */}
         <div className="flex flex-wrap items-center gap-2 mb-4 min-h-[1.5rem]">
-          {item.skills.split(',').slice(0, 3).map((skill, i) => (
+          {item.skills.slice(0, 3).map((skillId, i) => (
             <span key={i} className="text-xs font-bold text-indigo-700 dark:text-indigo-400 px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800/50">
-              {skill.trim()}
+              {skillIdToLabel(skillId, allSkills)}
             </span>
           ))}
-          {item.skills.split(',').length > 3 && (
+          {item.skills.length > 3 && (
             <div className="group/skills relative inline-block cursor-help">
               <span className="text-[10px] font-bold text-zinc-400 hover:text-indigo-500 transition-colors bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full">
-                +{item.skills.split(',').length - 3} more
+                +{item.skills.length - 3} more
               </span>
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/skills:block z-30">
                 <div className="bg-zinc-900 text-white text-[9px] py-1 px-2 rounded shadow-xl whitespace-nowrap">
-                  {item.skills.split(',').slice(3).join(', ')}
+                  {item.skills.slice(3).map((id) => skillIdToLabel(id, allSkills)).join(', ')}
                 </div>
               </div>
             </div>

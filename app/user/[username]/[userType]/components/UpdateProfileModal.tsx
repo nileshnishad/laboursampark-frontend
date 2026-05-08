@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserProfile } from "@/store/slices/authSlice";
+import SkillsPicker from "@/app/components/common/SkillsPicker";
 import { uploadFile } from "@/lib/s3-client";
 import ImageCropperModal from "@/app/components/ImageCropperModal";
 import LocationSelector from "@/app/components/LocationSelector";
@@ -29,7 +30,7 @@ type ProfileFormState = {
   experience: string;
   workingHours: string;
   bio: string;
-  skills: string;
+  skills: string[];  // array of skill IDs
   workTypes: string;
   serviceCategories: string;
   businessName: string;
@@ -64,7 +65,7 @@ const getInitialFormState = (user: any): ProfileFormState => ({
   experience: user?.experience || "",
   workingHours: user?.preferredWorkingHours || user?.workingHours || "",
   bio: user?.bio || "",
-  skills: toCsv(user?.skills),
+  skills: Array.isArray(user?.skills) ? user.skills : [],
   workTypes: toCsv(user?.workTypes),
   serviceCategories: toCsv(user?.serviceCategories),
   businessName: user?.businessName || "",
@@ -150,7 +151,7 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
       preferredWorkingHours: form.workingHours.trim(),
       workingHours: form.workingHours.trim(),
       bio: form.bio.trim(),
-      skills: toArray(form.skills),
+      skills: form.skills,  // already array of IDs
       workTypes: toArray(form.workTypes),
       serviceCategories: toArray(form.serviceCategories),
     };
@@ -383,11 +384,11 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Skills (comma separated)</label>
-                    <input
-                      value={form.skills}
-                      onChange={(e) => updateField("skills", e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Skills</label>
+                    <SkillsPicker
+                      selectedIds={form.skills}
+                      onChange={(ids) => updateField("skills", ids)}
+                      dropdownZIndex="z-30"
                     />
                   </div>
                   <div className="sm:col-span-2">

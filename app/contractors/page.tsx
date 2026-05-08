@@ -8,6 +8,8 @@ import { getToken } from "@/lib/api-service";
 import { showInfoToast } from "@/lib/toast-utils";
 import Skeleton from "@/app/components/Skeleton";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchSkills, skillIdsToSearchText } from "@/store/slices/skillsSlice";
 
 type Contractor = {
   _id: string;
@@ -45,6 +47,12 @@ function AllContractorsContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const isLoggedIn = Boolean(getToken());
   const searchParams = useSearchParams();
+  const dispatch = useAppDispatch();
+  const { skills: allSkills } = useAppSelector((state) => state.skills);
+
+  useEffect(() => {
+    dispatch(fetchSkills());
+  }, [dispatch]);
 
   const handleGuestViewAttempt = () => {
     showInfoToast("For viewing profile details, please login first.");
@@ -96,7 +104,7 @@ function AllContractorsContent() {
       typeof rawLocation === "string"
         ? rawLocation.toLowerCase()
         : `${rawLocation?.city || ""} ${rawLocation?.address || ""}`.toLowerCase();
-    const skills = (contractor.skills || []).join(" ").toLowerCase();
+    const skills = skillIdsToSearchText(contractor.skills || [], allSkills);
     const services = (contractor.serviceCategories || []).join(" ").toLowerCase();
 
     return (

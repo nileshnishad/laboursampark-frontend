@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchSkills, skillIdToLabel } from "@/store/slices/skillsSlice";
 interface UserProfileModalProps {
   user: any;
   isOpen: boolean;
@@ -7,6 +10,13 @@ interface UserProfileModalProps {
 }
 
 export default function UserProfileModal({ user, isOpen, onClose }: UserProfileModalProps) {
+  const dispatch = useAppDispatch();
+  const { skills: allSkills } = useAppSelector((state) => state.skills);
+
+  useEffect(() => {
+    dispatch(fetchSkills());
+  }, [dispatch]);
+
   if (!isOpen || !user) return null;
 
   const name = user.fullName || user.name || "User";
@@ -128,12 +138,12 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
             <div>
               <h3 className="font-bold text-sm text-gray-900 dark:text-white mb-2">🛠️ Skills</h3>
               <div className="flex flex-wrap gap-1.5">
-                {skills.slice(0, 6).map((skill: string) => (
+                {skills.slice(0, 6).map((skillId: string) => (
                   <span
-                    key={skill}
+                    key={skillId}
                     className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium"
                   >
-                    {skill}
+                    {skillIdToLabel(skillId, allSkills)}
                   </span>
                 ))}
                 {skills.length > 6 && (

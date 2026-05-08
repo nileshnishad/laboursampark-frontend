@@ -59,3 +59,11 @@ export const labourApi = {
   getById: (id: string) => apiService.get(`/api/users/labours/${id}`, { includeToken: false }),
 };
 
+/**
+ * Skills APIs - Fetch all available skills (public)
+ */
+export const skillsApi = {
+  // Get all skills (public)
+  getAll: () => apiService.get('/api/public/getallskillsname', { includeToken: false }),
+};
+

@@ -8,6 +8,8 @@ import Skeleton from "@/app/components/Skeleton";
 import { getToken } from "@/lib/api-service";
 import { showInfoToast } from "@/lib/toast-utils";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchSkills, skillIdsToSearchText } from "@/store/slices/skillsSlice";
 
 type Labour = {
   _id: string;
@@ -37,6 +39,13 @@ function AllLaboursContent() {
   const isLoggedIn = Boolean(getToken());
   const router = useRouter();
   const searchParams = useSearchParams();
+  const dispatch = useAppDispatch();
+  const { skills: allSkills } = useAppSelector((state) => state.skills);
+
+  // Ensure skills are loaded for ID → name resolution
+  useEffect(() => {
+    dispatch(fetchSkills());
+  }, [dispatch]);
 
   // Initialize searchQuery from URL search parameter
   useEffect(() => {
@@ -92,7 +101,8 @@ function AllLaboursContent() {
       typeof rawLocation === "string"
         ? rawLocation.toLowerCase()
         : `${rawLocation?.city || ""} ${rawLocation?.address || ""}`.toLowerCase();
-    const skills = (labour.skills || []).join(" ").toLowerCase();
+    // Resolve skill IDs to names (all 3 languages) for search
+    const skills = skillIdsToSearchText(labour.skills || [], allSkills);
 
     return (
       name.includes(query) || location.includes(query) || skills.includes(query)

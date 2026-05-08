@@ -1,11 +1,10 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import UpdateProfileModal from "./UpdateProfileModal";
 import SubscriptionAttention from "@/app/components/common/SubscriptionAttention";
-import type { RootState } from "@/store/store";
+import type { RootState, AppDispatch } from "@/store/store";
+import { fetchSkills, skillIdToLabel } from "@/store/slices/skillsSlice";
 
 type UserType = "labour" | "contractor";
 
@@ -79,9 +78,15 @@ const CompactSection = ({
 
 export default function PersonalDetails() {
   const params = useParams();
+  const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { skills: allSkills } = useSelector((state: RootState) => state.skills);
   const userType = params.userType as UserType;
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchSkills());
+  }, [dispatch]);
 
   if (!user) {
     return null;
@@ -184,7 +189,7 @@ export default function PersonalDetails() {
              { label: "Experience", value: user.experience },
              { label: "Working Hours", value: user.preferredWorkingHours || user.workingHours },
              { label: "Work Types", value: user.workTypes },
-             { label: "Skills", value: user.skills },
+             { label: "Skills", value: (user.skills || []).map((id: string) => skillIdToLabel(id, allSkills)).join(", ") || null },
              { label: "Service Categories", value: user.serviceCategories },
              { label: "Languages", value: user.preferredLanguages },
           ] : [
