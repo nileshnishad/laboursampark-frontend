@@ -5,6 +5,7 @@ import UpdateProfileModal from "./UpdateProfileModal";
 import SubscriptionAttention from "@/app/components/common/SubscriptionAttention";
 import type { RootState, AppDispatch } from "@/store/store";
 import { fetchSkills, skillIdToLabel } from "@/store/slices/skillsSlice";
+import { fetchBusinesses, businessIdToLabel } from "@/store/slices/businessesSlice";
 
 type UserType = "labour" | "contractor";
 
@@ -81,11 +82,13 @@ export default function PersonalDetails() {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   const { skills: allSkills } = useSelector((state: RootState) => state.skills);
+  const { businesses: allBusinesses } = useSelector((state: RootState) => state.businesses);
   const userType = params.userType as UserType;
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSkills());
+    dispatch(fetchBusinesses());
   }, [dispatch]);
 
   if (!user) {
@@ -194,6 +197,7 @@ export default function PersonalDetails() {
              { label: "Languages", value: user.preferredLanguages },
           ] : [
              { label: "Business Name", value: user.businessName },
+             { label: "Business Types", value: (user.businessTypes || []).map((id: string) => businessIdToLabel(id, allBusinesses)).join(", ") || null },
              { label: "Registration", value: user.registrationNumber },
              { label: "Exp Range", value: user.experienceRange },
              { label: "Team Size", value: user.teamSize },

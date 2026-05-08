@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchSkills, skillIdToLabel } from "@/store/slices/skillsSlice";
+import { fetchBusinesses, businessIdToLabel } from "@/store/slices/businessesSlice";
 
 interface ContractorProfileModalProps {
   user: any;
@@ -13,9 +14,11 @@ interface ContractorProfileModalProps {
 export default function ContractorProfileModal({ user, isOpen, onClose }: ContractorProfileModalProps) {
   const dispatch = useAppDispatch();
   const { skills: allSkills } = useAppSelector((state) => state.skills);
+  const { businesses: allBusinesses } = useAppSelector((state) => state.businesses);
 
   useEffect(() => {
     dispatch(fetchSkills());
+    dispatch(fetchBusinesses());
   }, [dispatch]);
 
   if (!isOpen || !user) return null;
@@ -37,6 +40,7 @@ export default function ContractorProfileModal({ user, isOpen, onClose }: Contra
   const profilePic = user.profilePic || user.profilePhotoUrl || "";
   const bio = user.bio || user.description || "";
   const skills = user.skills || [];
+  const businessTypes = user.businessTypes || [];
   const workTypes = user.workTypes || user.workType || [];
   const serviceCategories = user.serviceCategories || [];
   const available = user.availability !== undefined ? user.availability : (user.available !== undefined ? user.available : true);
@@ -133,6 +137,23 @@ export default function ContractorProfileModal({ user, isOpen, onClose }: Contra
             <div>
               <h3 className="font-bold text-sm text-gray-900 dark:text-white mb-2">About</h3>
               <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{bio}</p>
+            </div>
+          )}
+
+          {/* Business Types */}
+          {businessTypes.length > 0 && (
+            <div>
+              <h3 className="font-bold text-sm text-gray-900 dark:text-white mb-2">🏗️ Business Types</h3>
+              <div className="flex flex-wrap gap-1.5">
+                {businessTypes.map((bizId: string) => (
+                  <span
+                    key={bizId}
+                    className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium"
+                  >
+                    {businessIdToLabel(bizId, allBusinesses)}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 

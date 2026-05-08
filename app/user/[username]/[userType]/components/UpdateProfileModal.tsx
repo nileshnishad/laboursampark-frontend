@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserProfile } from "@/store/slices/authSlice";
 import SkillsPicker from "@/app/components/common/SkillsPicker";
+import BusinessPicker from "@/app/components/common/BusinessPicker";
 import { uploadFile } from "@/lib/s3-client";
 import ImageCropperModal from "@/app/components/ImageCropperModal";
 import LocationSelector from "@/app/components/LocationSelector";
@@ -40,6 +41,7 @@ type ProfileFormState = {
   about: string;
   servicesOffered: string;
   coverageArea: string;
+  businessTypes: string[];  // array of business type IDs
   companyLogoUrl: string;
   profilePhotoUrl: string;
 };
@@ -75,6 +77,7 @@ const getInitialFormState = (user: any): ProfileFormState => ({
   about: user?.about || "",
   servicesOffered: toCsv(user?.servicesOffered),
   coverageArea: toCsv(user?.coverageArea),
+  businessTypes: Array.isArray(user?.businessTypes) ? user.businessTypes : [],
   companyLogoUrl: user?.companyLogoUrl || "",
   profilePhotoUrl: user?.profilePhotoUrl || "",
 });
@@ -164,6 +167,7 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
       about: form.about.trim(),
       servicesOffered: toArray(form.servicesOffered),
       coverageArea: toArray(form.coverageArea),
+      businessTypes: form.businessTypes,  // array of business type IDs
     };
 
     const payload = {
@@ -463,6 +467,14 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
                       value={form.about}
                       onChange={(e) => updateField("about", e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Business Types</label>
+                    <BusinessPicker
+                      selectedIds={form.businessTypes}
+                      onChange={(ids) => updateField("businessTypes", ids)}
+                      dropdownZIndex="z-30"
                     />
                   </div>
                   <div className="sm:col-span-2">

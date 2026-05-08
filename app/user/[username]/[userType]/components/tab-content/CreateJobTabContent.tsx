@@ -766,6 +766,7 @@ export function JobApplicationsModal({
 }) {
   const dispatch = useAppDispatch();
   const { jobEnquiries, enquiryAcceptance, enquiryCompletion } = useSelector((state: RootState) => state.jobEnquiry);
+  const { skills: allSkills } = useSelector((state: RootState) => state.skills);
   const [feedbackTarget, setFeedbackTarget] = useState<{ enquiryId: string; applicantName: string } | null>(null);
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackHover, setFeedbackHover] = useState(0);
@@ -1248,7 +1249,7 @@ export function JobApplicationsModal({
 export function JobDetailsModal({ isOpen, job, saving, userType, onClose, onSave }: JobDetailsModalProps) {
   const [form, setForm] = useState<RequirementFormState>(INITIAL_FORM);
   const [isUploading, setIsUploading] = useState(false);
-  const modalFileInputRef = React.useRef<HTMLInputElement>();
+  const modalFileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleModalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

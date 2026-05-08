@@ -8,9 +8,9 @@ import ImageCropperModal from "@/app/components/ImageCropperModal";
 import LocationSelector from "@/app/components/LocationSelector";
 import type { LocationData } from "@/lib/use-location";
 import dropdownsData from "@/data/dropdowns.json";
+import BusinessPicker from "@/app/components/common/BusinessPicker";
 
 const {
-  businessTypes: BUSINESS_TYPES,
   teamSize: TEAM_SIZE,
   experienceRange: EXPERIENCE_RANGE,
 } = dropdownsData.contractor;
@@ -48,8 +48,6 @@ export default function ContractorRegisterForm({
   // Multi-select Options
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedCoverage, setSelectedCoverage] = useState<string[]>([]);
-  const [businessTypeDropdownOpen, setBusinessTypeDropdownOpen] =
-    useState<boolean>(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] =
     useState<boolean>(false);
   const [coverageDropdownOpen, setCoverageDropdownOpen] =
@@ -99,16 +97,6 @@ export default function ContractorRegisterForm({
 
   const removeCoverage = (area: string) => {
     setSelectedCoverage((prev) => prev.filter((a) => a !== area));
-  };
-
-  const toggleBusinessType = (type: string) => {
-    setSelectedBusinessTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
-    );
-  };
-
-  const removeBusinessType = (type: string) => {
-    setSelectedBusinessTypes((prev) => prev.filter((t) => t !== type));
   };
 
   // Handle Business License Upload
@@ -254,9 +242,6 @@ export default function ContractorRegisterForm({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('[data-dropdown="business-types"]')) {
-        setBusinessTypeDropdownOpen(false);
-      }
       if (!target.closest('[data-dropdown="services"]')) {
         setServicesDropdownOpen(false);
       }
@@ -490,87 +475,16 @@ export default function ContractorRegisterForm({
               </div>
             </div>
 
-            {/* Business Types Dropdown */}
-            <div data-dropdown="business-types">
+            {/* Business Types Picker */}
+            <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Business Types (Select Multiple) *
               </label>
-              <div className="relative">
-                {/* Dropdown Button */}
-                <button
-                  type="button"
-                  onClick={() =>
-                    setBusinessTypeDropdownOpen(!businessTypeDropdownOpen)
-                  }
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white bg-white text-left flex justify-between items-center"
-                >
-                  <span>
-                    {selectedBusinessTypes.length > 0
-                      ? `${selectedBusinessTypes.length} selected`
-                      : "Select business types"}
-                  </span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      businessTypeDropdownOpen ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </button>
-
-                {/* Dropdown Menu */}
-                {businessTypeDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-                    <div className="max-h-48 overflow-y-auto p-2 space-y-2">
-                      {BUSINESS_TYPES.map((type) => (
-                        <label
-                          key={type}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedBusinessTypes.includes(type)}
-                            onChange={() => toggleBusinessType(type)}
-                            className="w-4 h-4 rounded"
-                          />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {type}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Selected Business Types Chips */}
-              {selectedBusinessTypes.length > 0 && (
-                <div className="flex flex-wrap gap-2 p-2 mt-2 bg-blue-50 dark:bg-blue-900 rounded">
-                  {selectedBusinessTypes.map((type) => (
-                    <div
-                      key={type}
-                      className="flex items-center gap-1 px-2 py-1 bg-blue-200 dark:bg-blue-700 text-blue-900 dark:text-blue-100 text-xs rounded-full"
-                    >
-                      <span>{type}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeBusinessType(type)}
-                        className="text-blue-900 dark:text-blue-100 hover:font-bold"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <BusinessPicker
+                selectedIds={selectedBusinessTypes}
+                onChange={setSelectedBusinessTypes}
+                dropdownZIndex="z-20"
+              />
             </div>
           
 

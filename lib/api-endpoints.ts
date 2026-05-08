@@ -67,3 +67,11 @@ export const skillsApi = {
   getAll: () => apiService.get('/api/public/getallskillsname', { includeToken: false }),
 };
 
+/**
+ * Businesses APIs - Fetch all business types for contractors/sub-contractors (public)
+ */
+export const businessesApi = {
+  // Get all business names (public)
+  getAll: () => apiService.get('/api/public/getallbusinessname', { includeToken: false }),
+};
+

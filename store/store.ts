@@ -4,6 +4,7 @@ import inquiryReducer from './slices/inquirySlice';
 import visibleUsersReducer from './slices/visibleUsersSlice';
 import jobEnquiryReducer from './slices/jobEnquirySlice';
 import skillsReducer from './slices/skillsSlice';
+import businessesReducer from './slices/businessesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     visibleUsers: visibleUsersReducer,
     jobEnquiry: jobEnquiryReducer,
     skills: skillsReducer,
+    businesses: businessesReducer,
   },
 });
 

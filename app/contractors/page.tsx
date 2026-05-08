@@ -10,6 +10,7 @@ import Skeleton from "@/app/components/Skeleton";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchSkills, skillIdsToSearchText } from "@/store/slices/skillsSlice";
+import { fetchBusinesses, businessIdsToSearchText } from "@/store/slices/businessesSlice";
 
 type Contractor = {
   _id: string;
@@ -36,6 +37,7 @@ type Contractor = {
     };
   };
   skills?: string[];
+  businessTypes?: string[];
   locationText?: string;
 };
 
@@ -49,9 +51,11 @@ function AllContractorsContent() {
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const { skills: allSkills } = useAppSelector((state) => state.skills);
+  const { businesses: allBusinesses } = useAppSelector((state) => state.businesses);
 
   useEffect(() => {
     dispatch(fetchSkills());
+    dispatch(fetchBusinesses());
   }, [dispatch]);
 
   const handleGuestViewAttempt = () => {
@@ -105,12 +109,14 @@ function AllContractorsContent() {
         ? rawLocation.toLowerCase()
         : `${rawLocation?.city || ""} ${rawLocation?.address || ""}`.toLowerCase();
     const skills = skillIdsToSearchText(contractor.skills || [], allSkills);
+    const businessTypes = businessIdsToSearchText(contractor.businessTypes || [], allBusinesses);
     const services = (contractor.serviceCategories || []).join(" ").toLowerCase();
 
     return (
       name.includes(query) ||
       location.includes(query) ||
       skills.includes(query) ||
+      businessTypes.includes(query) ||
       services.includes(query)
     );
   });
