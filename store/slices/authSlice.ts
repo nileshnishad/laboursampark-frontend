@@ -199,6 +199,8 @@ export const registerLabour = createAsyncThunk(
 /**
  * Async thunk for user login
  */
+const ALLOWED_USER_TYPES = ['labour', 'contractor', 'sub_contractor'];
+
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (payload: LoginPayload, { rejectWithValue }) => {
@@ -207,11 +209,20 @@ export const loginUser = createAsyncThunk(
         includeToken: false,
       });
       if (response.success) {
-        // Save token if provided
-        if (response.data?.data.token) {
-          saveToken(response.data?.data.token);
+        const userData = response.data?.data;
+        const userType = (userData?.user?.userType || userData?.userType || '').toString().toLowerCase();
+
+        if (!ALLOWED_USER_TYPES.includes(userType)) {
+          return rejectWithValue(
+            'Access denied. Only Labour, Contractor, and Sub-Contractor accounts are permitted to login.'
+          );
         }
-        return response.data?.data;
+
+        // Save token if provided
+        if (userData?.token) {
+          saveToken(userData.token);
+        }
+        return userData;
       } else {
         return rejectWithValue(
           response.error || 'Login failed'

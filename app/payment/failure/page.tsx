@@ -180,12 +180,6 @@ function PaymentFailureContent() {
         {/* Actions */}
         <div className="flex flex-col gap-3">
           <button
-            onClick={handleRetry}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-colors"
-          >
-            Try Again
-          </button>
-          <button
             onClick={handleGoHome}
             className="w-full py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-xl font-semibold text-sm transition-colors"
           >
