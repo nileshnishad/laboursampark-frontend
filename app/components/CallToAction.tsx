@@ -41,7 +41,7 @@ export default function CallToAction() {
   };
 
   return (
-    <section className="px-4 mt-16 pb-8">
+    <section className="px-4 mt-8 pb-8">
       <div className="max-w-7xl mx-auto bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 text-white rounded-3xl p-8 md:p-14 shadow-2xl text-center relative overflow-hidden group">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
         

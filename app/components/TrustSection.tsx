@@ -8,7 +8,7 @@ export default function TrustSection() {
   const { locale } = useLanguage();
 
   return (
-    <section className="relative px-4 py-20 bg-white dark:bg-black overflow-hidden">
+    <section className="relative px-4 py-10 bg-white dark:bg-black overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-1/4 w-64 h-64 bg-blue-400/10 blur-[100px] rounded-full"></div>
       <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-emerald-400/10 blur-[100px] rounded-full"></div>

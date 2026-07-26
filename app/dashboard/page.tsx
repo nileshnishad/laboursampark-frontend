@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store/store";
 import { buildUserDashboardPath } from "@/lib/user-route";
@@ -10,6 +10,7 @@ import { getToken as getStoredToken } from "@/lib/api-service";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
   const { user, token } = useSelector((state: RootState) => state.auth);
 
@@ -17,7 +18,8 @@ export default function DashboardPage() {
     const hasToken = Boolean(token || getStoredToken());
 
     if (!hasToken) {
-      router.replace("/login");
+      const loginUrl = `/login?redirect=${encodeURIComponent(pathname)}`;
+      router.replace(loginUrl);
       return;
     }
 
@@ -27,7 +29,7 @@ export default function DashboardPage() {
     }
 
     dispatch(fetchUserProfile());
-  }, [dispatch, router, token, user]);
+  }, [dispatch, router, token, user, pathname]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">

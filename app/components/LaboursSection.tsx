@@ -139,7 +139,7 @@ export default function LaboursSection() {
   };
 
   return (
-    <section id="labours" className="py-20 bg-zinc-50 dark:bg-black overflow-hidden rounded-[3rem]">
+    <section id="labours" className="py-10 bg-zinc-50 dark:bg-black overflow-hidden rounded-[3rem]">
       <div className="max-w-7xl mx-auto px-4">
         {/* Modern Header for Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">

@@ -21,9 +21,9 @@ export default function UnifiedSearchInput({
 }: UnifiedSearchInputProps) {
   return (
     <div className={containerClassName}>
-      <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 block mb-2">
+      {/* <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 block mb-2">
         {label}
-      </label>
+      </label> */}
       <input
         type="text"
         placeholder={placeholder}

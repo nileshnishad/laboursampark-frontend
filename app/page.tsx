@@ -52,20 +52,20 @@ export default function Home() {
       />
       <main className="bg-zinc-50 dark:bg-black w-full font-sans">
         <HeroSection />
-        <div className="max-w-7xl mx-auto space-y-16 pb-20">
+        <div className="max-w-7xl mx-auto space-y-4 pb-10">
           <QuickActions />
           <CallToAction />
           <TrustSection />
           
-          <div className="px-4">
+          <div className="px-2">
             <LaboursSection />
           </div>
           
-          <div className="px-4">
+          <div className="px-2">
             <ContractorsSection />
           </div>
           
-          <div className="px-4">
+          <div className="px-2">
             <AboutSection />
           </div>
         </div>

@@ -2,13 +2,14 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { AppDispatch, RootState } from "@/store/store";
 import { fetchUserProfile, setToken } from "@/store/slices/authSlice";
 import { getToken as getStoredToken } from "@/lib/api-service";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
   const { token } = useSelector((state: RootState) => state.auth);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -23,11 +24,11 @@ export default function UserLayout({ children }: { children: ReactNode }) {
     if (persistedToken) {
       dispatch(setToken(persistedToken));
     } else {
-      router.replace("/login");
+      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
     }
 
     setIsCheckingAuth(false);
-  }, [token, dispatch, router]);
+  }, [token, dispatch, router, pathname]);
 
   useEffect(() => {
     if (!token) {

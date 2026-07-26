@@ -118,10 +118,10 @@ function AllLaboursContent() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="inline-flex items-center justify-center w-14 h-6 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm active:scale-95"
+                className="inline-flex items-center justify-center w-6 h-6 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm active:scale-95"
                 aria-label="Go back"
               >
-                <span className="text-xl">←</span>
+                <span className="text-md">←</span>
               </button>
               <div>
                 <h1 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
@@ -142,7 +142,7 @@ function AllLaboursContent() {
             </div>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-4">
             {/* Loading State */}
             {loading && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

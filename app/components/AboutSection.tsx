@@ -25,7 +25,7 @@ export default function AboutSection() {
   }));
 
   return (
-    <section id="about" className="py-24 bg-white dark:bg-black overflow-hidden">
+    <section id="about" className="py-10 bg-white dark:bg-black overflow-hidden">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header - Premium Alignment */}
         <div className="text-center mb-20">
