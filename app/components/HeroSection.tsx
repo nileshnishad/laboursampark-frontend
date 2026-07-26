@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { t } from "@/lib/i18n";
@@ -16,6 +16,7 @@ export default function HeroSection() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSpeak = (text: string) => {
     if (!window.speechSynthesis) return;
@@ -73,6 +74,14 @@ export default function HeroSection() {
 
     media.addListener(onChange);
     return () => media.removeListener(onChange);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      searchInputRef.current?.focus({ preventScroll: true });
+    }, 250);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const handleSearch = () => {
@@ -161,8 +170,8 @@ export default function HeroSection() {
               
               <div className="flex-[2] relative">
                 <input
+                  ref={searchInputRef}
                   type="text"
-                  autoFocus
                   placeholder={searchType === "labour" ? t(locale, "home.heroPlaceholderLabour") : t(locale, "home.heroPlaceholderContractor")}
                   className="w-full h-full min-h-[56px] px-2 text-sm bg-transparent text-gray-900 dark:text-white font-medium focus:outline-none placeholder:text-gray-600 dark:placeholder:text-gray-400"
                   value={query}
