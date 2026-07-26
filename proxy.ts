@@ -8,22 +8,21 @@ export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const token = request.cookies.get('authToken')?.value;
   const isAuthRoute = pathname === '/login' || pathname === '/register';
+  const isProtectedRoute = pathname === '/dashboard' || pathname.startsWith('/user');
 
-  // Protect /user routes - redirect to login if not authenticated
-  if (pathname.startsWith('/user') && !token) {
+  if (isProtectedRoute && !token) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', `${pathname}${search}`);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect authenticated users away from auth pages
-  if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL('/', request.url));
+  if (token && (pathname === '/' || isAuthRoute)) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/user/:path*', '/login', '/register'],
+  matcher: ['/', '/dashboard', '/user/:path*', '/login', '/register'],
 };

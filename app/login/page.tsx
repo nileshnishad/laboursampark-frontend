@@ -72,6 +72,10 @@ function LoginContent() {
     await dispatch(loginUser(payload));
   };
 
+  const handleBackToHome = () => {
+    router.replace("/");
+  };
+
   const handleSendForgotPasswordLink = async () => {
     const email = forgotEmail.trim().toLowerCase();
     if (!isEmail(email)) {
@@ -130,7 +134,7 @@ function LoginContent() {
         {/* Back to Home Button */}
         <div className="mb-6">
           <button
-            onClick={() => router.push("/")}
+            onClick={handleBackToHome}
             className="inline-flex items-center gap-2 text-gray-700 dark:text-black-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold text-sm transition-colors group"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span>

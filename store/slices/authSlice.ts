@@ -5,9 +5,7 @@ import {
   showErrorToast,
   dismissToast,
 } from '@/lib/toast-utils';
-import { apiGet, apiPost, apiPut, setToken as saveToken, clearToken as removeToken } from '@/lib/api-service';
-
-const USER_KEY = 'authUser';
+import { apiGet, apiPost, apiPut, setToken as saveToken, clearToken as removeToken, USER_KEY } from '@/lib/api-service';
 
 const getStoredUser = (): any | null => {
   if (typeof window === 'undefined') {

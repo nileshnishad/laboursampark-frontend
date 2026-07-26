@@ -6,7 +6,10 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000';
 const DEFAULT_TIMEOUT = 10000;
-const TOKEN_KEY = 'authToken';
+export const TOKEN_KEY = 'FToken';
+export const USER_KEY = 'FAuthUser';
+const LEGACY_TOKEN_KEY = 'authToken';
+const LEGACY_USER_KEY = 'authUser';
 
 // ============= Types =============
 
@@ -43,7 +46,19 @@ const getTokenFromCookie = (): string | null => {
 
 export const getToken = (): string | null => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem(TOKEN_KEY) || getTokenFromCookie() || null;
+    const storedToken = localStorage.getItem(TOKEN_KEY) || getTokenFromCookie() || null;
+    if (storedToken) {
+      return storedToken;
+    }
+
+    const legacyToken = localStorage.getItem(LEGACY_TOKEN_KEY);
+    if (legacyToken) {
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
+      localStorage.setItem(TOKEN_KEY, legacyToken);
+      return legacyToken;
+    }
+
+    return null;
   }
   return null;
 };
@@ -51,15 +66,27 @@ export const getToken = (): string | null => {
 export const setToken = (token: string): void => {
   if (typeof window !== 'undefined') {
     localStorage.setItem(TOKEN_KEY, token);
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
     document.cookie = `${TOKEN_KEY}=${encodeURIComponent(token)}; path=/; max-age=2592000; samesite=lax`;
+    document.cookie = `${LEGACY_TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
+  }
+};
+
+export const clearAuthSession = (): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
+    localStorage.removeItem(LEGACY_USER_KEY);
+    document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
+    document.cookie = `${USER_KEY}=; path=/; max-age=0; samesite=lax`;
+    document.cookie = `${LEGACY_TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
+    document.cookie = `${LEGACY_USER_KEY}=; path=/; max-age=0; samesite=lax`;
   }
 };
 
 export const clearToken = (): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem(TOKEN_KEY);
-    document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
-  }
+  clearAuthSession();
 };
 
 // ============= Helper Functions =============
@@ -232,7 +259,7 @@ const request = async <T = any>(
     }
 
     if (response.status === 401 && options.includeToken !== false) {
-      clearToken();
+      clearAuthSession();
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
         const redirectPath = `${window.location.pathname}${window.location.search}`;
         window.location.href = `/login?redirect=${encodeURIComponent(redirectPath)}`;
