@@ -124,8 +124,8 @@ export default function Footer() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Call Us</div>
-                  <a href="tel:+919172272305" className="text-gray-900 dark:text-white font-bold hover:text-green-600 transition-colors">
-                    +91 9172272305
+                  <a href="tel:+919702701777" className="text-gray-900 dark:text-white font-bold hover:text-green-600 transition-colors">
+                    +91 9702701777
                   </a>
                 </div>
               </li>

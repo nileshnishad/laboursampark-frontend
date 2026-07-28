@@ -69,7 +69,7 @@ export default function CallToAction() {
 
           <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto">
             <a
-              href="tel:+919172272305"
+              href="tel:+919702701777"
               className="flex items-center justify-center gap-3 bg-white text-green-700 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
             >
               <PhoneCall className="w-5 h-5" />

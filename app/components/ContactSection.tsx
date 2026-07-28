@@ -168,7 +168,7 @@ export default function ContactSection() {
           {
             icon: "📞",
             title: "Phone",
-            content: "+91 9172272305"
+            content: "+91 9702701777"
           },
           {
             icon: "✉️",
@@ -241,7 +241,7 @@ export default function ContactSection() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="9172272305"
+                placeholder="9702701777"
                 maxLength={10}
                 className={`w-full px-4 py-3 rounded-lg border dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
                   validationErrors.phone

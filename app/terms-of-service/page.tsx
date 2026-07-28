@@ -265,7 +265,7 @@ export default function TermsOfService() {
                 <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mt-4">
                   <p className="font-semibold text-green-900 dark:text-white">LabourSampark Legal Team</p>
                   <p className="text-gray-700 dark:text-gray-300">Email: legal@laboursampark.com</p>
-                  <p className="text-gray-700 dark:text-gray-300">Phone: +91 9172272305</p>
+                  <p className="text-gray-700 dark:text-gray-300">Phone: +91 9702701777</p>
                 </div>
               </section>
 

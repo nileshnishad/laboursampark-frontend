@@ -256,7 +256,7 @@ export const contactSchema = {
   "mainEntity": {
     "@type": "Organization",
     "name": "LabourSampark",
-    "telephone": "+91 9172272305",
+    "telephone": "+91 9702701777",
     "address": {
       "@type": "PostalAddress",
       "addressLocality": "Mumbai",
@@ -267,7 +267,7 @@ export const contactSchema = {
       "@type": "ContactPoint",
       "contactType": "Customer Support",
       "email": "support@laboursampark.com",
-      "telephone": "+91 9172272305",
+      "telephone": "+91 9702701777",
       "areaServed": "IN",
     },
   },
