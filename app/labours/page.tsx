@@ -110,10 +110,11 @@ function AllLaboursContent() {
   });
 
   return (
-    <main className=" bg-white dark:bg-zinc-950">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl p-2 md:p-10 border border-zinc-100 dark:border-zinc-800 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+    <main className="min-h-screen bg-white dark:bg-zinc-950 pb-4 px-2 sm:px-3">
+      <div className="max-w-7xl mx-auto h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)]">
+        <div className="dark:bg-zinc-900/50 rounded-3xl md:p-4 dark:border-zinc-800  h-full flex flex-col overflow-hidden">
+          <div className="sticky top-0 z-20 bg-zinc-50/95 dark:bg-zinc-900/90 backdrop-blur-sm px-1 md:px-2 py-3 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
             <div className="flex items-start gap-4">
               <button
                 type="button"
@@ -123,29 +124,30 @@ function AllLaboursContent() {
               >
                 <span className="text-md">←</span>
               </button>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
+              <div className="">
+                <h1 className="text-md md:text-2xl font-black text-zinc-900 dark:text-white tracking-tight leading-tight">
                   Skilled <span className="text-blue-600">Labours</span>
                 </h1>
-                <p className="text-zinc-500 dark:text-zinc-400 font-medium mt-1">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-1">
                   Connect with verified and rated labourers.
                 </p>
               </div>
             </div>
 
             <div className="w-full md:w-96">
-              <UnifiedSearchInput
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Search name, location, or skills..."
-              />
+                <UnifiedSearchInput
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  placeholder="Search name, location, or skills..."
+                />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto pr-1 space-y-3">
             {/* Loading State */}
             {loading && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
                 {[...Array(6)].map((_, index) => (
                   <div key={index} className="h-full">
                     <Skeleton type="card" />
@@ -163,9 +165,9 @@ function AllLaboursContent() {
 
             {/* Labours Grid */}
             {!loading && !error && filteredLabours.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 justify-items-center">
                 {filteredLabours.map((l) => (
-                  <div key={l._id} className="w-full max-w-[320px]">
+                  <div key={l._id} className="w-full max-w-none sm:max-w-[330px]">
                     <IDCard
                       labour={l}
                       onViewProfile={
@@ -202,7 +204,7 @@ export default function AllLaboursPage() {
           <div className="sticky top-0 z-20 bg-gray-50 dark:bg-gray-900 pb-3 border-b border-gray-200 dark:border-gray-700">
             <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
           </div>
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 pt-4">
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} type="card" />
             ))}

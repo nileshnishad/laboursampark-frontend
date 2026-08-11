@@ -181,7 +181,7 @@ export default function LaboursSection() {
           <div className="relative -mx-4 group/slider">
             <Slider {...slickSettings}>
               {labours.map((l) => (
-                <div key={l._id} className="px-4 py-8">
+                <div key={l._id} className="px-4 py-4">
                   <div className="transform transition-all duration-300 hover:-translate-y-2">
                     <IDCard
                       labour={l}

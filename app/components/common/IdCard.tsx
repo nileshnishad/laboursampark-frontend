@@ -3,9 +3,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { getToken } from "@/lib/api-service";
-import UserProfileModal from "./UserProfileModal";
 import type { RootState } from "@/store/store";
-import { Star, MapPin, Briefcase, CheckCircle, ShieldCheck, Phone, Mail, ArrowRight } from "lucide-react";
+import { Star, MapPin, Briefcase, ShieldCheck, Phone, Mail } from "lucide-react";
 
 interface IDCardProps {
   labour: any;
@@ -19,12 +18,10 @@ interface IDCardProps {
 
 export default function IDCard({
   labour,
-  onConnect,
   onViewProfile,
   className = "",
 }: IDCardProps) {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [sending, setSending] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
   React.useEffect(() => {
@@ -42,16 +39,52 @@ export default function IDCard({
   } else if (typeof rawLocation === "object" && rawLocation !== null) {
     location = [rawLocation.address, rawLocation.city].filter(Boolean).join(", ") || "N/A";
   }
-  const rating = labour.rating || 4.5;
+  const rating = labour.rating;
+  const hasRating = rating !== undefined && rating !== null && rating !== "";
   const completedJobs = labour.completedJobs || labour.projects || 0;
-  const skills = Array.isArray(labour.skills) ? labour.skills : [];
+  const allSkills = useSelector((state: RootState) => state.skills.skills);
+  const rawSkills = Array.isArray(labour.skills)
+    ? labour.skills
+    : Array.isArray(labour.workTypes)
+      ? labour.workTypes
+      : [];
+
+  const isLikelyId = (value: string) => /^[a-f0-9]{24}$/i.test(value);
+  const resolveSkillLabel = (value: any) => {
+    if (typeof value !== "string") return "";
+
+    const matched = allSkills.find(
+      (skill: any) => skill?.id === value || skill?._id === value
+    );
+
+    if (matched) {
+      return matched.enName || matched.hiName || matched.mrName || "";
+    }
+
+    // If backend sends a Mongo/Object-like ID and lookup misses, avoid showing raw ID in UI.
+    if (isLikelyId(value)) return "";
+
+    return value;
+  };
+
+  const displaySkills = rawSkills
+    .map(resolveSkillLabel)
+    .filter((skill: string, index: number, arr: string[]) => Boolean(skill) && arr.indexOf(skill) === index);
+
+  const primarySkill = displaySkills[0] || labour.primarySkill || labour.trade || "Skilled Worker";
+  const extraSkillsCount = Math.max(displaySkills.length - 1, 0);
   const available =
     labour.availability !== undefined
       ? labour.availability
       : labour.available !== undefined
         ? labour.available
         : true;
-  const verified = labour.aadharVerified || labour.verified || false;
+  const isTrueLike = (value: any) => value === true || value === "true" || value === 1 || value === "1";
+  const verified =
+    isTrueLike(labour.aadharVerified) ||
+    isTrueLike(labour.mobileVerified) ||
+    isTrueLike(labour.isMobileVerified) ||
+    isTrueLike(labour.verified);
   const profilePic = labour.profilePic || labour.profilePhotoUrl || "";
 
   const maskPhone = (phoneValue: string) => {
@@ -71,6 +104,8 @@ export default function IDCard({
   const canViewContact = isLoggedIn && user?.display !== false;
   const displayPhone = canViewContact ? phone : maskPhone(phone);
   const displayEmail = canViewContact ? email : maskEmail(email);
+  const callablePhone = canViewContact && phone !== "N/A" ? phone.replace(/[^\d+]/g, "") : "";
+  const emailableEmail = canViewContact && email !== "N/A" && email.includes("@") ? email : "";
 
   const getInitials = (fullName: string) => {
     return fullName
@@ -91,105 +126,111 @@ export default function IDCard({
 
   return (
     <div
-      className={`group relative w-[260px] h-[380px] mx-auto overflow-hidden rounded-[2rem] border-4 border-white dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-2xl transition-all duration-300 hover:scale-[1.02] ${className}`}
+      className={`group relative w-full max-w-[320px] mx-auto overflow-hidden rounded-2xl border border-blue-100 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${className}`}
     >
-      {/* ID Card "Lanyard" Hole */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-6 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full z-20 shadow-inner" />
-
-      {/* Header Banner - Identity Focus */}
-      <div className="h-20 bg-gradient-to-br from-blue-600 to-indigo-700 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-28 h-28 bg-white/10 rounded-full -mr-14 -mt-14 blur-2xl" />
-        <div className="absolute flex flex-col items-center justify-center inset-0 pt-3">
-           <h2 className="text-white/40 text-[9px] font-black uppercase tracking-[0.3em]">Worker Identity Card</h2>
+      <div className="p-2">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] leading-none font-semibold ${
+              available
+                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                : "bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
+            }`}
+          >
+            <span className={`h-2 w-2 rounded-full ${available ? "bg-emerald-500" : "bg-orange-500"}`}></span>
+            {available ? "Available" : "Busy"}
+          </span>
+          <span className="inline-flex items-center gap-1 text-[11px] leading-none font-semibold text-slate-700 dark:text-slate-200">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+            {verified ? "Verified" : "Unverified"}
+          </span>
         </div>
-      </div>
 
-      <div className="relative z-10 px-5 -mt-12 flex flex-col items-center">
-        {/* Profile Picture - Centered ID Style */}
-        <div className="relative mb-2 group-hover:rotate-0 transition-transform duration-500">
-          <div className="w-18 h-18 rounded-2xl bg-white dark:bg-slate-900 p-0.5 shadow-2xl border border-blue-100 dark:border-slate-700">
+        <div className="flex items-start gap-2.5 mb-2.5">
+          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-blue-100 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
             {profilePic ? (
               <img
                 src={profilePic}
                 alt={name}
-                className="w-full h-full rounded-xl object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
-              <div className="w-full h-full rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-xl">
+              <div className="h-full w-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-2xl">
                 {getInitials(name)}
               </div>
             )}
           </div>
-          {verified && (
-            <div className="absolute -bottom-1 -right-1 bg-blue-600 p-1 rounded-lg shadow-lg border border-white">
-              <ShieldCheck className="w-4 h-4 text-white" />
+
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm leading-tight font-black text-slate-900 dark:text-white line-clamp-1">
+              {name}
+            </h3>
+            <div className="mt-1.5 flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+              <span className="text-xs leading-tight font-semibold truncate">{primarySkill}</span>
+              {extraSkillsCount > 0 && (
+                <span className="rounded-full bg-blue-50 px-1 py-0.5 text-[10px] leading-none font-semibold dark:bg-blue-900/30">
+                  +{extraSkillsCount}
+                </span>
+              )}
             </div>
-          )}
-        </div>
-
-        {/* Name & Basic Info */}
-        <div className="text-center mb-3">
-          <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight line-clamp-1">
-            {name}
-          </h3>
-          <div className="flex items-center justify-center gap-1 text-blue-600 dark:text-blue-400 font-bold text-[10px] mt-0.5">
-            <Briefcase className="w-3 h-3" />
-            <span>{experience} Exp</span>
-          </div>
-        </div>
-
-        {/* Masked Contact Info */}
-        <div className="w-full flex flex-col gap-1 mb-3 px-2">
-          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-            <Phone className="w-3 h-3 text-blue-500" />
-            <span className="text-[10px] font-mono tracking-wider">{displayPhone}</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-            <Mail className="w-3 h-3 text-blue-500" />
-            <span className="text-[10px] font-mono tracking-wider lowercase truncate">{displayEmail}</span>
-          </div>
-        </div>
-
-        {/* Verified Data Grid */}
-        <div className="w-full grid grid-cols-2 gap-2 mb-3">
-          <div className="bg-white dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center">
-            <div className="flex items-center gap-0.5 text-amber-500">
-              <Star className="w-2.5 h-2.5 fill-amber-500" />
-              <span className="text-[11px] font-black">{rating}</span>
+            <div className="mt-0.5 space-y-1 text-[10px] leading-tight text-slate-600 dark:text-slate-300">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5 text-slate-500" />
+                <span className="truncate">{location}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Briefcase className="h-3.5 w-3.5 text-slate-500" />
+                <span>{experience} Exp.</span>
+              </div>
             </div>
-            <span className="text-[8px] font-bold text-slate-400 uppercase">Rating</span>
-          </div>
-          <div className="bg-white dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center">
-            <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter">{completedJobs}</span>
-            <span className="text-[8px] font-bold text-slate-400 uppercase">Jobs Done</span>
           </div>
         </div>
 
-        {/* Location & Contact - Small Identity details */}
-        <div className="w-full space-y-1.5 mb-4 text-center">
-           <div className="flex items-center justify-center gap-1 text-[10px] text-slate-500 dark:text-slate-400">
-              <MapPin className="w-3 h-3" />
-              <span className="truncate max-w-[150px]">{location}</span>
+        <div className="rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 px-1.5 py-1 mb-2">
+          <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-slate-700">
+            <div className="flex items-center justify-center gap-1 px-0.5 text-slate-900 dark:text-white">
+              <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+              <span className="text-[11px] font-bold leading-none">{hasRating ? rating : "N/A"}</span>
+              <span className="text-[9px] font-medium leading-none text-slate-600 dark:text-slate-300">Rating</span>
             </div>
-            <div className={`px-3 py-1 rounded-full inline-block text-[8px] font-black uppercase tracking-[0.15em] ${available ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-              {available ? 'Status: Available' : 'Status: Busy'}
+            <div className="flex items-center justify-center gap-1 px-0.5 text-slate-900 dark:text-white">
+              <span className="text-[11px] font-bold leading-none">{completedJobs}</span>
+              <span className="text-[9px] font-medium leading-none text-slate-600 dark:text-slate-300">Jobs Done</span>
             </div>
+          </div>
         </div>
 
-        {/* Primary Action */}
+        <div className="mb-2.5 flex items-center gap-1.5 rounded-lg border border-blue-100 dark:border-slate-700 px-2 py-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+          <div className="min-w-0 flex items-center gap-1">
+            <Phone className="h-3 w-3 shrink-0 text-slate-500" />
+            {callablePhone ? (
+              <a href={`tel:${callablePhone}`} className="truncate hover:text-blue-600 dark:hover:text-blue-300">
+                {displayPhone}
+              </a>
+            ) : (
+              <span className="truncate">{displayPhone}</span>
+            )}
+          </div>
+          <span className="text-slate-300">|</span>
+          <div className="min-w-0 flex items-center gap-1">
+            <Mail className="h-3 w-3 shrink-0 text-slate-500" />
+            {emailableEmail ? (
+              <a href={`mailto:${emailableEmail}`} className="truncate hover:text-blue-600 dark:hover:text-blue-300">
+                {displayEmail}
+              </a>
+            ) : (
+              <span className="truncate">{displayEmail}</span>
+            )}
+          </div>
+        </div>
+
         <button
           onClick={handleViewProfile}
-          className="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-black text-[10px] tracking-[0.15em] shadow-lg hover:shadow-xl active:scale-95 transition-all"
+          className="w-full rounded-lg border border-blue-300 dark:border-blue-600 py-1.5 text-xs leading-none font-semibold text-blue-600 dark:text-blue-300 transition-all hover:bg-blue-50 dark:hover:bg-blue-900/20 active:scale-[0.99]"
         >
-          VIEW FULL ID DETAILS
+          View Details
         </button>
       </div>
-
-      {/* Footer Branding */}
-      <div className="absolute bottom-3 left-0 right-0 text-center opacity-20">
-        <span className="text-[7px] font-bold uppercase tracking-[0.5em] text-slate-500">Labour Sampark Verified</span>
-      </div>
-
 
       {/* Modal removed from card, handled by parent */}
     </div>
