@@ -22,23 +22,17 @@ export default function ResetPasswordPage() {
 
   const passwordRule = useMemo(() => {
     const hasMinLength = newPassword.length >= 8;
-    const hasUppercase = /[A-Z]/.test(newPassword);
-    const hasLowercase = /[a-z]/.test(newPassword);
-    const hasNumber = /\d/.test(newPassword);
 
     return {
       hasMinLength,
-      hasUppercase,
-      hasLowercase,
-      hasNumber,
-      isValid: hasMinLength && hasUppercase && hasLowercase && hasNumber,
+      isValid: hasMinLength,
     };
   }, [newPassword]);
 
   const canSubmit =
     Boolean(resetToken) &&
     passwordRule.isValid &&
-    confirmPassword.trim().length >= 8 &&
+    confirmPassword.length >= 8 &&
     newPassword === confirmPassword;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,11 +44,11 @@ export default function ResetPasswordPage() {
     }
 
     if (!passwordRule.isValid) {
-      showErrorToast("Password must be minimum 8 characters and include uppercase, lowercase, and number.");
+      showErrorToast("Password must be at least 8 characters.");
       return;
     }
 
-    if (confirmPassword.trim().length < 8) {
+    if (confirmPassword.length < 8) {
       showErrorToast("Confirm password must be at least 8 characters.");
       return;
     }
@@ -172,7 +166,7 @@ export default function ResetPasswordPage() {
                 </button>
               </div>
               <p className="mt-1 text-[11px] text-gray-600 dark:text-gray-400">
-                Minimum 8 chars, with uppercase, lowercase, and number.
+                Password must be at least 8 characters.
               </p>
               {newPassword && !passwordRule.isValid && (
                 <p className="mt-1 text-xs text-red-600 dark:text-red-400">
