@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import { createPayULink, buildSubscriptionPayload, type PayULinkStatus } from "@/lib/payu-service";
+import { load } from "@cashfreepayments/cashfree-js";
+import { createCashfreeOrder } from "@/lib/cashfree-service";
 
 type UserType = "labour" | "contractor" | "sub_contractor";
 
@@ -33,6 +35,7 @@ export default function PaymentPage() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [payStatus, setPayStatus] = useState<PayULinkStatus>("idle");
   const [payError, setPayError] = useState<string | null>(null);
+  const paymentProvider = process.env.NEXT_PUBLIC_PAYMENT_PROVIDER || "cashfree";
 
   // Use fullName slug for username if available, else fallback to params.username
   let username = params.username as string;
@@ -90,16 +93,41 @@ export default function PaymentPage() {
       setPayStatus("loading");
 
       const payload = buildSubscriptionPayload(userType, plan.price);
-      const result = await createPayULink(payload);
+      if (paymentProvider === "payu") {
+        const result = await createPayULink(payload);
 
-      // Persist paymentId so success/failure pages can call the status API
-      if (result.paymentId) {
-        sessionStorage.setItem("payu_payment_id", result.paymentId);
+        if (result.paymentId) {
+          sessionStorage.setItem("payu_payment_id", result.paymentId);
+        }
+
+        setPayStatus("success");
+        window.location.href = result.paymentUrl;
+        return;
       }
 
+      const result = await createCashfreeOrder({
+        amount: payload.amount,
+        productInfo: payload.productInfo,
+        purpose: payload.purpose,
+        description: payload.description,
+        metadata: { benefitType: "profile_visibility", userType },
+      });
+      if (!result.paymentId) {
+        throw new Error("Payment service did not return a payment reference.");
+      }
+      sessionStorage.setItem("cashfree_payment_id", result.paymentId);
       setPayStatus("success");
-      // Redirect to PayU payment page
-      window.location.href = result.paymentUrl;
+      const cashfree = await load({
+        mode: process.env.NEXT_PUBLIC_CASHFREE_MODE === "production" ? "production" : "sandbox",
+      });
+      if (!cashfree) {
+        throw new Error("Unable to load the payment checkout. Please try again.");
+      }
+      await cashfree.checkout({
+        paymentSessionId: result.paymentSessionId,
+        redirectTarget: "_modal",
+      });
+      router.push(`/payment/cashfree-status?paymentId=${encodeURIComponent(result.paymentId)}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Payment initiation failed. Please try again.";
       setPayError(message);
@@ -238,7 +266,7 @@ export default function PaymentPage() {
                 ) : payStatus === "success" ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Redirecting to PayU...
+                    Opening secure checkout...
                   </>
                 ) : (
                   <>SUBSCRIBE NOW</>

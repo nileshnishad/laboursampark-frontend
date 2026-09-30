@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Cashfree Integration
+
+Cashfree is integrated alongside the existing PayU flow. The subscription payment screen uses Cashfree by default; set `NEXT_PUBLIC_PAYMENT_PROVIDER=payu` to retain PayU for an environment. Cashfree checkout uses `NEXT_PUBLIC_CASHFREE_MODE=sandbox` or `production` and only receives the backend-created `paymentSessionId`. No Cashfree secret or webhook credential belongs in frontend environment variables.
+
+The typed service in `lib/cashfree-service.ts` uses the existing authenticated fetch client. It provides order creation, backend payment-status verification, refunds, beneficiaries, and admin payout operations. Payment success is shown only after `GET /api/cashfree/orders/:paymentId/status` confirms it. The checkout page is `/user/[username]/[userType]/payment`; verification is handled at `/payment/cashfree-status`. Beneficiaries are managed at `/cashfree/beneficiaries`, and the role-gated admin tools are at `/admin/cashfree`.
+
+Install the declared SDK manually before running the app:
+
+```bash
+npm install
+```
+
+User flow: login, choose a subscription, create the backend order, complete sandbox checkout, refresh the backend status page, and confirm the existing subscription/profile data refreshes. Admin flow: open the Cashfree operations page, create or retry payouts, and submit full or partial refunds. Backend authorization remains authoritative for admin endpoints.
+
 ## Getting Started
 
 First, run the development server:

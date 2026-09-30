@@ -18,6 +18,8 @@ interface ApiOptions {
   baseUrl?: string;
 }
 
+export type ApiRequestOptions = ApiOptions;
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
