@@ -1,7 +1,13 @@
 import { MetadataRoute } from "next";
+import { getOpenJobFeed } from "@/lib/jobs-data";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://laboursampark.com";
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl =
+    (process.env.NEXT_PUBLIC_SITE_URL || "https://laboursampark.com").replace(
+      /\/+$/,
+      "",
+    );
+  const feed = await getOpenJobFeed();
 
   const routes: MetadataRoute.Sitemap = [
     // Main Pages
@@ -71,5 +77,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return routes;
+  const jobRoutes: MetadataRoute.Sitemap = feed.jobs.map((job) => ({
+    url: `${baseUrl}/jobs/${job.slug}`,
+    lastModified: job.postedAt ? new Date(job.postedAt) : new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.75,
+  }));
+
+  return [...routes, ...jobRoutes];
 }

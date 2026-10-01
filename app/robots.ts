@@ -1,6 +1,12 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
+  const siteUrl =
+    (process.env.NEXT_PUBLIC_SITE_URL || "https://laboursampark.com").replace(
+      /\/+$/,
+      "",
+    );
+
   return {
     rules: [
       {
@@ -19,32 +25,12 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
       {
-        // Block Scrapers and Aggressive AI Bots (Not Search Engines)
-        userAgent: [
-          "GPTBot",          // OpenAI
-          "CCBot",           // Common Crawl (Major source of bot traffic)
-          "ClaudeBot",       // Anthropic
-          "AdsBot-Google", 
-          "Amazonbot", 
-          "anthropic-ai", 
-          "Bytespider",      // TikTok/ByteDance (Very aggressive)
-          "Curebot",
-          "ImagesiftBot",
-          "PetalBot",
-          "SemrushBot",      // SEO Tools (Can be heavy)
-          "AhrefsBot",       // SEO Tools
-          "DotBot",
-          "Rogerbot"
-        ],
-        disallow: "/",
-      },
-      {
         // Explicitly allow Google and Bing (Main Search Engines)
         userAgent: ["Googlebot", "Bingbot", "DuckDuckBot"],
         allow: "/",
       },
     ],
-    sitemap: "https://laboursampark.com/sitemap.xml",
-    host: "https://laboursampark.com",
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl,
   };
 }

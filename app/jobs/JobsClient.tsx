@@ -1,148 +1,641 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { getToken } from "@/lib/api-service";
-import Skeleton from "@/app/components/Skeleton";
-import JobCard from "@/app/components/common/JobCard";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Briefcase, Filter, Search, SearchCheck } from "lucide-react";
+import { useMemo, useState, type FormEvent } from "react";
+import Link from "next/link";
+import {
+  BriefcaseBusiness,
+  ChevronRight,
+  MapPin,
+  Search,
+  X,
+} from "lucide-react";
+import type { MarketplaceJob } from "@/lib/jobs-data";
+import AppJobAction from "./AppJobAction";
 
-const mockJobs = [
-  {
-    _id: "1",
-    workTitle: "Urgent Furniture Work: Modular Kitchen & Wardrobe",
-    description: "Looking for 5 skilled furniture carpenters for a premium interior project in Mumbai. Specialist needed for modular kitchen fitting and wardrobe installation. Tools provided.",
-    location: { city: "Mumbai", state: "Maharashtra" },
-    workersNeeded: "5+",
-    category: "Furniture/Carpenter",
-    createdAt: new Date().toISOString(),
-    createdBy: { fullName: "Rakesh construction", email: "rakesh@const.com", mobile: "+91 9702701777" }
-  },
-  {
-    _id: "2",
-    workTitle: "Interior Wall Painting & Texture Work",
-    description: "Professional painters required for a high-end 3BHK interior painting job in Pune. Must be skilled in royal emulsion and decorative texture painting.",
-    location: { city: "Pune", state: "Maharashtra" },
-    workersNeeded: "2",
-    category: "Painting",
-    createdAt: new Date().toISOString(),
-    createdBy: { fullName: "Anil Designs", email: "anil@designs.com", mobile: "+91 8877665544" }
-  },
-  {
-    _id: "3",
-    workTitle: "Industrial Electrician: Warehouse Wiring & Panels",
-    description: "Heavy-duty warehouse project in Nashik needs licensed industrial electricians. Task includes main panel setup and underground cable wiring.",
-    location: { city: "Nashik", state: "Maharashtra" },
-    workersNeeded: "4",
-    category: "Electrical",
-    createdAt: new Date().toISOString(),
-    createdBy: { fullName: "Power Builders", email: "power@builders.com", mobile: "+91 7766554433" }
-  },
-  {
-    _id: "4",
-    workTitle: "Skilled Mason for Tile & Marble Installation",
-    description: "Building project in Thane requires expert masons for granite floor and wall tile installation. 6 months long-term project with accommodation.",
-    location: { city: "Thane", state: "Maharashtra" },
-    workersNeeded: "10+",
-    category: "Masonry",
-    createdAt: new Date().toISOString(),
-    createdBy: { fullName: "Thane Constructions", email: "thane@const.com", mobile: "+91 6655443322" }
-  },
-  {
-    _id: "5",
-    workTitle: "Sofa Repairing & Upholstery Specialist",
-    description: "Skilled upholstery worker/carpenter needed for premium sofa manufacturing unit in Nagpur. Must know fabric cutting and foam fixing.",
-    location: { city: "Nagpur", state: "Maharashtra" },
-    workersNeeded: "3",
-    category: "Furniture",
-    createdAt: new Date().toISOString(),
-    createdBy: { fullName: "Nagpur Furnishing", email: "nagpur@furnishing.com", mobile: "+91 5544332211" }
-  },
-  {
-    _id: "6",
-    workTitle: "Structural Steel Fixer for Metro Project",
-    description: "Aurangabad Metro project hiring steel fixers and welders for heavy structural bridge work. Safety certification preffered.",
-    location: { city: "Aurangabad", state: "Maharashtra" },
-    workersNeeded: "15+",
-    category: "Steel/Construction",
-    createdAt: new Date().toISOString(),
-    createdBy: { fullName: "Infra Corp", email: "infra@corp.com", mobile: "+91 4433221100" }
-  }
+const PAGE_SIZE = 12;
+
+interface JobsClientProps {
+  jobs: MarketplaceJob[];
+  feedError: boolean;
+  initialQuery?: string;
+  initialLocation?: string;
+  initialCategory?: string;
+  initialExperience?: string;
+  initialJobType?: string;
+  initialSalary?: string;
+}
+
+const salaryFilterOptions = [
+  { value: "month-under-20000", label: "Under ₹20,000 / month", min: 0, max: 20000, unit: "MONTH" },
+  { value: "month-20000-35000", label: "₹20,000–₹35,000 / month", min: 20000, max: 35000, unit: "MONTH" },
+  { value: "month-over-35000", label: "Over ₹35,000 / month", min: 35000, max: Infinity, unit: "MONTH" },
+  { value: "day-under-800", label: "Under ₹800 / day", min: 0, max: 800, unit: "DAY" },
+  { value: "day-800-1200", label: "₹800–₹1,200 / day", min: 800, max: 1200, unit: "DAY" },
+  { value: "day-over-1200", label: "Over ₹1,200 / day", min: 1200, max: Infinity, unit: "DAY" },
 ];
 
-export default function JobsClient() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [jobs] = useState(mockJobs);
-  const [loading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const isLoggedIn = Boolean(getToken());
+function money(value: number): string {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
 
-  useEffect(() => {
-    const urlSearch = searchParams.get("search");
-    if (urlSearch) setSearchQuery(decodeURIComponent(urlSearch));
-  }, [searchParams]);
+function salaryText(job: MarketplaceJob): string {
+  const salary = job.salary;
+  if (!salary) return "";
+  if (salary.label) return salary.label;
+  if (salary.min === undefined || salary.max === undefined) return "";
+  const range = `${money(salary.min)} – ${money(salary.max)}`;
+  const unit = salary.unit?.toLowerCase();
+  return unit ? `${range} / ${unit}` : range;
+}
 
-  const filteredJobs = jobs.filter(job => {
-    const query = searchQuery.toLowerCase();
-    const city = typeof job.location === "string" ? job.location : job.location?.city || "";
-    return job.workTitle.toLowerCase().includes(query) || 
-           job.description.toLowerCase().includes(query) ||
-           city.toLowerCase().includes(query);
+function postedDate(value?: string): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function updateSearchUrl(
+  values: Record<string, string>,
+) {
+  const params = new URLSearchParams();
+  Object.entries(values).forEach(([key, value]) => {
+    if (value) params.set(key, value);
   });
+  const queryString = params.toString();
+  window.history.replaceState(
+    null,
+    "",
+    queryString ? `/jobs?${queryString}` : "/jobs",
+  );
+}
+
+export default function JobsClient({
+  jobs,
+  feedError,
+  initialQuery = "",
+  initialLocation = "",
+  initialCategory = "",
+  initialExperience = "",
+  initialJobType = "",
+  initialSalary = "",
+}: JobsClientProps) {
+  const [query, setQuery] = useState(initialQuery);
+  const [location, setLocation] = useState(initialLocation);
+  const [category, setCategory] = useState(initialCategory);
+  const [experience, setExperience] = useState(initialExperience);
+  const [jobType, setJobType] = useState(initialJobType);
+  const [salaryFilter, setSalaryFilter] = useState(initialSalary);
+  const [page, setPage] = useState(1);
+
+  const categories = useMemo(
+    () => [...new Set(jobs.map((job) => job.category).filter(Boolean))],
+    [jobs],
+  );
+  const experiences = useMemo(
+    () => [...new Set(jobs.map((job) => job.experience).filter(Boolean))],
+    [jobs],
+  );
+  const jobTypes = useMemo(
+    () => [...new Set(jobs.map((job) => job.jobType).filter(Boolean))],
+    [jobs],
+  );
+  const salaryTypes = useMemo(
+    () =>
+      [...new Set(jobs.map((job) => job.salary?.unit).filter(Boolean))],
+    [jobs],
+  );
+  const availableSalaryFilters = salaryFilterOptions.filter((option) =>
+    salaryTypes.includes(option.unit as NonNullable<MarketplaceJob["salary"]>["unit"]),
+  );
+
+  const filteredJobs = useMemo(() => {
+    const terms = query
+      .trim()
+      .toLocaleLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+    const locationTerm = location.trim().toLocaleLowerCase();
+
+    return jobs.filter((job) => {
+      const searchableText = [
+        job.title,
+        job.company,
+        job.category,
+        job.location.city,
+        job.location.state,
+        job.location.address,
+        job.description,
+        ...job.skills,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLocaleLowerCase();
+      const matchesTerms = terms.every((term) => searchableText.includes(term));
+      const fullLocation = `${job.location.city} ${job.location.state} ${job.location.address ?? ""}`
+        .toLocaleLowerCase();
+      const matchesLocation =
+        !locationTerm || fullLocation.includes(locationTerm);
+      const matchesCategory = !category || job.category === category;
+      const matchesExperience =
+        !experience || job.experience === experience;
+      const matchesJobType = !jobType || job.jobType === jobType;
+      const salaryOption = salaryFilterOptions.find(
+        (option) => option.value === salaryFilter,
+      );
+      const matchesSalary =
+        !salaryOption ||
+        (job.salary?.unit === salaryOption.unit &&
+          job.salary.min !== undefined &&
+          job.salary.min < salaryOption.max &&
+          (job.salary.max ?? job.salary.min) >= salaryOption.min);
+
+      return (
+        matchesTerms &&
+        matchesLocation &&
+        matchesCategory &&
+        matchesExperience &&
+        matchesJobType &&
+        matchesSalary
+      );
+    });
+  }, [jobs, query, location, category, experience, jobType, salaryFilter]);
+
+  const pageCount = Math.max(1, Math.ceil(filteredJobs.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount);
+  const visibleJobs = filteredJobs.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
+  const applySearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPage(1);
+    updateSearchUrl({
+      q: query.trim(),
+      location: location.trim(),
+      skill: category,
+      experience,
+      type: jobType,
+      salary: salaryFilter,
+    });
+  };
+
+  const updateFilter = (
+    setter: (value: string) => void,
+    key: string,
+    value: string,
+  ) => {
+    setter(value);
+    setPage(1);
+    updateSearchUrl({
+      q: query.trim(),
+      location: location.trim(),
+      skill: key === "skill" ? value : category,
+      experience: key === "experience" ? value : experience,
+      type: key === "type" ? value : jobType,
+      salary: key === "salary" ? value : salaryFilter,
+    });
+  };
+
+  const clearFilters = () => {
+    setQuery("");
+    setLocation("");
+    setCategory("");
+    setExperience("");
+    setJobType("");
+    setSalaryFilter("");
+    setPage(1);
+    window.history.replaceState(null, "", "/jobs");
+  };
+
+  const filterSelectClass =
+    "h-11 min-w-0 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
 
   return (
-    <main className="min-h-screen bg-white dark:bg-zinc-950 pt-10 md:pt-10">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl p-6 md:p-10 border border-zinc-100 dark:border-zinc-800 shadow-sm mb-12">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10">
-            <div className="flex items-center gap-5">
-              <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
-                <Briefcase size={32} />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tight leading-none mb-2">
-                  All <span className="text-blue-600">Jobs</span>
-                </h1>
-                <p className="text-zinc-500 dark:text-zinc-400 font-medium">Opportunities for local skilled workers.</p>
-              </div>
-            </div>
-            <div className="w-full md:w-96 relative group">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search jobs, location, or skills..."
-                className="w-full h-16 pl-14 pr-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
-              />
-            </div>
+    <div className="min-h-screen bg-zinc-50 pb-16 pt-20 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:pt-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section
+          aria-labelledby="jobs-heading"
+          className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8"
+        >
+          <div className="max-w-3xl">
+            <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
+              <BriefcaseBusiness size={17} aria-hidden="true" />
+              LabourSampark Jobs
+            </p>
+            <h1
+              id="jobs-heading"
+              className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
+            >
+              Find Jobs That Match Your Skills
+            </h1>
+            <p className="mt-3 text-base leading-7 text-zinc-600 dark:text-zinc-300">
+              Discover work opportunities related to your skills, trade and
+              location. Search listings shared on LabourSampark and review the
+              details before continuing.
+            </p>
           </div>
-          {!isLoggedIn && (
-            <div className="bg-blue-600/5 border border-blue-500/20 rounded-2xl p-4 flex items-center gap-4 text-sm font-bold text-blue-700 mb-2">
-              <SearchCheck className="shrink-0" />
-              <span>Login to see full job details like mobile numbers and apply directly.</span>
-              <button onClick={() => router.push("/login?redirect=/jobs")} className="ml-auto px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-black uppercase shadow-lg shadow-blue-500/20">Login Now</button>
+
+          <form
+            aria-label="Search jobs"
+            onSubmit={applySearch}
+            className="mt-6 grid gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-950 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)_auto] sm:p-4"
+          >
+            <label className="relative block">
+              <span className="sr-only">Search jobs, skills or trades</span>
+              <Search
+                size={18}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search jobs, skills or trades"
+                className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm text-zinc-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+              />
+            </label>
+            <label className="relative block">
+              <span className="sr-only">Location</span>
+              <MapPin
+                size={18}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
+              <input
+                type="search"
+                value={location}
+                onChange={(event) => setLocation(event.target.value)}
+                placeholder="City or state"
+                className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm text-zinc-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+              />
+            </label>
+            <button
+              type="submit"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-blue-700 px-5 text-sm font-semibold text-white transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
+            >
+              Search jobs
+              <ChevronRight size={17} aria-hidden="true" />
+            </button>
+          </form>
+
+          {(categories.length > 0 ||
+            experiences.length > 0 ||
+            jobTypes.length > 0 ||
+            availableSalaryFilters.length > 0) && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {categories.length > 0 && (
+                <label>
+                  <span className="sr-only">Filter by skill or trade</span>
+                  <select
+                    value={category}
+                    onChange={(event) =>
+                      updateFilter(
+                        setCategory,
+                        "skill",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className={filterSelectClass}
+                  >
+                    <option value="">All skills</option>
+                    {categories.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {experiences.length > 0 && (
+                <label>
+                  <span className="sr-only">Filter by experience</span>
+                  <select
+                    value={experience}
+                    onChange={(event) =>
+                      updateFilter(
+                        setExperience,
+                        "experience",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className={filterSelectClass}
+                  >
+                    <option value="">Any experience</option>
+                    {experiences.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {jobTypes.length > 0 && (
+                <label>
+                  <span className="sr-only">Filter by job type</span>
+                  <select
+                    value={jobType}
+                    onChange={(event) =>
+                      updateFilter(
+                        setJobType,
+                        "type",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className={filterSelectClass}
+                  >
+                    <option value="">Any job type</option>
+                    {jobTypes.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {availableSalaryFilters.length > 0 && (
+                <label>
+                  <span className="sr-only">Filter by salary range</span>
+                  <select
+                    value={salaryFilter}
+                    onChange={(event) =>
+                      updateFilter(
+                        setSalaryFilter,
+                        "salary",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className={filterSelectClass}
+                  >
+                    <option value="">Any pay range</option>
+                    {availableSalaryFilters.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {(query || location || category || experience || jobType || salaryFilter) && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-zinc-600 underline underline-offset-2 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:text-zinc-300 dark:hover:text-blue-300"
+                >
+                  <X size={15} aria-hidden="true" />
+                  Clear filters
+                </button>
+              )}
             </div>
           )}
-        </div>
-        <div>
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => <Skeleton key={i} type="card" />)}
+        </section>
+
+        {feedError && (
+          <aside
+            aria-label="Job listing update"
+            className="mt-5 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-950 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-100"
+          >
+            Job updates are temporarily unavailable. You can still browse
+            these available opportunities.
+          </aside>
+        )}
+
+        <section
+          id="job-listings"
+          aria-labelledby="job-listings-heading"
+          className="mt-9 scroll-mt-24"
+        >
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2
+                id="job-listings-heading"
+                className="text-xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-2xl"
+              >
+                {category ? `${category} opportunities` : "Open job opportunities"}
+              </h2>
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                Browse skilled and trade work by role, experience and location.
+              </p>
             </div>
-          ) : filteredJobs.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-              {filteredJobs.map((job) => <JobCard key={job._id} job={job} isLoggedIn={isLoggedIn} />)}
+            <p className="text-sm text-zinc-500 dark:text-zinc-400" aria-live="polite">
+              {filteredJobs.length}{" "}
+              {filteredJobs.length === 1 ? "opportunity" : "opportunities"}
+            </p>
+          </div>
+
+          {visibleJobs.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {visibleJobs.map((job) => {
+                const place = [job.location.city, job.location.state]
+                  .filter(Boolean)
+                  .join(", ");
+                const date = postedDate(job.postedAt);
+
+                return (
+                  <article
+                    key={job.slug}
+                    className="flex min-w-0 flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                        <BriefcaseBusiness size={19} aria-hidden="true" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-base font-semibold leading-6 text-zinc-950 dark:text-white">
+                          <Link
+                            href={`/jobs/${job.slug}`}
+                            className="rounded-sm hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:hover:text-blue-300"
+                          >
+                            {job.title}
+                          </Link>
+                        </h3>
+                        {job.company && (
+                          <p className="mt-1 truncate text-sm text-zinc-600 dark:text-zinc-300">
+                            {job.company}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+                      {place && (
+                        <p className="flex items-start gap-2">
+                          <MapPin
+                            size={16}
+                            aria-hidden="true"
+                            className="mt-0.5 shrink-0 text-zinc-400"
+                          />
+                          <span>{place}</span>
+                        </p>
+                      )}
+                      {salaryText(job) && (
+                        <p className="font-semibold text-zinc-900 dark:text-white">
+                          {salaryText(job)}
+                        </p>
+                      )}
+                      {(job.experience || job.jobType) && (
+                        <p>
+                          {[job.experience, job.jobType]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                    {job.description && (
+                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                        {job.description}
+                      </p>
+                    )}
+                    {job.skills.length > 0 && (
+                      <ul
+                        aria-label="Required skills"
+                        className="mt-3 flex flex-wrap gap-1.5"
+                      >
+                        {job.skills.slice(0, 4).map((skill) => (
+                          <li
+                            key={skill}
+                            className="rounded-md bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                          >
+                            {skill}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+                      {date && (
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Posted {date}
+                        </p>
+                      )}
+                      <AppJobAction className="ml-auto inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900">
+                        Know more or apply in app
+                      </AppJobAction>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           ) : (
-            <div className="text-center py-40 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-[3rem] bg-zinc-50/50">
-              <Filter className="mx-auto mb-6 text-zinc-400" size={32} />
-              <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">No jobs found</h3>
+            <div className="rounded-xl border border-zinc-200 bg-white px-5 py-10 text-center dark:border-zinc-800 dark:bg-zinc-900 sm:px-8">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-300">
+                <Search size={21} aria-hidden="true" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-zinc-900 dark:text-white">
+                No opportunities match these filters
+              </h3>
+              <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                Try a different skill or location, or clear the filters to see
+                all available listings.
+              </p>
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              >
+                <X size={16} aria-hidden="true" />
+                Clear filters
+              </button>
             </div>
           )}
-        </div>
+
+          {pageCount > 1 && (
+            <nav
+              aria-label="Job listing pages"
+              className="mt-6 flex items-center justify-between gap-3"
+            >
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={currentPage <= 1}
+                className="inline-flex min-h-11 items-center rounded-lg border border-zinc-300 bg-white px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:focus-visible:ring-offset-zinc-950"
+              >
+                Previous
+              </button>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400" aria-live="polite">
+                Page {currentPage} of {pageCount}
+              </p>
+              <button
+                type="button"
+                onClick={() =>
+                  setPage((current) => Math.min(pageCount, current + 1))
+                }
+                disabled={currentPage >= pageCount}
+                className="inline-flex min-h-11 items-center rounded-lg border border-zinc-300 bg-white px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:focus-visible:ring-offset-zinc-950"
+              >
+                Next
+              </button>
+            </nav>
+          )}
+        </section>
+
+        <section
+          aria-labelledby="jobs-guide-heading"
+          className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800"
+        >
+          <h2
+            id="jobs-guide-heading"
+            className="text-lg font-semibold text-zinc-950 dark:text-white"
+          >
+            Find work based on your skills
+          </h2>
+          <p className="mt-2 max-w-4xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+            LabourSampark helps skilled workers, labour and contractors explore
+            job opportunities by trade and location. Listings may include
+            project work and ongoing roles in construction, maintenance,
+            interiors, fabrication and transport. Review the skills,
+            experience and location on each opportunity to find work relevant
+            to your profile.
+          </p>
+          <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+            LabourSampark also helps you{" "}
+            <Link
+              href="/labours"
+              className="font-medium text-blue-700 underline underline-offset-2 hover:text-blue-900 dark:text-blue-300 dark:hover:text-blue-200"
+            >
+              explore worker profiles
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/contractors"
+              className="font-medium text-blue-700 underline underline-offset-2 hover:text-blue-900 dark:text-blue-300 dark:hover:text-blue-200"
+            >
+              find contractors
+            </Link>
+            .
+          </p>
+          {categories.length > 0 && (
+            <nav aria-label="Popular job skills" className="mt-5">
+              <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                Browse popular skills
+              </h3>
+              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+                {categories.slice(0, 8).map((item) => {
+                  const params = new URLSearchParams({ skill: item });
+                  return (
+                    <li key={item}>
+                      <Link
+                        href={`/jobs?${params.toString()}`}
+                        className="text-sm text-blue-700 underline underline-offset-2 hover:text-blue-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:text-blue-300 dark:hover:text-blue-200"
+                      >
+                        {item} jobs
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          )}
+        </section>
       </div>
-    </main>
+    </div>
   );
 }

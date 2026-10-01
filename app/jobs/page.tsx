@@ -1,57 +1,114 @@
-import React, { Suspense } from "react";
-import Skeleton from "@/app/components/Skeleton";
-import { Briefcase } from "lucide-react";
-import SEOHead from "@/app/components/SEOHead";
+import type { Metadata } from "next";
+import { cache } from "react";
 import JobsClient from "./JobsClient";
+import { getOpenJobFeed } from "@/lib/jobs-data";
 
-// Server-side SEO data for crawlers
-const jobTitles = [
-  "Furniture Work (Modular Kitchen & Wardrobe)",
-  "Interior Wall Painting & Texture Work",
-  "Industrial Electrician (Warehouse Wiring)",
-  "Skilled Mason (Tile & Marble Installation)",
-  "Sofa Repairing & Upholstery Specialist",
-  "Structural Steel Fixer (Metro Project)"
-];
+export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Latest Construction & Furniture Jobs in India | LabourSampark",
-  description: "Explore high-paying jobs for carpenters, painters, electricians, and masons. Direct contact with contractors for furniture work and interior projects.",
-  keywords: ["furniture work", "carpenter jobs", "painting work", "electrician jobs", "masonry work", "labour jobs India"],
-};
+const title = "Jobs for Skilled Workers, Labour & Contractors | LabourSampark";
+const description =
+  "Find jobs for skilled workers, labour and contractors on LabourSampark. Search trade skills and locations to discover relevant work opportunities.";
+const siteUrl =
+  (process.env.NEXT_PUBLIC_SITE_URL || "https://laboursampark.com").replace(
+    /\/+$/,
+    "",
+  );
+const getCachedOpenJobFeed = cache(getOpenJobFeed);
 
-export default function JobsPage() {
+interface JobsPageProps {
+  searchParams: Promise<{
+    q?: string;
+    search?: string;
+    location?: string;
+    skill?: string;
+    experience?: string;
+    type?: string;
+    salary?: string;
+  }>;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title,
+    description,
+    keywords: [
+      "jobs for skilled workers",
+      "labour jobs",
+      "contractor jobs",
+      "trade jobs",
+      "job opportunities",
+      "LabourSampark",
+    ],
+    alternates: {
+      canonical: `${siteUrl}/jobs`,
+    },
+    robots: { index: true, follow: true },
+    openGraph: {
+      type: "website",
+      locale: "en_IN",
+      url: `${siteUrl}/jobs`,
+      siteName: "LabourSampark",
+      title,
+      description,
+      images: [
+        {
+          url: "/images/logo.jpg",
+          width: 1200,
+          height: 630,
+          alt: "LabourSampark job opportunities",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: ["/images/logo.jpg"],
+      creator: "@laboursampark",
+    },
+  };
+}
+
+export default async function JobsPage({ searchParams }: JobsPageProps) {
+  const [params, feed] = await Promise.all([
+    searchParams,
+    getCachedOpenJobFeed(),
+  ]);
   return (
     <>
-      <SEOHead 
-        title={metadata.title}
-        description={metadata.description}
-        keywords={metadata.keywords}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: siteUrl,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Jobs",
+                item: `${siteUrl}/jobs`,
+              },
+            ],
+          }).replace(/</g, "\\u003c"),
+        }}
       />
-      {/* Hidden container with job titles for SEO crawlers */}
-      <div className="sr-only" aria-hidden="true">
-        <h2>Available Job Opportunities:</h2>
-        <ul>
-          {jobTitles.map((title, index) => (
-            <li key={index}>{title}</li>
-          ))}
-        </ul>
-      </div>
-      
-      <Suspense fallback={
-        <main className="min-h-screen bg-white dark:bg-zinc-950 pt-16 md:pt-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="h-64 bg-zinc-100 dark:bg-zinc-800 rounded-3xl animate-pulse mb-8"></div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-96 bg-zinc-100 dark:bg-zinc-800 rounded-3xl animate-pulse"></div>
-              ))}
-            </div>
-          </div>
-        </main>
-      }>
-        <JobsClient />
-      </Suspense>
+      <JobsClient
+        jobs={feed.jobs}
+        feedError={feed.error}
+        initialQuery={params.q ?? params.search ?? ""}
+        initialLocation={params.location ?? ""}
+        initialCategory={params.skill ?? ""}
+        initialExperience={params.experience ?? ""}
+        initialJobType={params.type ?? ""}
+        initialSalary={params.salary ?? ""}
+      />
     </>
   );
 }
