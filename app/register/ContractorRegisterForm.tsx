@@ -9,6 +9,7 @@ import LocationSelector from "@/app/components/LocationSelector";
 import type { LocationData } from "@/lib/use-location";
 import dropdownsData from "@/data/dropdowns.json";
 import BusinessPicker from "@/app/components/common/BusinessPicker";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 const {
   teamSize: TEAM_SIZE,
@@ -22,6 +23,7 @@ interface ContractorRegisterFormProps {
 export default function ContractorRegisterForm({
   registrationRole = "contractor",
 }: ContractorRegisterFormProps) {
+  const { t } = useLanguage();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { loading, success, error, message } = useAppSelector(
@@ -324,7 +326,7 @@ export default function ContractorRegisterForm({
             onClick={() => router.push("/")}
             className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold text-sm transition-colors group"
           >
-            ← Back to Home
+            ← {t("back_to_home", {}, "Back to Home")}
           </button>
         </div>
 
@@ -332,13 +334,13 @@ export default function ContractorRegisterForm({
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-3">
             {registrationRole === "sub-contractor"
-              ? "Join as Sub-Contractor"
-              : "Register Your Business"}
+              ? t("register_as_subcontractor", {}, "Join as Sub-Contractor")
+              : t("register_as_contractor", {}, "Register Your Business")}
           </h1>
           <p className="text-sm md:text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
             {registrationRole === "sub-contractor"
-              ? "Create your sub-contractor profile and start getting project work."
-              : "Get connected with skilled workers and grow your business today."}
+              ? t("subcontractor_role_description", {}, "Create your sub-contractor profile and start getting project work.")
+              : t("contractor_role_description", {}, "Get connected with skilled workers and grow your business today.")}
           </p>
         </div>
 
@@ -349,11 +351,11 @@ export default function ContractorRegisterForm({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
-                  Full Name *
+                  {t("full_name", {}, "Full Name *")}
                 </label>
                 <input
                   type="text"
-                  placeholder="Your full name"
+                  placeholder={t("full_name_hint", {}, "Your full name")}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
@@ -361,11 +363,11 @@ export default function ContractorRegisterForm({
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
-                  Company Name *
+                  {t("business_name", {}, "Company Name *")}
                 </label>
                 <input
                   type="text"
-                  placeholder="Your Company name"
+                  placeholder={t("business_name_hint", {}, "Your Company name")}
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
@@ -373,11 +375,11 @@ export default function ContractorRegisterForm({
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
-                  Mobile Number *
+                  {t("mobile_number", {}, "Mobile Number *")}
                 </label>
                 <input
                   type="tel"
-                  placeholder="+91 XXXXXXXXXX"
+                  placeholder={t("mobile_number_hint", {}, "+91 XXXXXXXXXX")}
                   value={mobile}
                   onChange={(e) => setMobileNumber(e.target.value)}
                   className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
@@ -389,11 +391,11 @@ export default function ContractorRegisterForm({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
-                  Email ID *
+                  {t("email", {}, "Email ID *")}
                 </label>
                 <input
                   type="email"
-                  placeholder="your.email@example.com"
+                  placeholder={t("email_hint", {}, "your.email@example.com")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
@@ -401,12 +403,12 @@ export default function ContractorRegisterForm({
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
-                  Password *
+                  {t("password", {}, "Password *")}
                 </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter password"
+                    placeholder={t("password_hint", {}, "Enter password")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full px-4 py-2.5 pr-12 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
@@ -453,7 +455,7 @@ export default function ContractorRegisterForm({
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Location (City / Area) *
+                  {t("location", {}, "Location (City / Area) *")}
                 </label>
                 <LocationSelector onLocationChange={setLocation} />
               </div>
@@ -463,11 +465,11 @@ export default function ContractorRegisterForm({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Registration Number / GST Number *
+                  {t("business_reg_number", {}, "Registration Number / GST Number *")}
                 </label>
                 <input
                   type="text"
-                  placeholder="Business registration / GST Number"
+                  placeholder={t("business_reg_number_hint", {}, "Business registration / GST Number")}
                   value={registrationNumber}
                   onChange={(e) => setRegistrationNumber(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
@@ -478,7 +480,7 @@ export default function ContractorRegisterForm({
             {/* Business Types Picker */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Business Types (Select Multiple) *
+                {t("business_types", {}, "Business Types (Select Multiple) *")}
               </label>
               <BusinessPicker
                 selectedIds={selectedBusinessTypes}
@@ -492,14 +494,14 @@ export default function ContractorRegisterForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Experience Range *
+                  {t("experience_range", {}, "Experience Range *")}
                 </label>
                 <select
                   value={experienceRange}
                   onChange={(e) => setExperienceRange(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">Select experience</option>
+                  <option value="">{t("experience_years", {}, "Select experience")}</option>
                   {EXPERIENCE_RANGE.map((exp) => (
                     <option key={exp} value={exp}>
                       {exp}
@@ -509,14 +511,14 @@ export default function ContractorRegisterForm({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Team Size *
+                  {t("team_size", {}, "Team Size *")}
                 </label>
                 <select
                   value={teamSize}
                   onChange={(e) => setTeamSize(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">Select team size</option>
+                  <option value="">{t("team_size", {}, "Select team size")}</option>
                   {TEAM_SIZE.map((size) => (
                     <option key={size} value={size}>
                       {size}
@@ -529,7 +531,7 @@ export default function ContractorRegisterForm({
             {/* About Business */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                About Your Business
+                {t("about_your_business", {}, "About Your Business")}
               </label>
               <textarea
                 placeholder="Describe your business, specialties, and what makes you unique..."
@@ -545,7 +547,7 @@ export default function ContractorRegisterForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Business License / Insurance
+                  {t("business_license", {}, "Business License / Insurance")}
                 </label>
                 <div className="relative">
                   <input
@@ -565,7 +567,7 @@ export default function ContractorRegisterForm({
                 </div>
                 {uploadStatus.businessLicense === "success" && (
                   <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                    ✓ File uploaded successfully
+                    ✓ {t("company_logo_uploaded", {}, "File uploaded successfully")}
                   </p>
                 )}
                 {uploadErrors.businessLicense && (
@@ -576,7 +578,7 @@ export default function ContractorRegisterForm({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Company Logo / Photo
+                  {t("photos", {}, "Company Logo / Photo")}
                 </label>
                 <div className="flex gap-4 items-start">
                   {/* Upload Section */}
@@ -598,7 +600,7 @@ export default function ContractorRegisterForm({
                       )}
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Click to select image • Crop and resize • Max 10MB
+                      {t("tap_to_upload_license", {}, "Click to select image • Crop and resize • Max 10MB")}
                     </p>
                   </div>
 
@@ -620,7 +622,7 @@ export default function ContractorRegisterForm({
                         />
                       </div>
                       <p className="text-xs font-semibold text-green-600 dark:text-green-400">
-                        ✓ Uploaded
+                        ✓ {t("uploaded", {}, "Uploaded")}
                       </p>
                     </div>
                   )}
@@ -630,7 +632,7 @@ export default function ContractorRegisterForm({
                 <div className="mt-2 space-y-1">
                   {uploadStatus.companyLogo === "success" && (
                     <p className="text-xs text-green-600 dark:text-green-400">
-                      ✓ Logo uploaded successfully
+                      ✓ {t("company_logo_uploaded", {}, "Logo uploaded successfully")}
                     </p>
                   )}
                   {uploadErrors.companyLogo && (
@@ -655,7 +657,7 @@ export default function ContractorRegisterForm({
                 htmlFor="terms"
                 className="text-xs text-gray-700 dark:text-gray-300"
               >
-                I agree to the Terms & Conditions and Privacy Policy
+                {t("accept_terms_text", {}, "I agree to the Terms & Conditions and Privacy Policy")}
               </label>
             </div>
 
@@ -667,7 +669,7 @@ export default function ContractorRegisterForm({
                 disabled={loading}
                 className="flex-1 px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                {t("common.cancel", {}, "Cancel")}
               </button>
               <button
                 type="submit"
@@ -677,10 +679,10 @@ export default function ContractorRegisterForm({
                 {loading ? (
                   <>
                     <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    Creating Account...
+                    {t("creating_account", {}, "Creating Account...")}
                   </>
                 ) : (
-                  "Create Account"
+                  t("create_account", {}, "Create Account")
                 )}
               </button>
             </div>
@@ -690,12 +692,12 @@ export default function ContractorRegisterForm({
         {/* Footer Info */}
         <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900 rounded-lg text-center">
           <p className="text-xs text-gray-700 dark:text-gray-300">
-            Already have an account?{" "}
+            {t("dont_have_an_account", {}, "Already have an account?")}{" "}
             <button
               onClick={() => router.push("/login?type=contractor")}
               className="text-indigo-600 dark:text-indigo-300 font-bold hover:underline"
             >
-              Sign in here
+              {t("sign_in", {}, "Sign in here")}
             </button>
           </p>
         </div>

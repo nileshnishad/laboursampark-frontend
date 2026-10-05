@@ -11,6 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchSkills, skillIdsToSearchText } from "@/store/slices/skillsSlice";
 import { fetchBusinesses, businessIdsToSearchText } from "@/store/slices/businessesSlice";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 type Contractor = {
   _id: string;
@@ -43,6 +44,7 @@ type Contractor = {
 
 function AllContractorsContent() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +61,7 @@ function AllContractorsContent() {
   }, [dispatch]);
 
   const handleGuestViewAttempt = () => {
-    showInfoToast("For viewing profile details, please login first.");
+    showInfoToast(t("contractor.guestViewPrompt", {}, "For viewing profile details, please login first."));
     router.push("/login");
   };
 
@@ -137,10 +139,10 @@ function AllContractorsContent() {
               </button>
               <div>
                 <h1 className="text-xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tight">
-                  Verified <span className="text-green-600">Contractors</span>
+                  {t("contractor.verifiedContractors", {}, "Verified Contractors")}
                 </h1>
                 <p className="text-zinc-500 text-xs dark:text-zinc-400 font-medium mt-1">
-                  Browse verified professionals for your next project.
+                  {t("contractor.contractorsSubtitle", {}, "Browse verified professionals for your next project.")}
                 </p>
               </div>
             </div>
@@ -149,7 +151,7 @@ function AllContractorsContent() {
               <UnifiedSearchInput
                 value={searchQuery}
                 onChange={setSearchQuery}
-                placeholder="Search name, location, or skills..."
+                placeholder={t("contractor.searchPlaceholder", {}, "Search name, location, or skills...")}
               />
             </div>
           </div>
@@ -169,7 +171,7 @@ function AllContractorsContent() {
             {/* Error State */}
             {error && !loading && (
               <div className="flex justify-center items-center py-20">
-                <div className="text-red-600 dark:text-red-400">Error: {error}</div>
+                <div className="text-red-600 dark:text-red-400">{t("common.error", {}, "Error")}: {error}</div>
               </div>
             )}
 
@@ -191,7 +193,7 @@ function AllContractorsContent() {
             {!loading && !error && filteredContractors.length === 0 && (
               <div className="text-center py-20 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl">
                 <p className="text-zinc-500 font-medium">
-                  {searchQuery.trim() ? "No contractors match your search." : "No contractors found."}
+                  {searchQuery.trim() ? t("contractor.noContractorsMatch", {}, "No contractors match your search.") : t("contractor.noContractorsFound", {}, "No contractors found.")}
                 </p>
               </div>
             )}

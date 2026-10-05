@@ -9,10 +9,12 @@ import ImageCropperModal from "@/app/components/ImageCropperModal";
 import LocationSelector from "@/app/components/LocationSelector";
 import type { LocationData } from "@/lib/use-location";
 import dropdownsData from "@/data/dropdowns.json";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 const { experienceRange: EXPERIENCE_RANGE } = dropdownsData.labour;
 
 export default function LabourRegisterForm() {
+  const { t } = useLanguage();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { loading, success, error, message } = useAppSelector(
@@ -202,10 +204,10 @@ export default function LabourRegisterForm() {
         {/* Header */}
         <div className="text-center mb-2">
           <h1 className="text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white mb-2">
-            Join as Labour
+            {t("register_as_labour", {}, "Join as Labour")}
           </h1>
           <p className="text-xs md:text-sm text-gray-700 dark:text-gray-300">
-            Create your profile and get work opportunities
+            {t("labour_role_description", {}, "Create your profile and get work opportunities")}
           </p>
         </div>
 
@@ -216,7 +218,7 @@ export default function LabourRegisterForm() {
             <div className="flex flex-col items-center gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
               <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">1</span>
-                Profile Photo
+                {t("photos", {}, "Profile Photo")}
               </h2>
 
               {/* Photo Preview or Upload Area */}
@@ -239,7 +241,7 @@ export default function LabourRegisterForm() {
                     </div>
                     <div className="flex gap-1 mt-2">
                       <label className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors cursor-pointer flex items-center gap-2">
-                        <span>📷 Change Photo</span>
+                        <span>📷 {t("company_logo_uploaded", {}, "Change Photo")}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -249,14 +251,14 @@ export default function LabourRegisterForm() {
                         />
                       </label>
                     </div>
-                    <p className="text-xs text-green-600 dark:text-green-400 font-semibold mt-1">✓ Photo Uploaded</p>
+                    <p className="text-xs text-green-600 dark:text-green-400 font-semibold mt-1">✓ {t("company_logo_uploaded", {}, "Photo Uploaded")}</p>
                   </div>
                 ) : (
                   <label className="w-full cursor-pointer">
                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-full w-22 h-22 mx-auto flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                       <div className="text-center">
                         <span className="text-xl block mb-1">📷</span>
-                        <span className="text-xs text-gray-600 dark:text-gray-400">Add Photo</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-400">{t("tap_to_add_company_logo", {}, "Add Photo")}</span>
                       </div>
                     </div>
                     <input
@@ -274,7 +276,7 @@ export default function LabourRegisterForm() {
                   {uploadStatus === "uploading" && (
                     <div className="flex items-center justify-center gap-2">
                       <span className="inline-block w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
-                      <p className="text-xs text-blue-600 dark:text-blue-400">Uploading...</p>
+                      <p className="text-xs text-blue-600 dark:text-blue-400">{t("common.loading", {}, "Uploading...")}</p>
                     </div>
                   )}
                   {uploadError && (
@@ -289,17 +291,17 @@ export default function LabourRegisterForm() {
 
             {/* SECTION 2: Personal Details */}
             <div>
-              <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">Personal Details</h2>
+              <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">{t("personal_information", {}, "Personal Details")}</h2>
 
               {/* Row 1: Name, Age, Mobile */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Full Name *
+                    {t("full_name", {}, "Full Name *")}
                   </label>
                   <input
                     type="text"
-                    placeholder="Your name"
+                    placeholder={t("full_name_hint", {}, "Your name")}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
@@ -307,7 +309,7 @@ export default function LabourRegisterForm() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Age *
+                    {t("date_of_birth", {}, "Age *")}
                   </label>
                   <input
                     type="number"
@@ -319,11 +321,11 @@ export default function LabourRegisterForm() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Mobile Number *
+                    {t("mobile_number", {}, "Mobile Number *")}
                   </label>
                   <input
                     type="tel"
-                    placeholder="+91 XXXXXXXXXX"
+                    placeholder={t("mobile_number_hint", {}, "+91 XXXXXXXXXX")}
                     value={mobileNumber}
                     onChange={(e) => setMobileNumber(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
@@ -335,11 +337,11 @@ export default function LabourRegisterForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Email ID *
+                    {t("email", {}, "Email ID *")}
                   </label>
                   <input
                     type="email"
-                    placeholder="your.email@example.com"
+                    placeholder={t("email_hint", {}, "your.email@example.com")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
@@ -347,12 +349,12 @@ export default function LabourRegisterForm() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Password *
+                    {t("password", {}, "Password *")}
                   </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter password"
+                      placeholder={t("password_hint", {}, "Enter password")}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-3 py-2 pr-10 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
@@ -396,20 +398,20 @@ export default function LabourRegisterForm() {
               </div>            </div>
             {/* SECTION 3: Professional Details */}
             <div>
-              <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">Professional Details</h2>
+              <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">{t("business_information", {}, "Professional Details")}</h2>
 
               {/* Row: Experience & Location */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Years of Experience *
+                    {t("experience_years", {}, "Years of Experience *")}
                   </label>
                   <select
                     value={experience}
                     onChange={(e) => setExperience(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none dark:bg-gray-700 dark:text-white"
                   >
-                    <option>Select experience</option>
+                    <option>{t("experience_years", {}, "Select experience")}</option>
                     {EXPERIENCE_RANGE.map((exp) => (
                       <option key={exp} value={exp}>
                         {exp}
@@ -420,7 +422,7 @@ export default function LabourRegisterForm() {
 
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Your Location *{" "}
+                    {t("location", {}, "Your Location *")}{" "}
                     <span className="text-red-500 text-xs">
                       (Auto-detect available)
                     </span>
@@ -436,7 +438,7 @@ export default function LabourRegisterForm() {
               {/* Skills */}
               <div data-dropdown="skills" className="mb-3">
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Select Skills *
+                  {t("select_skills", {}, "Select Skills *")}
                 </label>
                 <SkillsPicker
                   selectedIds={selectedSkills}
@@ -448,10 +450,10 @@ export default function LabourRegisterForm() {
               {/* Bio */}
               <div className="mt-3">
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  About You / Bio
+                  {t("bio_hint", {}, "About You / Bio")}
                 </label>
                 <textarea
-                  placeholder="Tell about your experience and expertise..."
+                  placeholder={t("bio_hint", {}, "Tell about your experience and expertise...")}
                   rows={2}
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
@@ -474,7 +476,7 @@ export default function LabourRegisterForm() {
                   htmlFor="terms"
                   className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed cursor-pointer"
                 >
-                  I agree to the <span className="text-blue-600 dark:text-blue-400 font-semibold">Terms & Conditions</span> and <span className="text-blue-600 dark:text-blue-400 font-semibold">Privacy Policy</span>
+                  {t("accept_terms_text", {}, "I agree to the Terms & Conditions and Privacy Policy")}
                 </label>
               </div>
 
@@ -486,7 +488,7 @@ export default function LabourRegisterForm() {
                   disabled={loading}
                   className="flex-1 px-3 py-2 border-2 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cancel
+                  {t("common.cancel", {}, "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -496,10 +498,10 @@ export default function LabourRegisterForm() {
                   {loading ? (
                     <>
                       <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                      Creating Account...
+                      {t("creating_account", {}, "Creating Account...")}
                     </>
                   ) : (
-                    "Create Account"
+                    t("create_account", {}, "Create Account")
                   )}
                 </button>
               </div>
@@ -510,12 +512,12 @@ export default function LabourRegisterForm() {
         {/* Footer Info */}
         <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900 rounded-lg text-center">
           <p className="text-xs text-gray-700 dark:text-gray-300">
-            Already have an account?{" "}
+            {t("dont_have_an_account", {}, "Already have an account?")}{" "}
             <button
               onClick={() => router.push("/login?type=labour")}
               className="text-blue-600 dark:text-blue-300 font-bold hover:underline"
             >
-              Sign in here
+              {t("sign_in", {}, "Sign in here")}
             </button>
           </p>
         </div>

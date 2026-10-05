@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { fetchPaymentStatus, type PaymentStatusResponse } from "@/lib/payu-service";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 function PaymentSuccessContent() {
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [visible, setVisible] = useState(false);
@@ -21,7 +23,7 @@ function PaymentSuccessContent() {
   const payuStatus = searchParams.get("status") || "success";
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 100);
+    const tTimer = setTimeout(() => setVisible(true), 100);
     let deepLinkTimer: ReturnType<typeof setTimeout> | null = null;
 
     if (searchParams.get("source") === "mobile") {
@@ -46,7 +48,7 @@ function PaymentSuccessContent() {
     }
 
     return () => {
-      clearTimeout(t);
+      clearTimeout(tTimer);
       if (deepLinkTimer) {
         clearTimeout(deepLinkTimer);
       }
@@ -95,17 +97,17 @@ function PaymentSuccessContent() {
 
         {/* Heading */}
         <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-1">
-          Payment Successful!
+          {t("payment_successful_title", "Payment Successful!")}
         </h1>
         <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-5">
-          Your payment has been processed. Your profile will be visible shortly.
+          {t("payment_successful_desc", "Your payment has been processed. Your profile will be visible shortly.")}
         </p>
 
         {/* Backend status verification */}
         {statusLoading && (
           <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
             <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-            Verifying payment with server...
+            {t("verifying_with_server", "Verifying payment with server...")}
           </div>
         )}
         {statusError && (
@@ -118,7 +120,7 @@ function PaymentSuccessContent() {
         <div className="bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800 p-4 mb-6 space-y-2">
           {displayTxnId && (
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Transaction ID</span>
+              <span className="text-gray-500 dark:text-gray-400">{t("transaction_id", "Transaction ID")}</span>
               <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[55%] text-right">
                 {displayTxnId}
               </span>
@@ -126,7 +128,7 @@ function PaymentSuccessContent() {
           )}
           {(statusData?.paymentId || mihpayid) && (
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Payment ID</span>
+              <span className="text-gray-500 dark:text-gray-400">{t("payment_id", "Payment ID")}</span>
               <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[55%] text-right">
                 {statusData?.paymentId || mihpayid}
               </span>
@@ -134,7 +136,7 @@ function PaymentSuccessContent() {
           )}
           {displayAmount && (
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Amount Paid</span>
+              <span className="text-gray-500 dark:text-gray-400">{t("amount_paid", "Amount Paid")}</span>
               <span className="font-semibold text-green-700 dark:text-green-400">
                 {displayAmount}
               </span>
@@ -142,14 +144,14 @@ function PaymentSuccessContent() {
           )}
           {displayProduct && (
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Product</span>
+              <span className="text-gray-500 dark:text-gray-400">{t("product", "Product")}</span>
               <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[55%] text-right">
                 {displayProduct}
               </span>
             </div>
           )}
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Status</span>
+            <span className="text-gray-500 dark:text-gray-400">{t("status", "Status")}</span>
             <span className="font-semibold text-green-600 dark:text-green-400 capitalize">
               {displayStatus}
             </span>
@@ -158,7 +160,7 @@ function PaymentSuccessContent() {
             <div className="flex items-center gap-1.5 pt-1">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
               <span className="text-xs text-green-600 dark:text-green-400">
-                Verified by server
+                {t("verified_by_server", "Verified by server")}
               </span>
             </div>
           )}
@@ -166,7 +168,7 @@ function PaymentSuccessContent() {
 
         {/* Note */}
         <p className="text-xs text-center text-gray-400 dark:text-gray-500 mb-5">
-          A confirmation will be reflected on your profile within a few minutes.
+          {t("confirmation_reflected_notice", "A confirmation will be reflected on your profile within a few minutes.")}
         </p>
 
         {/* Actions */}
@@ -174,7 +176,7 @@ function PaymentSuccessContent() {
           onClick={handleGoToDashboard}
           className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-sm transition-colors"
         >
-          Go to Dashboard
+          {t("go_to_dashboard", "Go to Dashboard")}
         </button>
       </div>
     </div>

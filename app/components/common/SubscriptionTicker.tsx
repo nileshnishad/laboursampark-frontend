@@ -3,12 +3,14 @@ import { useRouter, useParams } from "next/navigation";
 import { apiGet } from "@/lib/api-service";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 interface SubscriptionTickerProps {
   userType: "labour" | "contractor" | "sub_contractor";
 }
 
 const SubscriptionTicker: React.FC<SubscriptionTickerProps> = ({ userType }) => {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -21,9 +23,6 @@ const SubscriptionTicker: React.FC<SubscriptionTickerProps> = ({ userType }) => 
   if (user?.fullName) {
     username = user.fullName.trim().toLowerCase().replace(/\s+/g, "-");
   }
-
-  console.log("user",user);
-  
 
   const handlePayNow = async () => {
     setLoading(true);
@@ -44,13 +43,13 @@ const SubscriptionTicker: React.FC<SubscriptionTickerProps> = ({ userType }) => 
 
   return (
     <div className="text-xs sm:text-md w-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-yellow-900 font-bold py-2 px-4 text-center animate-pulse flex items-center justify-center gap-2">
-      <span>⚠️ Your profile is hidden. Pay your subscription to get full access and visibility!</span>
+      <span>⚠️ {t("profile_hidden", {}, "Your profile is hidden. Pay your subscription to get full access and visibility!")}</span>
       <button
         onClick={handlePayNow}
         className="px-4 py-1 bg-blue-700 text-xs text-white rounded-full font-bold hover:bg-blue-800 transition disabled:opacity-60"
         disabled={loading}
       >
-        {loading ? "Loading..." : "Pay Now"}
+        {loading ? t("common.loading", {}, "Loading...") : t("subscribe_now", {}, "Pay Now")}
       </button>
       {error && <span className="ml-1 text-red-700 text-xs font-normal">{error}</span>}
     </div>

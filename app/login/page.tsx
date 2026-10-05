@@ -8,10 +8,12 @@ import type { LoginPayload } from "@/store/slices/authSlice";
 import { buildUserDashboardPath } from "@/lib/user-route";
 import { apiPost } from "@/lib/api-service";
 import { showErrorToast, showSuccessToast } from "@/lib/toast-utils";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, success, user } = useSelector((state: RootState) => state.auth);
 
@@ -138,17 +140,17 @@ function LoginContent() {
             className="inline-flex items-center gap-2 text-gray-700 dark:text-black-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold text-sm transition-colors group"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span>
-            Back to Home
+            {t("back_to_home", {}, "Back to Home")}
           </button>
         </div>
 
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-black mb-2">
-            Welcome Back
+            {t("welcome_back", {}, "Welcome Back")}
           </h1>
           <p className="text-sm md:text-base text-gray-700 dark:text-black-300">
-            Sign in to your account
+            {t("sign_in_to_your_account", {}, "Sign in to your account")}
           </p>
         </div>
 
@@ -161,11 +163,11 @@ function LoginContent() {
             {/* Email or Mobile Input */}
             <div>
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
-                Email or Mobile *
+                {t("email_or_mobile_number", {}, "Email or Mobile *")}
               </label>
               <input
                 type="text"
-                placeholder="your.email@example.com or +91 XXXXX XXXXX"
+                placeholder={t("email_or_mobile_hint", {}, "your.email@example.com or +91 XXXXX XXXXX")}
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
                 className={`w-full px-4 py-2.5 text-sm rounded-xl border ${
@@ -176,7 +178,7 @@ function LoginContent() {
               />
               {contact && !contactType && (
                 <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-                  Please enter a valid email or mobile number
+                  {t("valid_mobile_error", {}, "Please enter a valid email or mobile number")}
                 </p>
               )}
             </div>
@@ -196,7 +198,7 @@ function LoginContent() {
                   className="w-4 h-4 rounded border-gray-300 cursor-pointer"
                 />
                 <label htmlFor="useOTP" className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
-                  Use OTP instead of password
+                  {t("use_otp_option", {}, "Use OTP instead of password")}
                 </label>
               </div>
             )}
@@ -205,12 +207,12 @@ function LoginContent() {
             {contactType && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-200 mb-1.5 uppercase tracking-wider">
-                  {useOTP ? "OTP Code" : "Password"} *
+                  {useOTP ? "OTP Code" : t("password", {}, "Password")} *
                 </label>
                 {useOTP ? (
                   <input
                     type="text"
-                    placeholder="Enter 6-digit OTP"
+                    placeholder={t("enter_otp_hint", {}, "Enter 6-digit OTP")}
                     maxLength={6}
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
@@ -220,7 +222,7 @@ function LoginContent() {
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your security password"
+                      placeholder={t("password_hint", {}, "Enter your security password")}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-4 py-2.5 pr-12 text-sm rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white outline-none transition-all"
@@ -273,7 +275,7 @@ function LoginContent() {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 rounded cursor-pointer"
                 />
-                <span className="text-xs text-gray-700 dark:text-gray-300">Remember me</span>
+                <span className="text-xs text-gray-700 dark:text-gray-300">{t("remember_me", {}, "Remember me")}</span>
               </label>
               <button
                 type="button"
@@ -283,7 +285,7 @@ function LoginContent() {
                 }}
                 className="text-xs text-indigo-600 dark:text-indigo-300 hover:underline font-semibold"
               >
-                Forgot password?
+                {t("forgot_password", {}, "Forgot password?")}
               </button>
             </div>
 
@@ -293,7 +295,7 @@ function LoginContent() {
               disabled={loading || !contact || !contactType || (!password && !otp)}
               className="w-full px-4 py-2 bg-linear-to-r from-indigo-600 to-indigo-700 text-white rounded-lg font-semibold text-sm hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? t("signing_in", {}, "Signing in...") : t("sign_in", {}, "Sign In")}
             </button>
           </form>
 
@@ -318,12 +320,12 @@ function LoginContent() {
         {/* Footer Info */}
         <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900 rounded-lg text-center">
           <p className="text-xs text-gray-700 dark:text-gray-300">
-            Don't have an account?{" "}
+            {t("dont_have_an_account", {}, "Don't have an account?")}{" "}
             <button
               onClick={() => router.push("/register")}
               className="text-indigo-600 dark:text-indigo-300 font-bold hover:underline"
             >
-              Register here
+              {t("navigation.register", {}, "Register here")}
             </button>
           </p>
         </div>
@@ -335,9 +337,11 @@ function LoginContent() {
           <div className="w-full max-w-md rounded-xl bg-white dark:bg-gray-800 shadow-xl p-4 sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Forgot Password</h3>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                  {t("forgot_password", {}, "Forgot Password")}
+                </h3>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Enter your email to receive a password reset link.
+                  {t("forgot_password_instruction", {}, "Enter your email to receive a password reset link.")}
                 </p>
               </div>
               <button
@@ -346,13 +350,13 @@ function LoginContent() {
                 disabled={forgotLoading}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
               >
-                Close
+                {t("common.close", {}, "Close")}
               </button>
             </div>
 
             <div className="mt-4">
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Email Address
+                {t("common.email", {}, "Email Address")}
               </label>
               <input
                 type="email"
@@ -370,7 +374,7 @@ function LoginContent() {
                 disabled={forgotLoading}
                 className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white text-sm font-semibold disabled:opacity-60"
               >
-                Cancel
+                {t("common.cancel", {}, "Cancel")}
               </button>
               <button
                 type="button"
@@ -378,7 +382,7 @@ function LoginContent() {
                 disabled={forgotLoading || !forgotEmail.trim()}
                 className="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold disabled:opacity-60"
               >
-                {forgotLoading ? "Sending..." : "Send Link"}
+                {forgotLoading ? t("common.loading", {}, "Sending...") : t("send_reset_link", {}, "Send Link")}
               </button>
             </div>
           </div>

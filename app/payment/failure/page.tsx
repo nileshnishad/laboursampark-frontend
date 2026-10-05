@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { fetchPaymentStatus, type PaymentStatusResponse } from "@/lib/payu-service";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 function PaymentFailureContent() {
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [visible, setVisible] = useState(false);
@@ -24,7 +26,7 @@ function PaymentFailureContent() {
   const payuStatus = searchParams.get("status") || "failed";
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 100);
+    const tTimer = setTimeout(() => setVisible(true), 100);
     let deepLinkTimer: ReturnType<typeof setTimeout> | null = null;
 
     if (searchParams.get("source") === "mobile") {
@@ -49,7 +51,7 @@ function PaymentFailureContent() {
     }
 
     return () => {
-      clearTimeout(t);
+      clearTimeout(tTimer);
       if (deepLinkTimer) {
         clearTimeout(deepLinkTimer);
       }
@@ -71,7 +73,7 @@ function PaymentFailureContent() {
     errorMessage ||
     (statusData?.status && statusData.status !== "success"
       ? `Payment ${statusData.status}. Please try again.`
-      : "Your payment could not be processed. Please try again.");
+      : t("payment_failed_desc", "Your payment could not be processed. Please try again."));
 
   return (
     <div className="min-h-screen bg-gray-900/80 flex items-center justify-center p-4">
@@ -105,7 +107,7 @@ function PaymentFailureContent() {
 
         {/* Heading */}
         <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-1">
-          Payment Failed
+          {t("payment_failed_title", "Payment Failed")}
         </h1>
         <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-5">
           {displayError}
@@ -115,7 +117,7 @@ function PaymentFailureContent() {
         {statusLoading && (
           <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
             <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-            Checking payment status...
+            {t("checking_payment_status", "Checking payment status...")}
           </div>
         )}
         {statusError && (
@@ -129,7 +131,7 @@ function PaymentFailureContent() {
           <div className="bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 p-4 mb-5 space-y-2">
             {displayTxnId && (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Transaction ID</span>
+                <span className="text-gray-500 dark:text-gray-400">{t("transaction_id", "Transaction ID")}</span>
                 <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[55%] text-right">
                   {displayTxnId}
                 </span>
@@ -137,7 +139,7 @@ function PaymentFailureContent() {
             )}
             {statusData?.paymentId && (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Payment ID</span>
+                <span className="text-gray-500 dark:text-gray-400">{t("payment_id", "Payment ID")}</span>
                 <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[55%] text-right">
                   {statusData.paymentId}
                 </span>
@@ -145,12 +147,12 @@ function PaymentFailureContent() {
             )}
             {displayAmount && (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Amount</span>
+                <span className="text-gray-500 dark:text-gray-400">{t("amount", "Amount")}</span>
                 <span className="font-medium text-gray-800 dark:text-gray-200">{displayAmount}</span>
               </div>
             )}
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Status</span>
+              <span className="text-gray-500 dark:text-gray-400">{t("status", "Status")}</span>
               <span className="font-semibold text-red-600 dark:text-red-400 capitalize">
                 {displayStatus}
               </span>
@@ -159,7 +161,7 @@ function PaymentFailureContent() {
               <div className="flex items-center gap-1.5 pt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
                 <span className="text-xs text-blue-600 dark:text-blue-400">
-                  Verified by server
+                  {t("verified_by_server", "Verified by server")}
                 </span>
               </div>
             )}
@@ -171,8 +173,7 @@ function PaymentFailureContent() {
           <p className="text-xs text-yellow-700 dark:text-yellow-300 flex items-start gap-2">
             <span className="shrink-0">💡</span>
             <span>
-              If money was deducted from your account, it will be automatically refunded within 3–5
-              business days. Contact support if you need help.
+              {t("refund_notice", "If money was deducted from your account, it will be automatically refunded within 3–5 business days. Contact support if you need help.")}
             </span>
           </p>
         </div>
@@ -183,7 +184,7 @@ function PaymentFailureContent() {
             onClick={handleGoHome}
             className="w-full py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-xl font-semibold text-sm transition-colors"
           >
-            Go to Home
+            {t("go_home", "Go to Home")}
           </button>
         </div>
       </div>

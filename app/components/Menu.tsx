@@ -8,17 +8,18 @@ import { useLanguage } from "@/app/context/LanguageContext";
 import LanguageSelector from "./LanguageSelector";
 
 const sections = [
-  { id: "hero", label: "Home", path: "/" },
-  { id: "labours", label: "Labours", path: "/labours" },
-  { id: "contractors", label: "Contractors", path: "/contractors" },
-  { id: "jobs", label: "Jobs", path: "/jobs" },
-  { id: "about", label: "About", path: "/about" },
-  { id: "contact", label: "Contact", path: "/contact" },
+  { id: "hero", labelKey: "navigation.home", defaultLabel: "Home", path: "/" },
+  { id: "labours", labelKey: "navigation.labours", defaultLabel: "Labours", path: "/labours" },
+  { id: "contractors", labelKey: "navigation.contractors", defaultLabel: "Contractors", path: "/contractors" },
+  { id: "jobs", labelKey: "navigation.jobs", defaultLabel: "Jobs", path: "/jobs" },
+  { id: "about", labelKey: "navigation.about", defaultLabel: "About", path: "/about" },
+  { id: "contact", labelKey: "navigation.contact", defaultLabel: "Contact", path: "/contact" },
 ];
 
 export default function Menu() {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
   const { user } = useSelector((state: RootState) => state.auth);
   const [active, setActive] = useState("hero");
   const [open, setOpen] = useState(false);
@@ -120,7 +121,7 @@ export default function Menu() {
                     : "hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer"
                 }
               >
-                {section.label}
+                {t(section.labelKey, {}, section.defaultLabel)}
               </button>
             </li>
           ))}
@@ -135,14 +136,14 @@ export default function Menu() {
             onClick={() => router.push(buildUserDashboardPath(user))}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
           >
-            Dashboard
+            {t("navigation.dashboard", {}, "Dashboard")}
           </button>
         ) : (
           <button
             onClick={() => router.push("/login")}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
           >
-            Login
+            {t("navigation.login", {}, "Login")}
           </button>
         )}
       </div>
@@ -166,7 +167,7 @@ export default function Menu() {
                     : "hover:text-blue-600 dark:hover:text-blue-300 text-left w-full cursor-pointer"
                 }
               >
-                {section.label}
+                {t(section.labelKey, {}, section.defaultLabel)}
               </button>
             </li>
           ))}
@@ -188,7 +189,7 @@ export default function Menu() {
                 }}
                 className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors"
               >
-                Dashboard
+                {t("navigation.dashboard", {}, "Dashboard")}
               </button>
             ) : (
               <button
@@ -198,7 +199,7 @@ export default function Menu() {
                 }}
                 className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors"
               >
-                Login / Register
+                {t("navigation.loginRegister", {}, "Login / Register")}
               </button>
             )}
           </li>

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import ContractorProfileModal from "./ContractorProfileModal";
 import type { RootState } from "@/store/store";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 
 interface VisitingCardProps {
@@ -34,6 +35,7 @@ export default function VisitingCard({
   onViewProfile,
   className = "",
 }: VisitingCardProps) {
+  const { t } = useLanguage();
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [sending, setSending] = React.useState(false);
@@ -46,22 +48,22 @@ export default function VisitingCard({
 
   const name = contractor.fullName || contractor.name || "Business";
   const companyName = contractor.businessName || contractor.companyName || "";
-  let type = "Contractor";
+  let type = t("contractor_role_title", {}, "Contractor");
   if (contractor.userType === "sub_contractor") {
-    type = "Sub Contractor";
+    type = t("subcontractor_role_title", {}, "Sub Contractor");
   } else if (contractor.userType === "contractor") {
-    type = "Contractor";
+    type = t("contractor_role_title", {}, "Contractor");
   } else if (contractor.userType) {
     type = contractor.userType.charAt(0).toUpperCase() + contractor.userType.slice(1);
   }
-  const rawLocation = contractor.city || contractor.location || "Not specified";
-  let location = "Not specified";
+  const rawLocation = contractor.city || contractor.location || t("not_specified", {}, "Not specified");
+  let location = t("not_specified", {}, "Not specified");
   if (typeof rawLocation === "string") {
     location = rawLocation;
   } else if (typeof rawLocation === "object" && rawLocation !== null) {
     location = [rawLocation.address, rawLocation.city, rawLocation.state, rawLocation.pincode]
       .filter(Boolean)
-      .join(", ") || "Not specified";
+      .join(", ") || t("not_specified", {}, "Not specified");
   }
   const rating = contractor.rating || 0;
   const projects = contractor.completedJobs || contractor.projects || 0;
@@ -187,7 +189,7 @@ export default function VisitingCard({
                 onClick={handleViewProfile}
                 className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 flex items-center gap-1 uppercase tracking-tighter"
              >
-                BUSINESS PROFILE <ArrowRight className="h-3 w-3" />
+                {t("business_profile", {}, "BUSINESS PROFILE")} <ArrowRight className="h-3 w-3" />
              </button>
           </div>
         </div>

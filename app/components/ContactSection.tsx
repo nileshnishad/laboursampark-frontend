@@ -4,8 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { submitInquiry, resetInquiryState } from "@/store/slices/inquirySlice";
 import { showSuccessToast, showErrorToast, showWarningToast } from "@/lib/toast-utils";
 import type { AppDispatch, RootState } from "@/store/store";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 export default function ContactSection() {
+  const { t } = useLanguage();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, success, error } = useSelector(
     (state: RootState) => state.inquiry
@@ -152,8 +154,12 @@ export default function ContactSection() {
     <section id="contact" className="py-20 px-4 max-w-6xl mx-auto">
       {/* Header */}
       <div className="text-center mb-16">
-        <h2 className="text-4xl sm:text-5xl font-bold mb-4 text-blue-900 dark:text-white">Get In Touch</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+        <h2 className="text-4xl sm:text-5xl font-bold mb-4 text-blue-900 dark:text-white">
+          {t("get_in_touch", "Get In Touch")}
+        </h2>
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          {t("contact_desc", "Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.")}
+        </p>
       </div>
 
       {/* Contact Content */}
@@ -162,17 +168,17 @@ export default function ContactSection() {
         {[
           {
             icon: "📍",
-            title: "Address",
+            title: t("address", "Address"),
             content: "Mumbai city, Maharashtra, India"
           },
           {
             icon: "📞",
-            title: "Phone",
+            title: t("phone", "Phone"),
             content: "+91 9702701777"
           },
           {
             icon: "✉️",
-            title: "Email",
+            title: t("email", "Email"),
             content: "laboursampark@gmail.com"
           }
         ].map((item, idx) => (
@@ -188,12 +194,16 @@ export default function ContactSection() {
       <div className="grid md:grid-cols-2 gap-12">
         {/* Form */}
         <div>
-          <h3 className="text-2xl font-bold text-blue-900 dark:text-white mb-6">Send us a Message</h3>
+          <h3 className="text-2xl font-bold text-blue-900 dark:text-white mb-6">
+            {t("send_us_message", "Send us a Message")}
+          </h3>
 
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t("full_name", "Full Name")}
+              </label>
               <input
                 type="text"
                 name="name"
@@ -214,7 +224,9 @@ export default function ContactSection() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t("email_address", "Email Address")}
+              </label>
               <input
                 type="email"
                 name="email"
@@ -235,7 +247,9 @@ export default function ContactSection() {
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number (10 digits)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t("phone_number_digits", "Phone Number (10 digits)")}
+              </label>
               <input
                 type="tel"
                 name="phone"
@@ -252,13 +266,15 @@ export default function ContactSection() {
               {validationErrors.phone ? (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
               ) : formData.phone && (
-                <p className="text-gray-500 text-sm mt-1">{formData.phone.length}/10 digits</p>
+                <p className="text-gray-500 text-sm mt-1">{formData.phone.length}/10 {t("digits", "digits")}</p>
               )}
             </div>
 
             {/* Subject */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t("subject", "Subject")}
+              </label>
               <select
                 name="subject"
                 value={formData.subject}
@@ -270,12 +286,12 @@ export default function ContactSection() {
                 }`}
                 required
               >
-                <option value="">Select a subject</option>
-                <option value="general">General Inquiry</option>
-                <option value="support">Technical Support</option>
-                <option value="partnership">Partnership Opportunity</option>
-                <option value="feedback">Feedback & Suggestions</option>
-                <option value="other">Other</option>
+                <option value="">{t("select_subject", "Select a subject")}</option>
+                <option value="general">{t("general_inquiry", "General Inquiry")}</option>
+                <option value="support">{t("technical_support", "Technical Support")}</option>
+                <option value="partnership">{t("partnership_opportunity", "Partnership Opportunity")}</option>
+                <option value="feedback">{t("feedback_suggestions", "Feedback & Suggestions")}</option>
+                <option value="other">{t("other", "Other")}</option>
               </select>
               {validationErrors.subject && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.subject}</p>
@@ -285,7 +301,9 @@ export default function ContactSection() {
             {/* Message */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Message (minimum 50 characters)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t("message_min_chars", "Message (minimum 50 characters)")}
+                </label>
                 <span className={`text-sm font-medium ${
                   formData.message.trim().length >= 50
                     ? "text-green-600 dark:text-green-400"
@@ -298,7 +316,7 @@ export default function ContactSection() {
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Tell us what's on your mind... (at least 50 characters)"
+                placeholder={t("tell_us_placeholder", "Tell us what's on your mind... (at least 50 characters)")}
                 className={`w-full px-4 py-3 rounded-lg border dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none ${
                   validationErrors.message
                     ? "border-red-500 dark:border-red-400"
@@ -325,10 +343,10 @@ export default function ContactSection() {
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  Submitting...
+                  {t("submitting", "Submitting...")}
                 </span>
               ) : (
-                "Send Message"
+                t("send_message", "Send Message")
               )}
             </button>
           </form>
@@ -336,24 +354,26 @@ export default function ContactSection() {
 
         {/* Info Section */}
         <div>
-          <h3 className="text-2xl font-bold text-blue-900 dark:text-white mb-6">Why Contact Us?</h3>
+          <h3 className="text-2xl font-bold text-blue-900 dark:text-white mb-6">
+            {t("why_contact_us", "Why Contact Us?")}
+          </h3>
           <div className="space-y-4">
             {[
               {
-                title: "Support",
-                desc: "Need help with your account or have technical issues? We're here to assist."
+                title: t("support", "Support"),
+                desc: t("contact_support_desc", "Need help with your account or have technical issues? We're here to assist.")
               },
               {
-                title: "Partnerships",
-                desc: "Interested in collaborating with LabourSampark? Let's explore opportunities together."
+                title: t("partnerships", "Partnerships"),
+                desc: t("contact_partnerships_desc", "Interested in collaborating with LabourSampark? Let's explore opportunities together.")
               },
               {
-                title: "Feedback",
-                desc: "Your feedback helps us improve. Share your suggestions and ideas with us."
+                title: t("feedback", "Feedback"),
+                desc: t("contact_feedback_desc", "Your feedback helps us improve. Share your suggestions and ideas with us.")
               },
               {
-                title: "Inquiries",
-                desc: "Any questions about our services? Get answers directly from our team."
+                title: t("inquiries", "Inquiries"),
+                desc: t("contact_inquiries_desc", "Any questions about our services? Get answers directly from our team.")
               }
             ].map((item, idx) => (
               <div key={idx} className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border-l-4 border-blue-600">
@@ -365,8 +385,10 @@ export default function ContactSection() {
 
           {/* Response Time */}
           <div className="mt-8 bg-linear-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-6 border border-green-200 dark:border-green-700">
-            <h4 className="font-bold text-gray-800 dark:text-white mb-2">⏱️ Response Time</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">We typically respond to all inquiries within <strong>24 hours</strong>. For urgent matters, please call us directly.</p>
+            <h4 className="font-bold text-gray-800 dark:text-white mb-2">⏱️ {t("response_time", "Response Time")}</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {t("contact_response_time_note", "We typically respond to all inquiries within 24 hours. For urgent matters, please call us directly.")}
+            </p>
           </div>
         </div>
       </div>

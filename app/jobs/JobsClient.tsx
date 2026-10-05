@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { MarketplaceJob } from "@/lib/jobs-data";
 import AppJobAction from "./AppJobAction";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 const PAGE_SIZE = 12;
 
@@ -88,6 +89,7 @@ export default function JobsClient({
   initialJobType = "",
   initialSalary = "",
 }: JobsClientProps) {
+  const { t } = useLanguage();
   const [query, setQuery] = useState(initialQuery);
   const [location, setLocation] = useState(initialLocation);
   const [category, setCategory] = useState(initialCategory);
@@ -230,13 +232,13 @@ export default function JobsClient({
           <div className="max-w-3xl">
             <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
               <BriefcaseBusiness size={17} aria-hidden="true" />
-              LabourSampark Jobs
+              LabourSampark {t("navigation.jobs", {}, "Jobs")}
             </p>
             <h1
               id="jobs-heading"
               className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
             >
-              Find Jobs That Match Your Skills
+              {t("find_work_based_on_skills", {}, "Find Jobs That Match Your Skills")}
             </h1>
             <p className="mt-3 text-base leading-7 text-zinc-600 dark:text-zinc-300">
               Discover work opportunities related to your skills, trade and
@@ -251,7 +253,7 @@ export default function JobsClient({
             className="mt-6 grid gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-950 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)_auto] sm:p-4"
           >
             <label className="relative block">
-              <span className="sr-only">Search jobs, skills or trades</span>
+              <span className="sr-only">{t("search_labour_hint", {}, "Search jobs, skills or trades")}</span>
               <Search
                 size={18}
                 aria-hidden="true"
@@ -261,12 +263,12 @@ export default function JobsClient({
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search jobs, skills or trades"
+                placeholder={t("search_labour_hint", {}, "Search jobs, skills or trades")}
                 className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm text-zinc-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
               />
             </label>
             <label className="relative block">
-              <span className="sr-only">Location</span>
+              <span className="sr-only">{t("city_dropdown", {}, "City or state")}</span>
               <MapPin
                 size={18}
                 aria-hidden="true"
@@ -276,7 +278,7 @@ export default function JobsClient({
                 type="search"
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
-                placeholder="City or state"
+                placeholder={t("city_dropdown", {}, "City or state")}
                 className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm text-zinc-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
               />
             </label>
@@ -284,7 +286,7 @@ export default function JobsClient({
               type="submit"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-blue-700 px-5 text-sm font-semibold text-white transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
             >
-              Search jobs
+              {t("search_contractor", {}, "Search jobs")}
               <ChevronRight size={17} aria-hidden="true" />
             </button>
           </form>
@@ -308,7 +310,7 @@ export default function JobsClient({
                     }
                     className={filterSelectClass}
                   >
-                    <option value="">All skills</option>
+                    <option value="">{t("all_skills", {}, "All skills")}</option>
                     {categories.map((item) => (
                       <option key={item} value={item}>
                         {item}
@@ -331,7 +333,7 @@ export default function JobsClient({
                     }
                     className={filterSelectClass}
                   >
-                    <option value="">Any experience</option>
+                    <option value="">{t("any_experience", {}, "Any experience")}</option>
                     {experiences.map((item) => (
                       <option key={item} value={item}>
                         {item}
@@ -354,7 +356,7 @@ export default function JobsClient({
                     }
                     className={filterSelectClass}
                   >
-                    <option value="">Any job type</option>
+                    <option value="">{t("any_job_type", {}, "Any job type")}</option>
                     {jobTypes.map((item) => (
                       <option key={item} value={item}>
                         {item}
@@ -377,7 +379,7 @@ export default function JobsClient({
                     }
                     className={filterSelectClass}
                   >
-                    <option value="">Any pay range</option>
+                    <option value="">{t("any_pay_range", {}, "Any pay range")}</option>
                     {availableSalaryFilters.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
@@ -393,7 +395,7 @@ export default function JobsClient({
                   className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-zinc-600 underline underline-offset-2 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:text-zinc-300 dark:hover:text-blue-300"
                 >
                   <X size={15} aria-hidden="true" />
-                  Clear filters
+                  {t("clear_filters", {}, "Clear filters")}
                 </button>
               )}
             </div>
@@ -421,7 +423,7 @@ export default function JobsClient({
                 id="job-listings-heading"
                 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-2xl"
               >
-                {category ? `${category} opportunities` : "Open job opportunities"}
+                {category ? `${category} ${t("opportunities", {}, "opportunities")}` : t("open_job_opportunities", {}, "Open job opportunities")}
               </h2>
               <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
                 Browse skilled and trade work by role, experience and location.
@@ -429,7 +431,7 @@ export default function JobsClient({
             </div>
             <p className="text-sm text-zinc-500 dark:text-zinc-400" aria-live="polite">
               {filteredJobs.length}{" "}
-              {filteredJobs.length === 1 ? "opportunity" : "opportunities"}
+              {filteredJobs.length === 1 ? t("opportunity", {}, "opportunity") : t("opportunities", {}, "opportunities")}
             </p>
           </div>
 
@@ -513,11 +515,11 @@ export default function JobsClient({
                     <div className="mt-auto flex items-center justify-between gap-3 pt-5">
                       {date && (
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          Posted {date}
+                          {t("posted_on", {}, "Posted")} {date}
                         </p>
                       )}
                       <AppJobAction className="ml-auto inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900">
-                        Know more or apply in app
+                        {t("know_more_or_apply_in_app", {}, "Know more or apply in app")}
                       </AppJobAction>
                     </div>
                   </article>
@@ -530,11 +532,10 @@ export default function JobsClient({
                 <Search size={21} aria-hidden="true" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-zinc-900 dark:text-white">
-                No opportunities match these filters
+                {t("no_opportunities_match", {}, "No opportunities match these filters")}
               </h3>
               <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                Try a different skill or location, or clear the filters to see
-                all available listings.
+                {t("try_different_filter", {}, "Try a different skill or location, or clear the filters to see all available listings.")}
               </p>
               <button
                 type="button"
@@ -542,7 +543,7 @@ export default function JobsClient({
                 className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
               >
                 <X size={16} aria-hidden="true" />
-                Clear filters
+                {t("clear_filters", {}, "Clear filters")}
               </button>
             </div>
           )}
@@ -558,10 +559,10 @@ export default function JobsClient({
                 disabled={currentPage <= 1}
                 className="inline-flex min-h-11 items-center rounded-lg border border-zinc-300 bg-white px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:focus-visible:ring-offset-zinc-950"
               >
-                Previous
+                {t("previous", {}, "Previous")}
               </button>
               <p className="text-sm text-zinc-600 dark:text-zinc-400" aria-live="polite">
-                Page {currentPage} of {pageCount}
+                {t("page_of", { current: currentPage, total: pageCount }, `Page ${currentPage} of ${pageCount}`)}
               </p>
               <button
                 type="button"
@@ -571,7 +572,7 @@ export default function JobsClient({
                 disabled={currentPage >= pageCount}
                 className="inline-flex min-h-11 items-center rounded-lg border border-zinc-300 bg-white px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:focus-visible:ring-offset-zinc-950"
               >
-                Next
+                {t("next", {}, "Next")}
               </button>
             </nav>
           )}
@@ -585,7 +586,7 @@ export default function JobsClient({
             id="jobs-guide-heading"
             className="text-lg font-semibold text-zinc-950 dark:text-white"
           >
-            Find work based on your skills
+            {t("find_work_based_on_skills", {}, "Find work based on your skills")}
           </h2>
           <p className="mt-2 max-w-4xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">
             LabourSampark helps skilled workers, labour and contractors explore
@@ -615,7 +616,7 @@ export default function JobsClient({
           {categories.length > 0 && (
             <nav aria-label="Popular job skills" className="mt-5">
               <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                Browse popular skills
+                {t("browse_popular_skills", {}, "Browse popular skills")}
               </h3>
               <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
                 {categories.slice(0, 8).map((item) => {

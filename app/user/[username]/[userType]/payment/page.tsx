@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/authSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import { createPayULink, buildSubscriptionPayload, type PayULinkStatus } from "@/lib/payu-service";
+import { useLanguage } from "@/app/context/LanguageContext";
+import LanguageSelector from "@/app/components/LanguageSelector";
 
 type UserType = "labour" | "contractor" | "sub_contractor";
 
@@ -18,17 +20,18 @@ const normalizeUserType = (type: string): UserType => {
   return normalized === "contractor" ? "contractor" : "labour";
 };
 
-const getUserTypeLabel = (type: UserType): string => {
-  if (type === "labour") return "Labour";
-  if (type === "sub_contractor") return "Sub-Contractor";
-  return "Contractor";
-};
-
 export default function PaymentPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const params = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const getUserTypeLabel = (type: UserType): string => {
+    if (type === "labour") return t("labour", "Labour");
+    if (type === "sub_contractor") return t("sub_contractor", "Sub-Contractor");
+    return t("contractor", "Contractor");
+  };
 
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [payStatus, setPayStatus] = useState<PayULinkStatus>("idle");
@@ -43,7 +46,6 @@ export default function PaymentPage() {
   }
   const userType = normalizeUserType(params.userType as string);
   const userTypeLabel = getUserTypeLabel(userType);
-
 
   // Subscription plan state
   const [plan, setPlan] = useState<any>(null);
@@ -110,7 +112,7 @@ export default function PaymentPage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+        <p className="text-gray-600 dark:text-gray-300">{t("loading", "Loading...")}</p>
       </div>
     );
   }
@@ -118,14 +120,14 @@ export default function PaymentPage() {
   if (planLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <p className="text-gray-600 dark:text-gray-300">Loading subscription plan...</p>
+        <p className="text-gray-600 dark:text-gray-300">{t("loading_plan", "Loading subscription plan...")}</p>
       </div>
     );
   }
   if (planError || !plan) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <p className="text-red-600 dark:text-red-400">{planError || "Could not load plan."}</p>
+        <p className="text-red-600 dark:text-red-400">{planError || t("could_not_load_plan", "Could not load plan.")}</p>
       </div>
     );
   }
@@ -134,6 +136,25 @@ export default function PaymentPage() {
   const duration = plan?.durationDays || 90;
   const price = plan?.price || 0;
   const pricePerDay = price && duration ? (price / duration).toFixed(2) : "-";
+
+  const getTranslatedFeature = (feat: string): string => {
+    switch (feat) {
+      case "Basic Job Access": return t("basic_job_access", "Basic Job Access");
+      case "Limited Contractor Connections": return t("limited_contractor_connections", "Limited Contractor Connections");
+      case "Profile Listing": return t("profile_listing", "Profile Listing");
+      case "Support Access": return t("support_access", "Support Access");
+      case "Post Small Projects": return t("post_small_projects", "Post Small Projects");
+      case "Connect with Labour": return t("connect_with_labour", "Connect with Labour");
+      case "Basic Analytics": return t("basic_analytics", "Basic Analytics");
+      case "Priority Listing": return t("priority_listing", "Priority Listing");
+      case "Unlimited Project Posting": return t("unlimited_project_posting", "Unlimited Project Posting");
+      case "Direct Labour Hiring": return t("direct_labour_hiring", "Direct Labour Hiring");
+      case "Advanced Analytics": return t("advanced_analytics", "Advanced Analytics");
+      case "Priority Support": return t("priority_support", "Priority Support");
+      case "Verified Badge": return t("verified_badge", "Verified Badge");
+      default: return feat;
+    }
+  };
 
   // UI config for each user type
   const planUI = {
@@ -194,9 +215,16 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-white dark:from-yellow-900/10 dark:to-gray-900 flex flex-col items-center justify-center py-8">
-      <header className="w-full max-w-2xl mx-auto mb-6">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-center text-yellow-900 dark:text-yellow-100 tracking-tight mb-1">Subscription Plan</h1>
-        <p className="text-center text-gray-700 dark:text-gray-200 text-sm mb-2">Upgrade your profile and unlock all features!</p>
+      <header className="w-full max-w-2xl mx-auto mb-6 px-4">
+        <div className="flex justify-end mb-2">
+          <LanguageSelector compact />
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-center text-yellow-900 dark:text-yellow-100 tracking-tight mb-1">
+          {t("subscription_plan", "Subscription Plan")}
+        </h1>
+        <p className="text-center text-gray-700 dark:text-gray-200 text-sm mb-2">
+          {t("upgrade_profile_desc", "Upgrade your profile and unlock all features!")}
+        </p>
       </header>
       <main className="w-full max-w-md mx-auto p-3 ">
         <div className={`rounded-2xl shadow-xl border-2 ${ui.border} ${ui.bg} bg-white dark:bg-gray-800 p-0 flex flex-col items-center relative w-full max-w-md sm:max-w-lg mx-auto`}>
@@ -213,14 +241,18 @@ export default function PaymentPage() {
               <div className="mb-1 sm:mb-2">{ui.icon}</div>
               <div className="text-xs text-gray-500 mb-1 sm:mb-2">{fullName}</div>
               <div className={`text-2xl sm:text-3xl font-extrabold mb-0.5 sm:mb-1 text-${ui.color}-700 dark:text-${ui.color}-400`}>₹{price}</div>
-              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 mb-1 sm:mb-2">for {duration} Days</div>
-              <div className={`text-xs font-semibold mb-2 sm:mb-3 px-2 sm:px-3 py-0.5 sm:py-1 rounded bg-white/80 border border-dashed border-gray-300 text-gray-700 dark:bg-gray-900/40 dark:text-gray-100`}>₹{pricePerDay} / Day <span className="text-gray-400">({price} ÷ {duration} Days)</span></div>
+              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 mb-1 sm:mb-2">
+                {t("for_days", { days: duration }, `for ${duration} Days`)}
+              </div>
+              <div className={`text-xs font-semibold mb-2 sm:mb-3 px-2 sm:px-3 py-0.5 sm:py-1 rounded bg-white/80 border border-dashed border-gray-300 text-gray-700 dark:bg-gray-900/40 dark:text-gray-100`}>
+                {t("per_day", { amount: pricePerDay }, `₹${pricePerDay} / Day`)} <span className="text-gray-400">({price} ÷ {duration} {t("days", "Days")})</span>
+              </div>
             </div>
             <ul className="w-full mb-2 sm:mb-4 mt-1 sm:mt-2 space-y-1 sm:space-y-2">
               {(Array.isArray(plan?.features) && plan.features.length > 0 ? plan.features : ui.features).map((feature: string, idx: number) => (
                 <li key={idx} className={`flex items-center gap-2 text-sm text-${ui.color}-800 dark:text-${ui.color}-100`}>
                   <span className={`text-lg font-bold text-${ui.color}-700 dark:text-${ui.color}-300`}>✓</span>
-                  <span>{feature}</span>
+                  <span>{getTranslatedFeature(feature)}</span>
                 </li>
               ))}
             </ul>
@@ -233,15 +265,15 @@ export default function PaymentPage() {
                 {payStatus === "loading" ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Initiating Payment...
+                    {t("initiating_payment", "Initiating Payment...")}
                   </>
                 ) : payStatus === "success" ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Redirecting to PayU...
+                    {t("redirecting_payu", "Redirecting to PayU...")}
                   </>
                 ) : (
-                  <>SUBSCRIBE NOW</>
+                  <>{t("subscribe_now", "SUBSCRIBE NOW")}</>
                 )}
               </button>
               <button
@@ -249,7 +281,7 @@ export default function PaymentPage() {
                 disabled={payStatus === "loading" || payStatus === "success"}
                 className="w-full py-2 sm:py-3 rounded-lg font-semibold text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 text-sm sm:text-base transition-colors"
               >
-                Go Back
+                {t("go_back", "Go Back")}
               </button>
             </div>
             {payError && (
@@ -263,25 +295,25 @@ export default function PaymentPage() {
           </div>
         </div>
         <div className="w-full max-w-md mx-auto mt-6 text-xs text-gray-600 dark:text-gray-300 flex flex-col items-center gap-1">
-          <div>Note: {duration} Days = {Math.round(duration/30)} Months (All plans billed for {duration} days only)</div>
-          <div>All amounts are in Indian Rupees (₹) | No Hidden Charges</div>
+          <div>Note: {duration} {t("days", "Days")} = {Math.round(duration/30)} {t("months", "Months")} ({t("all_plans_billed_note", `All plans billed for ${duration} days only`)})</div>
+          <div>{t("no_hidden_charges", "All amounts are in Indian Rupees (₹) | No Hidden Charges")}</div>
         </div>
         {/* FAQ Section */}
         <div className="w-full max-w-md mx-auto mt-8 border-t border-gray-200 dark:border-gray-700 pt-4">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2">Quick FAQs</h3>
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2">{t("quick_faqs", "Quick FAQs")}</h3>
           <div className="space-y-2">
             {[
               {
-                question: "Is payment secure on LabourSampark?",
-                answer: "Yes. Your payment details are fully encrypted and never stored on our servers. We follow PCI-DSS security standards.",
+                question: t("faq_secure_q", "Is payment secure on LabourSampark?"),
+                answer: t("faq_secure_a", "Yes. Your payment details are fully encrypted and never stored on our servers. We follow PCI-DSS security standards."),
               },
               {
-                question: "What payment methods are accepted?",
-                answer: "UPI, Debit/Credit Cards, Net Banking - all major payment options are available on LabourSampark.",
+                question: t("faq_methods_q", "What payment methods are accepted?"),
+                answer: t("faq_methods_a", "UPI, Debit/Credit Cards, Net Banking - all major payment options are available on LabourSampark."),
               },
               {
-                question: "How long is verification valid?",
-                answer: plan?.durationDays ? `${plan.durationDays} days from payment date. You can renew your ${userType === "labour" ? "labour" : userType === "sub_contractor" ? "sub-contractor" : "contractor"} profile anytime.` : `3 months from payment date. You can renew your ${userType === "labour" ? "labour" : userType === "sub_contractor" ? "sub-contractor" : "contractor"} profile anytime.`,
+                question: t("faq_validity_q", "How long is verification valid?"),
+                answer: plan?.durationDays ? `${plan.durationDays} ${t("days_from_payment_date", "days from payment date. You can renew your profile anytime.")}` : `3 ${t("months_from_payment_date", "months from payment date. You can renew your profile anytime.")}`,
               },
             ].map((faq, idx) => (
               <div key={idx}>

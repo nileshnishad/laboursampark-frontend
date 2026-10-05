@@ -2,8 +2,11 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import UnifiedSearchInput from "@/app/components/common/UnifiedSearchInput";
 import SubscriptionTicker from "@/app/components/common/SubscriptionTicker";
+import LanguageSelector from "@/app/components/LanguageSelector";
+import { useLanguage } from "@/app/context/LanguageContext";
 import type { DashboardSearchMeta, DashboardTabValue, DashboardUserType } from "./dashboard-tabs-config";
 
 interface UserDashboardLayoutProps {
@@ -110,10 +113,40 @@ export default function UserDashboardLayout({
   searchMeta,
   children,
 }: UserDashboardLayoutProps) {
+  const { t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navGroups = getNavGroups(userType);
+  const rawNavGroups = getNavGroups(userType);
   const colors = COLOR_SCHEMES[userType];
   const router = useRouter();
+
+  const getTranslatedNavLabel = (value: DashboardTabValue, defaultLabel: string) => {
+    switch (value) {
+      case "jobs":
+      case "job_requirements":
+        return t("jobs", "Jobs");
+      case "contractors":
+        return t("contractors", "Contractors");
+      case "sub_contractors":
+        return t("sub_contractors", "Sub-Contractors");
+      case "labours":
+      case "labour_required":
+        return t("find_labour", "Find Labour");
+      case "history":
+        return t("history", "History");
+      case "profile":
+        return t("profile", "Profile");
+      default:
+        return t(value, defaultLabel);
+    }
+  };
+
+  const navGroups = rawNavGroups.map(group => ({
+    ...group,
+    items: group.items.map(item => ({
+      ...item,
+      label: getTranslatedNavLabel(item.value, item.label),
+    })),
+  }));
 
   const profileImageUrl =
     user?.companyLogoUrl ||
@@ -153,7 +186,7 @@ export default function UserDashboardLayout({
             <div>
               <h1 className="text-lg font-black text-zinc-900 dark:text-white leading-none">LabourSampark</h1>
               <span className={`text-[10px] font-black uppercase tracking-widest ${colors.text}`}>
-                {userType.replace("_", " ")} Portal
+                {userType.replace("_", " ")} {t("portal", "Portal")}
               </span>
             </div>
           </div>
@@ -170,15 +203,17 @@ export default function UserDashboardLayout({
                 <p className="text-xs font-black text-zinc-900 dark:text-white truncate capitalize">
                   {username.split("-").join(" ")}
                 </p>
-                <p className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400">Verified Member</p>
+                <p className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                  {t("verified_member", "Verified Member")}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter bg-white/80 dark:bg-zinc-800/80 ${colors.text}`}>
-                {user?.display !== false ? "Visible" : "Hidden"}
+                {user?.display !== false ? t("visible", "Visible") : t("hidden", "Hidden")}
               </div>
               <div className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter bg-emerald-500 text-white">
-                Active
+                {t("active", "Active")}
               </div>
             </div>
           </div>
@@ -208,13 +243,11 @@ export default function UserDashboardLayout({
 
         {/* Support/Ads Area - Optional compact design */}
         <div className="p-6">
-
-
           <button
             onClick={onLogout}
             className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-2xl text-xs font-black uppercase tracking-widest transition-all"
           >
-            <span>Logout</span>
+            <span>{t("logout", "Logout")}</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" />
             </svg>
@@ -239,24 +272,25 @@ export default function UserDashboardLayout({
           </div>
           <div className="flex flex-col">
             <span className="flex items-center gap-1 text-sm font-black text-zinc-900 dark:text-white">
-             
               • {username.replace(/-/g, " ")}
             </span>
             <span className={`text-[10px] font-black uppercase tracking-widest ${colors.text}`}>
-              {userType.replace("_", " ")} Portal
+              {userType.replace("_", " ")} {t("portal", "Portal")}
             </span>
           </div>
-
         </div>
 
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageSelector compact />
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* ── Main Content Area ───────────────────────────────────── */}
@@ -273,17 +307,18 @@ export default function UserDashboardLayout({
             </h2>
             <div className="h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-2" />
             <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
-              Welcome back, <span className="text-zinc-900 dark:text-white capitalize">{username.replace(/-/g, " ")}</span>
+              {t("welcome_back", "Welcome back")}, <span className="text-zinc-900 dark:text-white capitalize">{username.replace(/-/g, " ")}</span>
             </p>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <LanguageSelector compact />
             <div className="h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
             <button
               onClick={onLogout}
               className="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
             >
-              <span>Logout</span>
+              <span>{t("logout", "Logout")}</span>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" />
               </svg>
@@ -293,7 +328,6 @@ export default function UserDashboardLayout({
 
         {/* Dashboard Dynamic View */}
         <div className="flex-1 px-0 sm:px-0 pt-4 sm:pt-6 lg:pt-8">
-          {/* Add margin-top for mobile, and use a subtle background for contrast */}
           <div className="max-w-full mx-auto">
             {children}
           </div>
@@ -308,7 +342,7 @@ export default function UserDashboardLayout({
             <div className="p-6 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-lg ${colors.active} flex items-center justify-center text-sm font-black italic text-white`}>LS</div>
-                <span className="text-sm font-black text-zinc-900 dark:text-white">Menu</span>
+                <span className="text-sm font-black text-zinc-900 dark:text-white">{t("menu", "Menu")}</span>
               </div>
               <button onClick={() => setSidebarOpen(false)} className="p-2 text-zinc-400"><X size={24} /></button>
             </div>
@@ -334,9 +368,9 @@ export default function UserDashboardLayout({
             <div className="p-6 border-t border-zinc-100 dark:border-zinc-800">
               <button
                 onClick={onLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-4 text-red-500 rounded-2xl text-sm dark:text-whiteuppercase tracking-widest shadow-lg shadow-red-500/20"
+                className="w-full flex items-center justify-center gap-2 px-4 py-4 text-red-500 rounded-2xl text-sm uppercase tracking-widest shadow-lg shadow-red-500/20"
               >
-                Logout
+                {t("logout", "Logout")}
               </button>
             </div>
           </div>
@@ -345,6 +379,3 @@ export default function UserDashboardLayout({
     </div>
   );
 }
-
-// Simple Icon Import for mobile drawer
-import { X } from "lucide-react";

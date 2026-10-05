@@ -1,422 +1,100 @@
 // lib/i18n.ts
-export const defaultLocale = "en";
-export const locales = ["en", "hi", "mr"] as const;
-export type Locale = (typeof locales)[number];
+import { en } from "./translations/en";
+import { hi } from "./translations/hi";
+import { mr } from "./translations/mr";
+import { ALL_LANGUAGES, locales, type Locale } from "./translations/types";
+
+export { ALL_LANGUAGES, locales, type Locale };
+export const defaultLocale: Locale = "en";
 
 export const translations = {
-  en: {
-    common: {
-      name: "Name",
-      email: "Email",
-      phone: "Phone",
-      location: "Location",
-      skills: "Skills",
-      experience: "Experience",
-      rating: "Rating",
-      jobs: "Jobs",
-      bio: "Bio",
-      connected: "Connected",
-      pending: "Pending",
-      available: "Available",
-      unavailable: "Unavailable",
-      settings: "Settings",
-      language: "Language",
-    },
-    labour: {
-      title: "Labour",
-      joinAs: "Join as Labour",
-      myProfile: "My Profile",
-      findWork: "Find Worker",
-    },
-    contractor: {
-      title: "Contractor",
-      joinAs: "Join as Contractor",
-      myProfile: "My Profile",
-      findLabour: "Find Contractor",
-    },
-    home: {
-      title: "LabourSampark",
-      subtitle: "Connecting Skilled Labourers with Trusted Contractors",
-      heroHeading: "Find Skilled Workers or Grow Your Business",
-      heroDesc: "Connect with verified labourers and contractors across India. Fast, reliable, and transparent hiring.",
-      heroPlaceholderLabour: "Looking for work? (e.g. Mason, Plumber)",
-      heroPlaceholderContractor: "Looking for a contractor?",
-      heroSearchBtn: "Search",
-      heroBadgeAadhaar: "Aadhaar Verified Workers",
-      heroBadgeTrusted: "Trusted Contractors",
-      heroBadgeDirect: "100% Direct Connection",
-      cta1: "Join as Labour",
-      cta2: "Join as Contractor",
-      exploreLabours: "Search",
-      exploreContractors: "Search",
-      heroHelpline: "Don't have the app? Call us Get Work!  No more wandering for work. Call our helpline to get the right job or labour directly.",
-      aboutTitle: "About LabourSampark",
-      aboutDesc: "We bridge the gap between skilled labourers and trusted contractors. Our platform ensures safe, transparent, and verified connections.",
-      aboutSection: {
-        badge: "Our Story",
-        title: "About LabourSampark",
-        subtitle: "Bridging the gap between skilled professionals and opportunity",
-        missionTitle: "Our Mission",
-        missionPara1: "LabourSampark is a platform dedicated to connecting skilled labourers and trusted contractors across India. We believe every skilled professional deserves equal opportunities, and every contractor deserves access to verified and reliable talent.",
-        missionPara2: "Our mission is to make it simple, transparent, and secure for labourers to find meaningful work and for contractors to build reliable teams.",
-        whyTitle: "Why Choose LabourSampark?",
-        reasons: {
-          0: { title: "Verified Professionals", desc: "Every profile is verified with detailed credentials and work history" },
-          1: { title: "Transparent Ratings", desc: "Real feedback from contractors and labourers you can trust" },
-          2: { title: "Quick Connection", desc: "Direct messaging and instant communication with verified contacts" },
-          3: { title: "Secure Platform", desc: "Your data is protected with industry-standard security measures" },
-        },
-        stats: {
-          0: { number: "10,000+", label: "Active Labourers" },
-          1: { number: "2,500+", label: "Verified Contractors" },
-          2: { number: "50+", label: "Trades Supported" },
-          3: { number: "98%", label: "Satisfaction Rate" },
-        },
-        featuresTitle: "Key Features",
-        features: {
-          0: { icon: "👤", title: "Easy Profile Setup", desc: "Create a professional profile in minutes with your skills and experience" },
-          1: { icon: "⭐", title: "Verified Reviews", desc: "Build trust through verified feedback from clients and colleagues" },
-          2: { icon: "💬", title: "Direct Communication", desc: "Connect directly with opportunities and collaborate seamlessly" },
-          3: { icon: "🔍", title: "Smart Search", desc: "Find the perfect match based on skills, location, and experience" },
-          4: { icon: "📱", title: "Mobile Friendly", desc: "Access opportunities anytime, anywhere on your mobile device" },
-          5: { icon: "🛡️", title: "Secure & Safe", desc: "Your data is protected and all transactions are secure" },
-        },
-        ctaTitle: "Ready to Get Started?",
-        ctaDesc: "Join thousands of professionals already using LabourSampark to grow their careers and businesses",
-        ctaStart: "Start Now",
-        ctaContact: "Contact Us",
-      },
-      quickActions: {
-        findJobTitle: "Find Work",
-        findJobDesc: "Find work according to your skills",
-        hireLabourTitle: "Hire Labour",
-        hireLabourDesc: "Hire trusted labour instantly",
-      },
-      trustSection: {
-        badge: "100% Secure & Verified",
-        title: "Trust That Speaks for Itself",
-        subtitle: "Labour Sampark is not just a platform, it's a promise—the right person, the right price, and 100% transparency.",
-        card1Title: "Aadhaar Authenticated",
-        card1Desc: "Every profile is KYC verified. We ensure that the person you're talking to is real and authentic.",
-        card1Footer: "Trusted by 50K+ Users",
-        card2Title: "Zero Commission",
-        card2Desc: "No middleman, no extra fees. Your money, your work. Call directly and finalize the deal.",
-        card2Footer: "Direct-to-Source Connection",
-        card3Title: "Verified Ratings",
-        card3Desc: "Choose the best labourers and contractors through real public reviews and feedback. No compromise on quality.",
-        card3Footer: "Certified Skill Network",
-        stat1Label: "Verified Workers",
-        stat2Label: "Trusted Contractors",
-        stat3Label: "Skill Categories",
-        stat4Label: "Safe & Secure",
-      },
-      laboursSection: {
-        titlePart1: "Top",
-        titlePart2: "Skilled",
-        titlePart3: "Labourers",
-        subtitle: "Verified professionals ready to help you with your next project",
-        viewAll: "View All Labourers",
-        noData: "No labourers found.",
-      },
-      contractorsSection: {
-        titlePart1: "Trusted",
-        titlePart2: "Contractors",
-        subtitle: "Professional contractors with proven track records",
-        viewAll: "View All Contractors",
-        noData: "No contractors found.",
-      },
-      contactTitle: "Get in Touch",
-      contactDesc: "Have questions? We're here to help!",
-      footerText: "© 2024 LabourSampark. All rights reserved.",
-      callToAction: {
-        title: "Don't know how to use the App? Call us - Get Work! 📞",
-        subtitle: "No more wandering for work. Call our helpline to get the right job or labour directly.",
-        callButton: "Call Support",
-        viewWorkButton: "View Work",
-      },
-    },
-  },
-  hi: {
-    common: {
-      name: "नाम",
-      email: "ईमेल",
-      phone: "फोन",
-      location: "स्थान",
-      skills: "कौशल",
-      experience: "अनुभव",
-      rating: "रेटिंग",
-      jobs: "काम",
-      bio: "परिचय",
-      connected: "जुड़ा हुआ",
-      pending: "लंबित",
-      available: "उपलब्ध",
-      unavailable: "अनुपलब्ध",
-      settings: "सेटिंग्स",
-      language: "भाषा",
-    },
-    labour: {
-      title: "मजदूर",
-      joinAs: "मजदूर के रूप में शामिल हों",
-      myProfile: "मेरी प्रोफाइल",
-      findWork: "मजदूर खोजें",
-    },
-    contractor: {
-      title: "ठेकेदार",
-      joinAs: "ठेकेदार के रूप में शामिल हों",
-      myProfile: "मेरी प्रोफाइल",
-      findLabour: "ठेकेदार खोजें",
-    },
-    home: {
-      title: "लेबरसमपार्क",
-      subtitle: "कुशल मजदूरों को विश्वसनीय ठेकेदारों से जोड़ना",
-      heroHeading: "कुशल कर्मचारी खोजें or अपना व्यवसाय बढ़ाएं",
-      heroDesc: "पूरे भारत में सत्यापित मजदूरों और ठेकेदारों से जुड़ें। तेज़, विश्वसनीय और स्वच्छ भर्ती।",
-      heroPlaceholderLabour: "कौन सा काम चाहिए? (जैसे: मिस्त्री, प्लंबर)",
-      heroPlaceholderContractor: "कैसा ठेकेदार चाहिए?",
-      heroSearchBtn: "खोजें",
-      heroBadgeAadhaar: "आधार सत्यापित मजदूर",
-      heroBadgeTrusted: "विश्वसनीय ठेकेदार",
-      heroBadgeDirect: "100% सीधा संपर्क",
-      cta1: "मजदूर के रूप में शामिल हों",
-      cta2: "ठेकेदार के रूप में शामिल हों",
-      exploreLabours: "उपलब्ध मजदूरों को देखें",
-      exploreContractors: "उपलब्ध ठेकेदारों को देखें",
-      heroHelpline: "App Use karna nahi aata? Call karo kaam pao! Ab kaam dhundhne ke liye bhatakna nahi padega. Hamare helpline number par call karein aur direct sahi kaam ya labour payein.",
-      aboutTitle: "लेबरसमपार्क के बारे में",
-      aboutDesc: "हम कुशल मजदूरों और विश्वसनीय ठेकेदारों के बीच की खाई को पाटते हैं। हमारा प्लेटफॉर्म सुरक्षित, पारदर्शी और सत्यापित कनेक्शन सुनिश्चित करता है।",
-      aboutSection: {
-        badge: "हमारी कहानी",
-        title: "लेबरसमपार्क के बारे में",
-        subtitle: "कुशल पेशेवरों और अवसरों के बीच की दूरी कम करना",
-        missionTitle: "हमारा मिशन",
-        missionPara1: "लेबरसमपार्क एक ऐसा प्लेटफॉर्म है जो भारत भर के कुशल मजदूरों और विश्वसनीय ठेकेदारों को जोड़ता. हमारा विश्वास है कि हर कुशल व्यक्ति को समान अवसर मिलने चाहिए और हर ठेकेदार को सत्यापित प्रतिभा मिलनी चाहिए।",
-        missionPara2: "हमारा मिशन मजदूरों के लिए काम पाना और ठेकेदारों के लिए भरोसेमंद टीम बनाना सरल, पारदर्शी और सुरक्षित बनाना है।",
-        whyTitle: "लेबरसमपार्क क्यों चुनें?",
-        reasons: {
-          0: { title: "सत्यापित प्रोफाइल", desc: "हर प्रोफाइल को दस्तावेज और कार्य इतिहास के साथ सत्यापित किया जाता है" },
-          1: { title: "पारदर्शी रेटिंग", desc: "ठेकेदारों और मजदूरों से वास्तविक और भरोसेमंद प्रतिक्रिया" },
-          2: { title: "तेज़ कनेक्शन", desc: "सीधा संपर्क और तुरंत संचार" },
-          3: { title: "सुरक्षित प्लेटफॉर्म", desc: "आपका डेटा उद्योग-स्तरीय सुरक्षा के साथ सुरक्षित रहता है" },
-        },
-        stats: {
-          0: { number: "10,000+", label: "सक्रिय मजदूर" },
-          1: { number: "2,500+", label: "सत्यापित ठेकेदार" },
-          2: { number: "50+", label: "समर्थित ट्रेड" },
-          3: { number: "98%", label: "संतुष्टि दर" },
-        },
-        featuresTitle: "मुख्य विशेषताएं",
-        features: {
-          0: { icon: "👤", title: "आसान प्रोफाइल सेटअप", desc: "कुछ मिनटों में अपनी प्रोफाइल बनाएं" },
-          1: { icon: "⭐", title: "सत्यापित रिव्यू", desc: "वास्तविक प्रतिक्रिया से भरोसा बनाएं" },
-          2: { icon: "💬", title: "सीधा संवाद", desc: "अवसरों से सीधे जुड़ें" },
-          3: { icon: "🔍", title: "स्मार्ट सर्च", desc: "कौशल, स्थान और अनुभव के अनुसार खोजें" },
-          4: { icon: "📱", title: "मोबाइल फ्रेंडली", desc: "कहीं भी, कभी भी उपयोग करें" },
-          5: { icon: "🛡️", title: "सुरक्षित और सुरक्षित", desc: "आपका डेटा और लेन-देन सुरक्षित हैं" },
-        },
-        ctaTitle: "शुरू करने के लिए तैयार हैं?",
-        ctaDesc: "हजारों प्रोफेशनल्स पहले से ही लेबरसमपार्क का उपयोग करके अपना करियर और व्यवसाय बढ़ा रहे हैं",
-        ctaStart: "अभी शुरू करें",
-        ctaContact: "संपर्क करें",
-      },
-      quickActions: {
-        findJobTitle: "काम ढूंढें",
-        findJobDesc: "अपने कौशल के हिसाब से काम ढूंढें",
-        hireLabourTitle: "मजूर hiring करें",
-        hireLabourDesc: "भरोसेमंद मजूर तुरंत hire करें",
-      },
-      trustSection: {
-        badge: "100% सुरक्षित और सत्यापित",
-        title: "भरोसा जो खुद बोलता है",
-        subtitle: "लेबर समपार्क सिर्फ एक प्लेटफॉर्म नहीं, एक वादा है—सही इंसान, सही दाम और 100% पारदर्शिता का।",
-        card1Title: "आधार सत्यापित",
-        card1Desc: "हर प्रोफाइल KYC सत्यापित है। हम सुनिश्चित करते हैं कि आप जिससे बात कर रहे हैं वह असली और प्रामाणिक हो।",
-        card1Footer: "50,000+ यूजर्स द्वारा विश्वसनीय",
-        card2Title: "जीरो कमीशन",
-        card2Desc: "कोई बिचौलिया नहीं, कोई एक्स्ट्रा फीस नहीं। आपका पैसा, आपका काम। डायरेक्ट कॉल करें और डील फाइनल करें।",
-        card2Footer: "सोर्स से सीधा संपर्क",
-        card3Title: "सत्यापित रेटिंग्स",
-        card3Desc: "रियल पब्लिक रिव्यूज और फीडबैक से बेस्ट मजदूरों और ठेकेदारों को चुनें। क्वालिटी से कोई समझौता नहीं।",
-        card3Footer: "सर्टिफाइड स्किल नेटवर्क",
-        stat1Label: "सत्यापित वर्कर्स",
-        stat2Label: "भरोसेमंद ठेकेदार",
-        stat3Label: "स्किल कैटेगरीज",
-        stat4Label: "सुरक्षित और सुव्यवस्थित",
-      },
-      laboursSection: {
-        titlePart1: "कुशल",
-        titlePart2: "मजदूर",
-        titlePart3: "",
-        subtitle: "सत्यापित प्रोफेशनल्स आपके अगले प्रोजेक्ट में मदद के लिए तैयार हैं",
-        viewAll: "सभी मजदूर देखें",
-        noData: "कोई मजदूर नहीं मिला।",
-      },
-      contractorsSection: {
-        titlePart1: "सत्यापित",
-        titlePart2: "ठेकेदार",
-        subtitle: "प्रोफेशनल ठेकेदार जिनके पास बेहतरीन अनुभव है",
-        viewAll: "सभी ठेकेदार देखें",
-        noData: "कोई ठेकेदार नहीं मिला।",
-      },
-      contactTitle: "हमसे संपर्क करें",
-      contactDesc: "कोई सवाल है? हम यहाँ मदद के लिए हैं!",
-      footerText: "© 2024 लेबरसमपार्क। सर्वाधिकार सुरक्षित।",
-      callToAction: {
-        title: "App nahi aata? Call karo – kaam pao! 📞",
-        subtitle: "Ab kaam dhundhne ke liye bhatakna nahi padega. Hamare helpline number par call karein aur direct sahi kaam ya labour payein.",
-        callButton: "कॉल करें",
-        viewWorkButton: "काम देखें",
-      },
-    },
-  },
-  mr: {
-    common: {
-      name: "नाव",
-      email: "ईमेल",
-      phone: "फोन",
-      location: "स्थान",
-      skills: "कौशल्य",
-      experience: "अनुभव",
-      rating: "रेटिंग",
-      jobs: "नोकरी",
-      bio: "बायो",
-      connected: "जोडलेले",
-      pending: "प्रलंबित",
-      available: "उपलब्ध",
-      unavailable: "अनुपलब्ध",
-      settings: "सेटिंग्स",
-      language: "भाषा",
-    },
-    labour: {
-      title: "मजूर",
-      joinAs: "मजूर म्हणून सामील व्हा",
-      myProfile: "माझी प्रोफाईल",
-      findWork: "मजूर शोधा",
-    },
-    contractor: {
-      title: "कंत्राटर",
-      joinAs: "कंत्राटर म्हणून सामील व्हा",
-      myProfile: "माझी प्रोफाईल",
-      findLabour: "कंत्राटर शोधा",
-    },
-    home: {
-      title: "लेबरसमपार्क",
-      subtitle: "कुशल मजूरांना विश्वासार्ह कंत्राटरांशी जोडणे",
-      heroHeading: "कुशल कामगार शोधा किंवा आपला व्यवसाय वाढवा",
-      heroDesc: "संपूर्ण भारतातील सत्यापित मजूर आणि कंत्राटरांशी कनेक्ट करा। वेगवान, विश्वासार्ह आणि पारदर्शक भर्ती।",
-      heroPlaceholderLabour: "कोणते काम पाहिजे? (उदा. मिस्त्री, प्लंबर)",
-      heroPlaceholderContractor: "कसा कंत्राटर पाहिजे?",
-      heroSearchBtn: "शोधा",
-      heroBadgeAadhaar: "आधार सत्यापित मजूर",
-      heroBadgeTrusted: "विश्वासार्ह कंत्राटर",
-      heroBadgeDirect: "100% थेट संपर्क",
-      cta1: "मजूर म्हणून सामील व्हा",
-      cta2: "कंत्राटर म्हणून सामील व्हा",
-      exploreLabours: "उपलब्ध मजूर पाहा",
-      exploreContractors: "उपलब्ध कंत्राटर पाहा",
-      heroHelpline: "App वापरायला येत नाही? कॉल करा काम मिळवा! आता कामासाठी फिरायची गरज नाही. आमच्या हेल्पलाईनवर कॉल करा आणि योग्य काम किंवा मजूर मिळवा.",
-      aboutTitle: "लेबरसमपार्क बद्दल",
-      aboutDesc: "आम्ही कुशल मजूर आणि विश्वासार्ह कंत्राटरांच्या दरम्यान होना कमी करतो। आमचा प्लेटफॉर्म सुरक्षित, पारदर्शक आणि सत्यापित कनेक्शन सुनिश्चित करतो।",
-      aboutSection: {
-        badge: "आमची कथा",
-        title: "लेबरसमपार्क बद्दल",
-        subtitle: "कुशल व्यावसायिक आणि संधी यांच्यातील दरी कमी करणे",
-        missionTitle: "आमचे ध्येय",
-        missionPara1: "लेबरसमपार्क हे भारतभरातील कुशल मजूर आणि विश्वासार्ह कंत्राटरांना जोडणारे व्यासपीठ आहे. प्रत्येक कुशल व्यक्तीला समान संधी आणि प्रत्येक कंत्राटराला सत्यापित प्रतिभा मिळाली पाहिजे असा आमचा विश्वास आहे.",
-        missionPara2: "मजुरांना अर्थपूर्ण काम आणि कंत्राटरांना विश्वासार्ह टीम मिळणे सोपे, पारदर्शक आणि सुरक्षित करणे हे आमचे ध्येय आहे.",
-        whyTitle: "लेबरसमपार्क का निवडावे?",
-        reasons: {
-          0: { title: "सत्यापित प्रोफाइल", desc: "प्रत्येक प्रोफाइल कागदपत्रे आणि कामाच्या इतिहासासह सत्यापित केले जाते" },
-          1: { title: "पारदर्शक रेटिंग", desc: "विश्वासार्ह आणि वास्तविक अभिप्राय" },
-          2: { title: "जलद कनेक्शन", desc: "थेट संवाद आणि त्वरित संपर्क" },
-          3: { title: "सुरक्षित प्लॅटफॉर्म", desc: "आपला डेटा उद्योग-मानक सुरक्षेसह सुरक्षित असतो" },
-        },
-        stats: {
-          0: { number: "10,000+", label: "सक्रिय मजूर" },
-          1: { number: "2,500+", label: "सत्यापित कंत्राटर" },
-          2: { number: "50+", label: "समर्थित ट्रेड" },
-          3: { number: "98%", label: "समाधान दर" },
-        },
-        featuresTitle: "मुख्य वैशिष्ट्ये",
-        features: {
-          0: { icon: "👤", title: "सोपे प्रोफाइल सेटअप", desc: "काही मिनिटांत प्रोफाइल तयार करा" },
-          1: { icon: "⭐", title: "सत्यापित पुनरावलोकने", desc: "विश्वसनीय अभिप्रायातून विश्वास वाढवा" },
-          2: { icon: "💬", title: "थेट संवाद", desc: "संधींशी थेट जोडा" },
-          3: { icon: "🔍", title: "स्मार्ट शोध", desc: "कौशल्य, स्थान आणि अनुभवावर आधारित शोध" },
-          4: { icon: "📱", title: "मोबाइल फ्रेंडली", desc: "कधीही, कुठेही वापरा" },
-          5: { icon: "🛡️", title: "सुरक्षित आणि संरक्षित", desc: "आपला डेटा आणि व्यवहार सुरक्षित आहेत" },
-        },
-        ctaTitle: "सुरुवात करण्यास तयार आहात?",
-        ctaDesc: "हजारो व्यावसायिक लेबरसमपार्क वापरून आपले करिअर आणि व्यवसाय वाढवत आहेत",
-        ctaStart: "आता सुरू करा",
-        ctaContact: "आमच्याशी संपर्क करा",
-      },
-      quickActions: {
-        findJobTitle: "काम शोधा",
-        findJobDesc: "तुमच्या कौशल्यानुसार काम शोधा",
-        hireLabourTitle: "मजूर कामावर ठेवा",
-        hireLabourDesc: "विश्वासार्ह मजूर त्वरित कामावर ठेवा",
-      },
-      trustSection: {
-        badge: "100% सुरक्षित आणि सत्यापित",
-        title: "विश्वास जो स्वतः बोलतो",
-        subtitle: "लेबर समपार्क फक्त एक प्लॅटफॉर्म नाही, तर एक वचन आहे—योग्य व्यक्ती, योग्य किंमत आणि 100% पारदर्शकता.",
-        card1Title: "आधार सत्यापित",
-        card1Desc: "प्रत्येक प्रोफाइल केवायसी सत्यापित आहे. तुम्ही ज्याच्याशी बोलत आहात तो खरा आणि अधिकृत आहे याची आम्ही खात्री देतो.",
-        card1Footer: "50,000+ वापरकर्त्यांद्वारे विश्वासार्ह",
-        card2Title: "झिरो कमिशन",
-        card2Desc: "कोणताही मध्यस्थ नाही, कोणतेही अतिरिक्त शुल्क नाही. तुमचे पैसे, तुमचे काम. थेट कॉल करा आणि करार निश्चित करा.",
-        card2Footer: "थेट संपर्क",
-        card3Title: "सत्यापित रेटिंग",
-        card3Desc: "खऱ्या सार्वजनिक अभिप्राय आणि फीडबॅकमधून सर्वोत्तम मजूर आणि कंत्राटदार निवडा. गुणवत्तेशी कोणतीही तडजोड नाही.",
-        card3Footer: "प्रमाणित कौशल्य नेटवर्क",
-        stat1Label: "सत्यापित कामगार",
-        stat2Label: "विश्वासार्ह कंत्राटदार",
-        stat3Label: "कौशल्य श्रेणी",
-        stat4Label: "सुरक्षित आणि सुरक्षित",
-      },
-      laboursSection: {
-        titlePart1: "कुशल",
-        titlePart2: "मजूर",
-        titlePart3: "",
-        subtitle: "सत्यापित व्यावसायिक तुमच्या पुढील प्रकल्पात मदत करण्यासाठी तयार आहेत",
-        viewAll: "सर्व मजूर पहा",
-        noData: "कोणताही मजूर आढळला नाही।",
-      },
-      contractorsSection: {
-        titlePart1: "सत्यापित",
-        titlePart2: "कंत्राटदार",
-        subtitle: "सिद्ध ट्रॅक रेकॉर्ड असलेले व्यावसायिक कंत्राटदार",
-        viewAll: "सर्व कंत्राटदार पहा",
-        noData: "कोणताही कंत्राटदार आढळला नाही।",
-      },
-      contactTitle: "आमच्याशी संपर्क करा",
-      contactDesc: "काही प्रश्न आहेत? आम्ही मदत करण्यासाठी येथे आहोत!",
-      footerText: "© 2024 लेबरसमपार्क। सर्व अधिकार सुरक्षित।",
-      callToAction: {
-        title: "App वापरायला येत नाही? कॉल करा – काम मिळवा! 📞",
-        subtitle: "आता कामासाठी फिरायची गरज नाही. आमच्या हेल्पलाईनवर कॉल करा आणि योग्य काम किंवा मजूर मिळवा.",
-        callButton: "कॉल करा",
-        viewWorkButton: "काम पहा",
-      },
-    },
-  },
+  en,
+  hi,
+  mr,
 };
+
+function humanizeKey(key: string): string {
+  const lastPart = key.split(".").pop() || key;
+  const words = lastPart
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .trim();
+  if (!words) return "";
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+function resolveKeyValue(dict: any, key: string): any {
+  if (!dict || typeof dict !== "object") return undefined;
+
+  // 1. Direct key match (flat key e.g. "welcome_back" or "home.heroHeading")
+  if (key in dict) {
+    return dict[key];
+  }
+
+  // 2. Nested key path (e.g. "home.aboutSection.title")
+  if (key.includes(".")) {
+    const parts = key.split(".");
+    let current = dict;
+    for (const part of parts) {
+      if (current && typeof current === "object" && part in current) {
+        current = current[part];
+      } else {
+        return undefined;
+      }
+    }
+    return current;
+  }
+
+  return undefined;
+}
 
 export function t(
   locale: Locale,
   key: string,
+  paramsOrDefault?: Record<string, any> | string,
   defaultText?: string
 ): string {
-  const keys = key.split(".");
-  let value: any = translations[locale];
+  const params: Record<string, any> | undefined =
+    typeof paramsOrDefault === "object" && paramsOrDefault !== null
+      ? paramsOrDefault
+      : undefined;
 
-  for (const k of keys) {
-    if (value && typeof value === "object" && k in value) {
-      value = value[k];
+  const fallbackText: string | undefined =
+    typeof paramsOrDefault === "string" ? paramsOrDefault : defaultText;
+
+  const currentDict = translations[locale] || translations.en;
+  const enDict = translations.en;
+
+  // 1. Try specified locale
+  let rawValue = resolveKeyValue(currentDict, key);
+
+  // 2. Fallback to English if not found or empty
+  if (rawValue === undefined && locale !== "en") {
+    rawValue = resolveKeyValue(enDict, key);
+  }
+
+  // 3. Fallback to provided default text
+  if (rawValue === undefined) {
+    if (fallbackText !== undefined && fallbackText !== null) {
+      rawValue = fallbackText;
     } else {
-      return defaultText || key;
+      rawValue = humanizeKey(key);
     }
   }
 
-  return typeof value === "string" ? value : key;
+  // Ensure string
+  let result = typeof rawValue === "string" ? rawValue : String(rawValue ?? "");
+
+  // 4. Parameter interpolation: replace {param} or {{param}}
+  if (params && typeof params === "object") {
+    result = result.replace(/\{+(\w+)\}+/g, (match, paramName) => {
+      if (paramName in params) {
+        const val = params[paramName];
+        return val !== undefined && val !== null ? String(val) : "";
+      }
+      return match;
+    });
+  }
+
+  return result;
 }

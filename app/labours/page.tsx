@@ -10,6 +10,7 @@ import { showInfoToast } from "@/lib/toast-utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchSkills, skillIdsToSearchText } from "@/store/slices/skillsSlice";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 type Labour = {
   _id: string;
@@ -32,6 +33,7 @@ type Labour = {
 };
 
 function AllLaboursContent() {
+  const { t } = useLanguage();
   const [labours, setLabours] = useState<Labour[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +89,7 @@ function AllLaboursContent() {
     fetchLabours();
   }, []);
   const handleGuestViewAttempt = () => {
-    showInfoToast("For viewing profile details, please login first.");
+    showInfoToast(t("labour.guestViewPrompt", {}, "For viewing profile details, please login first."));
     router.push("/login");
   };
 
@@ -126,10 +128,10 @@ function AllLaboursContent() {
               </button>
               <div className="">
                 <h1 className="text-md md:text-2xl font-black text-zinc-900 dark:text-white tracking-tight leading-tight">
-                  Skilled <span className="text-blue-600">Labours</span>
+                  {t("labour.skilledLabours", {}, "Skilled Labours")}
                 </h1>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-1">
-                  Connect with verified and rated labourers.
+                  {t("labour.laboursSubtitle", {}, "Connect with verified and rated labourers.")}
                 </p>
               </div>
             </div>
@@ -138,7 +140,7 @@ function AllLaboursContent() {
                 <UnifiedSearchInput
                   value={searchQuery}
                   onChange={setSearchQuery}
-                  placeholder="Search name, location, or skills..."
+                  placeholder={t("labour.searchPlaceholder", {}, "Search name, location, or skills...")}
                 />
               </div>
             </div>
@@ -159,7 +161,7 @@ function AllLaboursContent() {
             {/* Error State */}
             {error && !loading && (
               <div className="flex justify-center items-center py-20">
-                <div className="text-red-600 dark:text-red-400">Error: {error}</div>
+                <div className="text-red-600 dark:text-red-400">{t("common.error", {}, "Error")}: {error}</div>
               </div>
             )}
 
@@ -184,8 +186,8 @@ function AllLaboursContent() {
               <div className="text-center py-20 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl">
                 <p className="text-zinc-500 font-medium">
                   {searchQuery.trim()
-                    ? "No labours match your search."
-                    : "No labours found."}
+                    ? t("labour.noLaboursMatch", {}, "No labours match your search.")
+                    : t("labour.noLaboursFound", {}, "No labours found.")}
                 </p>
               </div>
             )}

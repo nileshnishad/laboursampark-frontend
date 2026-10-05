@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { getToken } from "@/lib/api-service";
 import type { RootState } from "@/store/store";
 import { Star, MapPin, Briefcase, ShieldCheck, Phone, Mail } from "lucide-react";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 interface IDCardProps {
   labour: any;
@@ -21,6 +22,7 @@ export default function IDCard({
   onViewProfile,
   className = "",
 }: IDCardProps) {
+  const { t } = useLanguage();
   const { user } = useSelector((state: RootState) => state.auth);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
@@ -28,16 +30,16 @@ export default function IDCard({
     setIsLoggedIn(Boolean(getToken()));
   }, []);
 
-  const name = labour.fullName || labour.name || "Labour";
+  const name = labour.fullName || labour.name || t("labour.title", {}, "Labour");
   const experience = labour.experience || labour.experienceRange || "N/A";
   const phone = labour.mobile || labour.phone || "N/A";
   const email = labour.email || "N/A";
-  const rawLocation = labour.location || labour.address || labour.city || "N/A";
+  const rawLocation = labour.location || labour.address || labour.city || t("not_specified", {}, "N/A");
   let location = "N/A";
   if (typeof rawLocation === "string") {
     location = rawLocation;
   } else if (typeof rawLocation === "object" && rawLocation !== null) {
-    location = [rawLocation.address, rawLocation.city].filter(Boolean).join(", ") || "N/A";
+    location = [rawLocation.address, rawLocation.city].filter(Boolean).join(", ") || t("not_specified", {}, "N/A");
   }
   const rating = labour.rating;
   const hasRating = rating !== undefined && rating !== null && rating !== "";
@@ -138,11 +140,11 @@ export default function IDCard({
             }`}
           >
             <span className={`h-2 w-2 rounded-full ${available ? "bg-emerald-500" : "bg-orange-500"}`}></span>
-            {available ? "Available" : "Busy"}
+            {available ? t("available", {}, "Available") : t("busy", {}, "Busy")}
           </span>
           <span className="inline-flex items-center gap-1 text-[11px] leading-none font-semibold text-slate-700 dark:text-slate-200">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-            {verified ? "Verified" : "Unverified"}
+            {verified ? t("common.verified", {}, "Verified") : t("common.notVerified", {}, "Unverified")}
           </span>
         </div>
 
@@ -180,7 +182,7 @@ export default function IDCard({
               </div>
               <div className="flex items-center gap-1.5">
                 <Briefcase className="h-3.5 w-3.5 text-slate-500" />
-                <span>{experience} Exp.</span>
+                <span>{experience} {t("experience_years", {}, "Exp.")}</span>
               </div>
             </div>
           </div>
@@ -191,11 +193,11 @@ export default function IDCard({
             <div className="flex items-center justify-center gap-1 px-0.5 text-slate-900 dark:text-white">
               <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
               <span className="text-[11px] font-bold leading-none">{hasRating ? rating : "N/A"}</span>
-              <span className="text-[9px] font-medium leading-none text-slate-600 dark:text-slate-300">Rating</span>
+              <span className="text-[9px] font-medium leading-none text-slate-600 dark:text-slate-300">{t("rating_label", {}, "Rating")}</span>
             </div>
             <div className="flex items-center justify-center gap-1 px-0.5 text-slate-900 dark:text-white">
               <span className="text-[11px] font-bold leading-none">{completedJobs}</span>
-              <span className="text-[9px] font-medium leading-none text-slate-600 dark:text-slate-300">Jobs Done</span>
+              <span className="text-[9px] font-medium leading-none text-slate-600 dark:text-slate-300">{t("my_jobs", {}, "Jobs Done")}</span>
             </div>
           </div>
         </div>
@@ -228,7 +230,7 @@ export default function IDCard({
           onClick={handleViewProfile}
           className="w-full rounded-lg border border-blue-300 dark:border-blue-600 py-1.5 text-xs leading-none font-semibold text-blue-600 dark:text-blue-300 transition-all hover:bg-blue-50 dark:hover:bg-blue-900/20 active:scale-[0.99]"
         >
-          View Details
+          {t("view_details", {}, "View Details")}
         </button>
       </div>
 

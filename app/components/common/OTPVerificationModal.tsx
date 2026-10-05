@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { apiPost } from "@/lib/api-service";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 interface OTPVerificationModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface OTPVerificationModalProps {
 }
 
 const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mobile }) => {
+  const { t } = useLanguage();
   const user = useSelector((state: RootState) => state.auth.user);
   const [step, setStep] = useState<"send" | "input" | "success">("send");
   const [otp, setOtp] = useState("");
@@ -121,14 +123,16 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-3 border border-gray-100 dark:border-gray-800">
-        <h2 className="text-xl font-bold mb-1 text-gray-900 dark:text-white">OTP Verification Required</h2>
+        <h2 className="text-xl font-bold mb-1 text-gray-900 dark:text-white">
+          {t("otp_verification_required", {}, "OTP Verification Required")}
+        </h2>
         <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-          Verify your mobile number to activate your account and continue.
+          {t("verify_mobile_instruction", {}, "Verify your mobile number to activate your account and continue.")}
         </p>
 
         {step === "send" && (
           <div className="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 p-3 text-left">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Mobile No:</p>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{t("mobile_number_label", {}, "Mobile No:")}</p>
             {!isEditingNumber ? (
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{displayMobile}</p>
@@ -138,7 +142,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
                   className="text-xs font-semibold text-blue-600 hover:text-blue-700"
                   disabled={loading}
                 >
-                  Edit Number
+                  {t("common.edit", {}, "Edit Number")}
                 </button>
               </div>
             ) : (
@@ -151,7 +155,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
                   value={editableMobile}
                   onChange={(e) => setEditableMobile(toDigits(e.target.value).slice(0, 10))}
                   className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  placeholder="Enter 10-digit mobile"
+                  placeholder={t("enter_mobile_hint", {}, "Enter 10-digit mobile")}
                   disabled={loading}
                 />
               </div>
@@ -176,7 +180,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
             onClick={handleSendOTP}
             disabled={loading || !isValidMobile}
           >
-            {loading ? "Sending OTP..." : "Send OTP"}
+            {loading ? t("sending_otp", {}, "Sending OTP...") : t("send_otp", {}, "Send OTP")}
           </button>
         )}
 
@@ -196,7 +200,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
               value={otp}
               onChange={e => setOtp(e.target.value.replace(/\D/g, ""))}
               className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 text-lg text-center tracking-widest"
-              placeholder="Enter 6-digit OTP"
+              placeholder={t("enter_otp_hint", {}, "Enter 6-digit OTP")}
               autoFocus
               required
               disabled={loading}
@@ -207,7 +211,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
                 className="w-full py-2.5 px-4 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition disabled:opacity-60"
                 disabled={loading || otp.length !== 6}
               >
-                {loading ? "Verifying..." : "Verify OTP"}
+                {loading ? t("verifying_otp", {}, "Verifying...") : t("verify_otp", {}, "Verify OTP")}
               </button>
               <button
                 type="button"
@@ -215,7 +219,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
                 className="w-full py-2.5 px-4 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition disabled:opacity-60"
                 disabled={loading || !isValidMobile}
               >
-                Resend OTP
+                {t("resend_otp", {}, "Resend OTP")}
               </button>
             </div>
             <button
@@ -230,24 +234,24 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({ isOpen, mob
               className="text-xs text-blue-600 hover:text-blue-700 font-semibold"
               disabled={loading}
             >
-              Change Mobile Number
+              {t("change_mobile_number", {}, "Change Mobile Number")}
             </button>
           </form>
         )}
         {step === "success" && (
           <div className="text-green-700 dark:text-green-300 font-semibold text-base mt-2">
-            Verification successful. Refreshing your session...
+            {t("verification_successful", {}, "Verification successful. Refreshing your session...")}
           </div>
         )}
         <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-          Need help? Ensure your network is stable and the entered mobile number is correct.
+          {t("need_help_call_support", {}, "Need help? Call support: +91 9702701777")}
         </div>
 
         {loading && (
           <div className="absolute inset-0 rounded-2xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-[1px] flex items-center justify-center">
             <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
               <span className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Please wait...</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t("common.loading", {}, "Please wait...")}</span>
             </div>
           </div>
         )}

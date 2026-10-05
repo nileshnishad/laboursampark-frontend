@@ -12,22 +12,24 @@ import {
   MapPin, 
   ExternalLink 
 } from "lucide-react";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 export default function Footer() {
   const router = useRouter();
+  const { t } = useLanguage();
   
   const footerLinks = {
     platform: [
-      { label: "Home", path: "/" },
-      { label: "Find Labours", path: "/labours" },
-      { label: "Find Contractors", path: "/contractors" },
-      { label: "About Us", path: "/about" },
-      { label: "Contact", path: "/contact" },
+      { label: t("navigation.home", {}, "Home"), path: "/" },
+      { label: t("navigation.labours", {}, "Find Labours"), path: "/labours" },
+      { label: t("navigation.contractors", {}, "Find Contractors"), path: "/contractors" },
+      { label: t("navigation.about", {}, "About Us"), path: "/about" },
+      { label: t("navigation.contact", {}, "Contact"), path: "/contact" },
     ],
     legal: [
-      { label: "Privacy Policy", path: "/privacy-policy" },
-      { label: "Terms of Service", path: "/terms-of-service" },
-      { label: "Refund Policy", path: "/refund-policy" },
+      { label: t("navigation.privacyPolicy", {}, "Privacy Policy"), path: "/privacy-policy" },
+      { label: t("navigation.termsOfService", {}, "Terms of Service"), path: "/terms-of-service" },
+      { label: t("navigation.refundPolicy", {}, "Refund Policy"), path: "/refund-policy" },
     ],
     social: [
       { icon: <Facebook size={18} />, url: "https://facebook.com/laboursampark", label: "Facebook" },
@@ -49,7 +51,7 @@ export default function Footer() {
               <img src="/images/dark-logo.png" alt="LabourSampark" className="w-40 h-12 rounded-xl object-cover shadow-sm hidden dark:block" />
             </div>
             <p className="text-gray-500 dark:text-gray-400 text-md leading-relaxed font-medium">
-              India's most trusted platform connecting skilled labourers and verified contractors. We believe in direct connections and transparent work.
+              {t("footer.tagline", {}, "India's most trusted platform connecting skilled labourers and verified contractors. We believe in direct connections and transparent work.")}
             </p>
             <div className="flex gap-4">
               {footerLinks.social.map((item, idx) => (
@@ -69,7 +71,7 @@ export default function Footer() {
 
           {/* Quick Links Column */}
           <div>
-            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Quick Links</h4>
+            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-6">{t("navigation.quickLinks", {}, "Quick Links")}</h4>
             <ul className="space-y-4">
               {footerLinks.platform.map((link, idx) => (
                 <li key={idx}>
@@ -87,7 +89,7 @@ export default function Footer() {
 
           {/* Legal Column */}
           <div>
-            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Support & Legal</h4>
+            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-6">{t("navigation.legal", {}, "Support & Legal")}</h4>
             <ul className="space-y-4">
               {footerLinks.legal.map((link, idx) => (
                 <li key={idx}>
@@ -105,14 +107,14 @@ export default function Footer() {
 
           {/* Contact Column */}
           <div>
-            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Get in Touch</h4>
+            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-6">{t("navigation.getInTouch", {}, "Get in Touch")}</h4>
             <ul className="space-y-5">
               <li className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 shrink-0">
                   <Mail size={18} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Email Us</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{t("common.email", {}, "Email Us")}</div>
                   <a href="mailto:laboursampark@gmail.com" className="text-gray-900 dark:text-white font-bold hover:text-blue-600 transition-colors">
                     laboursampark@gmail.com
                   </a>
@@ -123,7 +125,7 @@ export default function Footer() {
                   <Phone size={18} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Call Us</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{t("home.callToAction.callButton", {}, "Call Us")}</div>
                   <a href="tel:+919702701777" className="text-gray-900 dark:text-white font-bold hover:text-green-600 transition-colors">
                     +91 9702701777
                   </a>
@@ -134,7 +136,7 @@ export default function Footer() {
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Location</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{t("common.location", {}, "Location")}</div>
                   <div className="text-gray-900 dark:text-white font-bold">
                     Maharashtra, India
                   </div>
@@ -148,18 +150,18 @@ export default function Footer() {
         {/* Footer Bottom */}
         <div className="pt-10 border-t border-gray-100 dark:border-zinc-900 flex flex-col lg:flex-row items-center justify-between gap-6">
           <div className="text-gray-500 dark:text-gray-400 text-sm font-medium text-center lg:text-left">
-            © {new Date().getFullYear()} <span className="text-gray-900 dark:text-white font-bold">LabourSampark</span>. All rights reserved. 
-            <p className="mt-1 text-xs opacity-75">Operated by NILESH RAJENDRA NISHAD</p>
+            © {new Date().getFullYear()} <span className="text-gray-900 dark:text-white font-bold">LabourSampark</span>. {t("footer.rightsReserved", {}, "All rights reserved.")}
+            <p className="mt-1 text-xs opacity-75">{t("footer.operatedBy", {}, "Operated by NILESH RAJENDRA NISHAD")}</p>
           </div>
           
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-tighter">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              Platform Status: Online
+              {t("footer.platformStatus", {}, "Platform Status: Online")}
             </div>
             <div className="h-4 w-px bg-gray-200 dark:bg-zinc-800 hidden sm:block"></div>
             <div className="text-xs font-medium text-gray-400">
-              Handcrafted in India 🇮🇳
+              {t("footer.handcrafted", {}, "Handcrafted in India 🇮🇳")}
             </div>
           </div>
         </div>
