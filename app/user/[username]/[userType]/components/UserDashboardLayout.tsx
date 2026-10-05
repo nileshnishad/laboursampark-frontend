@@ -186,7 +186,7 @@ export default function UserDashboardLayout({
             <div>
               <h1 className="text-lg font-black text-zinc-900 dark:text-white leading-none">LabourSampark</h1>
               <span className={`text-[10px] font-black uppercase tracking-widest ${colors.text}`}>
-                {userType.replace("_", " ")} {t("portal", "Portal")}
+                {userType === "labour" ? t("labour_portal", "Labour Portal") : userType === "contractor" ? t("contractor_portal", "Contractor Portal") : t("subcontractor_portal", "Sub-Contractor Portal")}
               </span>
             </div>
           </div>
@@ -275,7 +275,7 @@ export default function UserDashboardLayout({
               • {username.replace(/-/g, " ")}
             </span>
             <span className={`text-[10px] font-black uppercase tracking-widest ${colors.text}`}>
-              {userType.replace("_", " ")} {t("portal", "Portal")}
+              {userType === "labour" ? t("labour_portal", "Labour Portal") : userType === "contractor" ? t("contractor_portal", "Contractor Portal") : t("subcontractor_portal", "Sub-Contractor Portal")}
             </span>
           </div>
         </div>

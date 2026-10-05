@@ -6,6 +6,7 @@ import {
   dismissToast,
 } from '@/lib/toast-utils';
 import { apiGet, apiPost, apiPut, setToken as saveToken, clearToken as removeToken, USER_KEY } from '@/lib/api-service';
+import { normalizeUserRole } from '@/lib/user-route';
 
 const getStoredUser = (): any | null => {
   if (typeof window === 'undefined') {
@@ -18,7 +19,11 @@ const getStoredUser = (): any | null => {
   }
 
   try {
-    return JSON.parse(storedUser);
+    const user = JSON.parse(storedUser);
+    if (user && user.userType) {
+      user.userType = normalizeUserRole(user.userType) || user.userType;
+    }
+    return user;
   } catch {
     localStorage.removeItem(USER_KEY);
     return null;
@@ -89,7 +94,7 @@ export interface LoginPayload {
   mobile?: string;
   password?: string;
   otp?: string;
-  userType: 'labour' | 'contractor' | 'sub_contractor';
+  userType?: 'labour' | 'contractor' | 'sub_contractor';
 }
 
 export interface AuthState {
@@ -197,8 +202,6 @@ export const registerLabour = createAsyncThunk(
 /**
  * Async thunk for user login
  */
-const ALLOWED_USER_TYPES = ['labour', 'contractor', 'sub_contractor'];
-
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (payload: LoginPayload, { rejectWithValue }) => {
@@ -208,12 +211,18 @@ export const loginUser = createAsyncThunk(
       });
       if (response.success) {
         const userData = response.data?.data;
-        const userType = (userData?.user?.userType || userData?.userType || '').toString().toLowerCase();
+        const rawUserType = userData?.user?.userType || userData?.userType || (response.data as any)?.userType;
+        const normalizedRole = normalizeUserRole(rawUserType);
 
-        if (!ALLOWED_USER_TYPES.includes(userType)) {
+        if (!normalizedRole) {
           return rejectWithValue(
             'Access denied. Only Labour, Contractor, and Sub-Contractor accounts are permitted to login.'
           );
+        }
+
+        // Ensure user object has canonical normalized userType
+        if (userData?.user) {
+          userData.user.userType = normalizedRole;
         }
 
         // Save token if provided
@@ -334,8 +343,12 @@ const authSlice = createSlice({
     },
 
     setUser: (state, action: PayloadAction<any | null>) => {
-      state.user = action.payload;
-      saveUser(action.payload);
+      let user = action.payload ? { ...action.payload } : null;
+      if (user && user.userType) {
+        user.userType = normalizeUserRole(user.userType) || user.userType;
+      }
+      state.user = user;
+      saveUser(user);
     },
   },
   extraReducers: (builder) => {
@@ -352,9 +365,13 @@ const authSlice = createSlice({
       .addCase(registerContractor.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.user = action.payload?.user || null;
+        let registeredUser = action.payload?.user ? { ...action.payload.user } : null;
+        if (registeredUser && registeredUser.userType) {
+          registeredUser.userType = normalizeUserRole(registeredUser.userType) || registeredUser.userType;
+        }
+        state.user = registeredUser;
         state.token = action.payload?.token || null;
-        saveUser(action.payload?.user || null);
+        saveUser(registeredUser);
         state.message = action.payload?.message || 'Registration successful!';
         dismissToast();
         showSuccessToast(
@@ -385,9 +402,13 @@ const authSlice = createSlice({
       .addCase(registerLabour.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.user = action.payload?.user || null;
+        let registeredUser = action.payload?.user ? { ...action.payload.user } : null;
+        if (registeredUser && registeredUser.userType) {
+          registeredUser.userType = normalizeUserRole(registeredUser.userType) || registeredUser.userType;
+        }
+        state.user = registeredUser;
         state.token = action.payload?.token || null;
-        saveUser(action.payload?.user || null);
+        saveUser(registeredUser);
         state.message = action.payload?.message || 'Registration successful!';
         dismissToast();
         showSuccessToast(
@@ -418,9 +439,13 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.user = action.payload?.user || null;
+        let loggedUser = action.payload?.user ? { ...action.payload.user } : null;
+        if (loggedUser && loggedUser.userType) {
+          loggedUser.userType = normalizeUserRole(loggedUser.userType) || loggedUser.userType;
+        }
+        state.user = loggedUser;
         state.token = action.payload?.token || null;
-        saveUser(action.payload?.user || null);
+        saveUser(loggedUser);
         state.message = action.payload?.message || 'Login successful!';
         dismissToast();
         showSuccessToast(
@@ -448,10 +473,17 @@ const authSlice = createSlice({
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.profileLoading = false;
         state.profileError = null;
+        const incomingUser = action.payload?.user ? { ...action.payload.user } : {};
+        if (incomingUser.userType) {
+          incomingUser.userType = normalizeUserRole(incomingUser.userType) || incomingUser.userType;
+        }
         const mergedUser = {
           ...(state.user || {}),
-          ...(action.payload?.user || {}),
+          ...incomingUser,
         };
+        if (mergedUser.userType) {
+          mergedUser.userType = normalizeUserRole(mergedUser.userType) || mergedUser.userType;
+        }
         state.user = mergedUser;
         saveUser(mergedUser);
         state.message = action.payload?.message || state.message;
@@ -472,10 +504,17 @@ const authSlice = createSlice({
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.updatingProfile = false;
         state.updateProfileError = null;
+        const incomingUser = action.payload?.user ? { ...action.payload.user } : {};
+        if (incomingUser.userType) {
+          incomingUser.userType = normalizeUserRole(incomingUser.userType) || incomingUser.userType;
+        }
         const mergedUser = {
           ...(state.user || {}),
-          ...(action.payload?.user || {}),
+          ...incomingUser,
         };
+        if (mergedUser.userType) {
+          mergedUser.userType = normalizeUserRole(mergedUser.userType) || mergedUser.userType;
+        }
         state.user = mergedUser;
         saveUser(mergedUser);
         state.message = action.payload?.message || state.message;

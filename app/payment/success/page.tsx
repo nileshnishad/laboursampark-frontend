@@ -60,10 +60,18 @@ function PaymentSuccessContent() {
   };
 
   // Derive display values — prefer verified backend data over URL params
-  const displayAmount = statusData?.amount ? `₹${statusData.amount}` : amount ? `₹${amount}` : "";
-  const displayTxnId = statusData?.txnId || txnId;
-  const displayStatus = statusData?.status || payuStatus;
-  const displayProduct = statusData?.productInfo || productInfo;
+  const formatDisplay = (val: any): string => {
+    if (!val) return "";
+    if (typeof val === "string") return val;
+    if (typeof val === "number") return String(val);
+    if (typeof val === "object") return val.title || val.name || val.label || val.id || "";
+    return String(val);
+  };
+  const rawAmount = statusData?.amount || amount || "";
+  const displayAmount = rawAmount ? `₹${formatDisplay(rawAmount)}` : "";
+  const displayTxnId = formatDisplay(statusData?.txnId || txnId);
+  const displayStatus = formatDisplay(statusData?.status || payuStatus);
+  const displayProduct = formatDisplay(statusData?.productInfo || productInfo);
 
   return (
     <div className="min-h-screen bg-gray-900/80 flex items-center justify-center p-4">

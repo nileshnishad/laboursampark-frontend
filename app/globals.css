@@ -3,11 +3,30 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* LabourSampark Brand Color Identity */
+  --brand-orange: #ea580c;
+  --brand-orange-hover: #c2410c;
+  --brand-purple: #7c3aed;
+  --brand-purple-hover: #6d28d9;
+  --brand-green: #16a34a;
+  --brand-green-hover: #15803d;
+
+  /* Distinct Role Tokens */
+  --role-labour: #2563eb;
+  --role-contractor: #4f46e5;
+  --role-subcontractor: #059669;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-green: var(--brand-green);
+  --color-role-labour: var(--role-labour);
+  --color-role-contractor: var(--role-contractor);
+  --color-role-subcontractor: var(--role-subcontractor);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

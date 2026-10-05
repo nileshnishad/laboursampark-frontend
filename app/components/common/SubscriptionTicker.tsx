@@ -5,6 +5,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { useLanguage } from "@/app/context/LanguageContext";
 
+import { getSafeUsername } from "@/lib/user-route";
+
 interface SubscriptionTickerProps {
   userType: "labour" | "contractor" | "sub_contractor";
 }
@@ -18,11 +20,7 @@ const SubscriptionTicker: React.FC<SubscriptionTickerProps> = ({ userType }) => 
   // Get username from Redux or params
   const { user } = useSelector((state: RootState) => state.auth);
   const params = useParams();
-  // Prefer fullName (slugified), fallback to params.username
-  let username = params.username as string;
-  if (user?.fullName) {
-    username = user.fullName.trim().toLowerCase().replace(/\s+/g, "-");
-  }
+  const username = getSafeUsername(user) || (params.username as string);
 
   const handlePayNow = async () => {
     setLoading(true);
@@ -32,8 +30,7 @@ const SubscriptionTicker: React.FC<SubscriptionTickerProps> = ({ userType }) => 
       // Use correct price path
       const price = res?.data?.data?.price ?? res?.data?.price;
       if (!res.success || !price) throw new Error("Could not fetch plan price");
-      // Use actual username
-      router.push(`/user/${user.fullName.trim().toLowerCase().replace(/\s+/g, "-")}/${userType}/payment?amount=${price}`);
+      router.push(`/user/${username}/${userType}/payment?amount=${price}`);
     } catch (e: any) {
       setError(e.message || "Failed to fetch plan");
     } finally {

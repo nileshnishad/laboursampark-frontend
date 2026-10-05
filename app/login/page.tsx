@@ -5,7 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser, resetAuthState } from "@/store/slices/authSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import type { LoginPayload } from "@/store/slices/authSlice";
-import { buildUserDashboardPath } from "@/lib/user-route";
+import {
+  buildUserDashboardPath,
+  getSafeUserType,
+  isUserDashboardPath,
+  extractUserTypeFromPath,
+} from "@/lib/user-route";
 import { apiPost } from "@/lib/api-service";
 import { showErrorToast, showSuccessToast } from "@/lib/toast-utils";
 import { useLanguage } from "@/app/context/LanguageContext";
@@ -18,7 +23,6 @@ function LoginContent() {
   const { loading, success, user } = useSelector((state: RootState) => state.auth);
 
   // Form states
-  const [userType, setUserType] = useState<"labour" | "contractor" | "sub_contractor">("labour");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -53,9 +57,7 @@ function LoginContent() {
       return;
     }
 
-    const payload: LoginPayload = {
-      userType,
-    };
+    const payload: LoginPayload = {};
 
     if (isEmail(contact)) {
       payload.email = contact.toLowerCase();
@@ -108,16 +110,36 @@ function LoginContent() {
     }
   };
 
-  // Handle successful login
+  // Handle successful login with strict role-based dashboard destination
   useEffect(() => {
     if (success && user) {
       const redirectPath = searchParams.get('redirect');
-      router.push(redirectPath || buildUserDashboardPath(user, userType));
+      const canonicalRole = getSafeUserType(user);
+      const dashboardPath = buildUserDashboardPath(user);
+
+      if (redirectPath) {
+        if (isUserDashboardPath(redirectPath)) {
+          const redirectRole = extractUserTypeFromPath(redirectPath);
+          // If the redirect path target matches this user's authentic role, allow it
+          if (redirectRole && redirectRole === canonicalRole) {
+            router.push(redirectPath);
+          } else {
+            // Mismatched role in stale redirect URL - go directly to user's authentic dashboard
+            router.push(dashboardPath);
+          }
+        } else {
+          // Non-dashboard redirect (e.g. /jobs, /contractors)
+          router.push(redirectPath);
+        }
+      } else {
+        router.push(dashboardPath);
+      }
+
       setTimeout(() => {
         dispatch(resetAuthState());
       }, 500);
     }
-  }, [success, user, dispatch, router, searchParams, userType]);
+  }, [success, user, dispatch, router, searchParams]);
 
   return (
     <div className="min-h-screen relative py-10 px-2" style={{

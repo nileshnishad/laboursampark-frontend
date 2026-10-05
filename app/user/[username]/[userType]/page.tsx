@@ -15,28 +15,36 @@ import {
 } from "./components/dashboard-tabs-config";
 import type { AppDispatch, RootState } from "@/store/store";
 import OTPVerificationModal from "@/app/components/common/OTPVerificationModal";
-
-type UserType = "labour" | "contractor" | "sub_contractor";
-
-const normalizeUserType = (type: string): UserType => {
-  const normalized = type.toLowerCase();
-  if (normalized === "sub_contractor" || normalized === "sub-contractor") {
-    return "sub_contractor";
-  }
-  return normalized === "contractor" ? "contractor" : "labour";
-};
-
-const getDashboardLabel = (type: UserType): string => {
-  if (type === "labour") return "Labour";
-  if (type === "sub_contractor") return "Sub-Contractor";
-  return "Contractor";
-};
+import { useLanguage } from "@/app/context/LanguageContext";
+import {
+  getSafeUserType,
+  normalizeUserRole,
+  buildUserDashboardPath,
+  type CanonicalUserType,
+} from "@/lib/user-route";
 
 export default function UserDashboardPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const params = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const actualRole: CanonicalUserType = getSafeUserType(user);
+  const routeRole = normalizeUserRole(params.userType as string);
+
+  // Strict role redirection: ensure user cannot stay on mismatched portal
+  useEffect(() => {
+    if (user && routeRole && routeRole !== actualRole) {
+      router.replace(buildUserDashboardPath(user));
+    }
+  }, [user, routeRole, actualRole, router]);
+
+  const getDashboardLabel = (type: CanonicalUserType): string => {
+    if (type === "labour") return t("role_labour", "Labour");
+    if (type === "sub_contractor") return t("role_sub_contractor", "Sub-Contractor");
+    return t("role_contractor", "Contractor");
+  };
   const { users: visibleUsers, loading: usersLoading, error: usersError } = useSelector(
     (state: RootState) => state.visibleUsers
   );
@@ -47,7 +55,8 @@ export default function UserDashboardPage() {
   }, [dispatch]);
 
   const username = params.username as string;
-  const userType = normalizeUserType(params.userType as string);
+  // Always enforce the user's authentic canonical role
+  const userType: CanonicalUserType = actualRole;
   const [activeFilter, setActiveFilter] = useState<DashboardTabValue>("jobs");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -57,8 +66,7 @@ export default function UserDashboardPage() {
   };
 
   const handleConnect = async (userId: string) => {
-    // TODO: Implement API call to send connection request
-    // await dispatch(sendConnectionRequest(userId));
+    // API call to send connection request
   };
 
   const handleGoToPayment = () => {
@@ -94,7 +102,7 @@ export default function UserDashboardPage() {
     setSearchQuery("");
   }, [activeFilter]);
 
-  if (!user) {
+  if (!user || (routeRole && routeRole !== actualRole)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <p className="text-gray-600">Loading...</p>

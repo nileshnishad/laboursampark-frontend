@@ -5,8 +5,7 @@ import UpdateProfileModal from "./UpdateProfileModal";
 import type { RootState, AppDispatch } from "@/store/store";
 import { fetchSkills, skillIdToLabel } from "@/store/slices/skillsSlice";
 import { fetchBusinesses, businessIdToLabel } from "@/store/slices/businessesSlice";
-
-type UserType = "labour" | "contractor";
+import { getSafeUserType, type CanonicalUserType } from "@/lib/user-route";
 
 type DetailItem = {
   label: string;
@@ -77,12 +76,11 @@ const CompactSection = ({
 );
 
 export default function PersonalDetails() {
-  const params = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   const { skills: allSkills } = useSelector((state: RootState) => state.skills);
   const { businesses: allBusinesses } = useSelector((state: RootState) => state.businesses);
-  const userType = params.userType as UserType;
+  const userType: CanonicalUserType = getSafeUserType(user);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
@@ -131,7 +129,7 @@ export default function PersonalDetails() {
             </h2>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-6">
                <div className="px-4 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-                  {userType === "contractor" ? "Construction Partner" : "Skilled Worker"}
+                  {userType === "contractor" ? "Construction Partner" : userType === "sub_contractor" ? "Sub-Contractor Partner" : "Skilled Worker"}
                </div>
                <div className="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl text-[10px] font-black uppercase tracking-widest">
                   ID: #{user._id?.slice(-6).toUpperCase() || "NEW"}
@@ -170,8 +168,8 @@ export default function PersonalDetails() {
           <CompactGrid items={basicDetails} />
         </CompactSection>
 
-        <CompactSection title={userType === "contractor" ? "Professional Company Profile" : "Work Experience & Skills"} defaultOpen>
-          {userType === "contractor" && user.companyLogoUrl && (
+        <CompactSection title={userType === "contractor" ? "Professional Company Profile" : userType === "sub_contractor" ? "Sub-Contracting Business Profile" : "Work Experience & Skills"} defaultOpen>
+          {(userType === "contractor" || userType === "sub_contractor") && user.companyLogoUrl && (
             <div className="mb-6 flex items-center gap-4 bg-zinc-50 dark:bg-zinc-800/20 p-4 rounded-[1.5rem] border border-zinc-100 dark:border-zinc-800">
               <div className="w-16 h-16 rounded-2xl bg-white dark:bg-zinc-800 p-2 border border-zinc-200 dark:border-zinc-800 shadow-sm shrink-0">
                 <img src={user.companyLogoUrl} alt="Logo" className="w-full h-full object-contain" />

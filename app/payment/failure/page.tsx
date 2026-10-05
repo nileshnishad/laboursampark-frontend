@@ -66,13 +66,21 @@ function PaymentFailureContent() {
     router.push("/");
   };
 
-  const displayTxnId = statusData?.txnId || txnId;
-  const displayAmount = statusData?.amount ? `₹${statusData.amount}` : amount ? `₹${amount}` : "";
-  const displayStatus = statusData?.status || payuStatus;
+  const formatDisplay = (val: any): string => {
+    if (!val) return "";
+    if (typeof val === "string") return val;
+    if (typeof val === "number") return String(val);
+    if (typeof val === "object") return val.title || val.name || val.label || val.message || "";
+    return String(val);
+  };
+  const displayTxnId = formatDisplay(statusData?.txnId || txnId);
+  const rawAmount = statusData?.amount || amount || "";
+  const displayAmount = rawAmount ? `₹${formatDisplay(rawAmount)}` : "";
+  const displayStatus = formatDisplay(statusData?.status || payuStatus);
   const displayError =
-    errorMessage ||
+    formatDisplay(errorMessage) ||
     (statusData?.status && statusData.status !== "success"
-      ? `Payment ${statusData.status}. Please try again.`
+      ? `Payment ${formatDisplay(statusData.status)}. Please try again.`
       : t("payment_failed_desc", "Your payment could not be processed. Please try again."));
 
   return (

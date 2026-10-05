@@ -9,16 +9,12 @@ import type { AppDispatch, RootState } from "@/store/store";
 import { createPayULink, buildSubscriptionPayload, type PayULinkStatus } from "@/lib/payu-service";
 import { useLanguage } from "@/app/context/LanguageContext";
 import LanguageSelector from "@/app/components/LanguageSelector";
-
-type UserType = "labour" | "contractor" | "sub_contractor";
-
-const normalizeUserType = (type: string): UserType => {
-  const normalized = type.toLowerCase();
-  if (normalized === "sub_contractor" || normalized === "sub-contractor") {
-    return "sub_contractor";
-  }
-  return normalized === "contractor" ? "contractor" : "labour";
-};
+import {
+  getSafeUserType,
+  normalizeUserRole,
+  getSafeUsername,
+  type CanonicalUserType,
+} from "@/lib/user-route";
 
 export default function PaymentPage() {
   const { t } = useLanguage();
@@ -27,24 +23,31 @@ export default function PaymentPage() {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const getUserTypeLabel = (type: UserType): string => {
-    if (type === "labour") return t("labour", "Labour");
-    if (type === "sub_contractor") return t("sub_contractor", "Sub-Contractor");
-    return t("contractor", "Contractor");
+  const actualRole: CanonicalUserType = getSafeUserType(user);
+  const routeRole = normalizeUserRole(params.userType as string);
+
+  // Strict role redirection: redirect if URL role doesn't match authentic user
+  useEffect(() => {
+    if (user && routeRole && routeRole !== actualRole) {
+      const safeUser = getSafeUsername(user);
+      router.replace(`/user/${safeUser}/${actualRole}/payment`);
+    }
+  }, [user, routeRole, actualRole, router]);
+
+  const getUserTypeLabel = (type: CanonicalUserType): string => {
+    if (type === "labour") return t("role_labour", "Labour");
+    if (type === "sub_contractor") return t("role_sub_contractor", "Sub-Contractor");
+    return t("role_contractor", "Contractor");
   };
 
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [payStatus, setPayStatus] = useState<PayULinkStatus>("idle");
   const [payError, setPayError] = useState<string | null>(null);
 
-  // Use fullName slug for username if available, else fallback to params.username
-  let username = params.username as string;
-  let fullName = username.replace(/-/g, " ");
-  if (user?.fullName) {
-    fullName = user.fullName;
-    username = user.fullName.trim().toLowerCase().replace(/\s+/g, "-");
-  }
-  const userType = normalizeUserType(params.userType as string);
+  // Enforce authentic user slug & role
+  const username = getSafeUsername(user) || (params.username as string);
+  const fullName = user?.fullName || username.replace(/-/g, " ");
+  const userType: CanonicalUserType = actualRole;
   const userTypeLabel = getUserTypeLabel(userType);
 
   // Subscription plan state
@@ -53,14 +56,12 @@ export default function PaymentPage() {
   const [planError, setPlanError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!userType) return;
     setPlanLoading(true);
     setPlanError(null);
     apiGet(`/api/subscription/plan?userType=${encodeURIComponent(userType)}`)
       .then((res) => {
         if (res.success && res.data) {
-
-          console.log(res?.data?.data);
-          
           setPlan(res?.data?.data);
         } else {
           setPlanError(res.error || res.message || "Could not fetch plan");
@@ -137,8 +138,9 @@ export default function PaymentPage() {
   const price = plan?.price || 0;
   const pricePerDay = price && duration ? (price / duration).toFixed(2) : "-";
 
-  const getTranslatedFeature = (feat: string): string => {
-    switch (feat) {
+  const getTranslatedFeature = (feat: any): string => {
+    const text = typeof feat === "string" ? feat : feat?.title || feat?.name || feat?.label || "";
+    switch (text) {
       case "Basic Job Access": return t("basic_job_access", "Basic Job Access");
       case "Limited Contractor Connections": return t("limited_contractor_connections", "Limited Contractor Connections");
       case "Profile Listing": return t("profile_listing", "Profile Listing");
@@ -152,20 +154,23 @@ export default function PaymentPage() {
       case "Advanced Analytics": return t("advanced_analytics", "Advanced Analytics");
       case "Priority Support": return t("priority_support", "Priority Support");
       case "Verified Badge": return t("verified_badge", "Verified Badge");
-      default: return feat;
+      default: return text || "";
     }
   };
 
-  // UI config for each user type
+  // UI config for each user type aligned with role color system
   const planUI = {
     labour: {
-      color: 'green',
-      bg: 'bg-green-50',
-      border: 'border-green-400',
-      button: 'bg-green-600 hover:bg-green-700',
+      headerBg: 'bg-blue-600',
+      bg: 'bg-blue-50/70 dark:bg-blue-950/20',
+      border: 'border-blue-400 dark:border-blue-700',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      priceText: 'text-blue-700 dark:text-blue-300',
+      featureText: 'text-blue-900 dark:text-blue-100',
+      checkmarkText: 'text-blue-600 dark:text-blue-400',
       icon: (
-        <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 mb-2">
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" className="text-green-600"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="currentColor" strokeWidth="2"/></svg>
+        <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/40 mb-2">
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" className="text-blue-600 dark:text-blue-400"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="currentColor" strokeWidth="2"/></svg>
         </span>
       ),
       features: [
@@ -176,13 +181,16 @@ export default function PaymentPage() {
       ],
     },
     sub_contractor: {
-      color: 'orange',
-      bg: 'bg-orange-50',
-      border: 'border-orange-400',
-      button: 'bg-orange-500 hover:bg-orange-600',
+      headerBg: 'bg-emerald-600',
+      bg: 'bg-emerald-50/70 dark:bg-emerald-950/20',
+      border: 'border-emerald-400 dark:border-emerald-700',
+      button: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+      priceText: 'text-emerald-700 dark:text-emerald-300',
+      featureText: 'text-emerald-900 dark:text-emerald-100',
+      checkmarkText: 'text-emerald-600 dark:text-emerald-400',
       icon: (
-        <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 mb-2">
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" className="text-orange-500"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="currentColor" strokeWidth="2"/></svg>
+        <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/40 mb-2">
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" className="text-emerald-600 dark:text-emerald-400"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="currentColor" strokeWidth="2"/></svg>
         </span>
       ),
       features: [
@@ -193,13 +201,16 @@ export default function PaymentPage() {
       ],
     },
     contractor: {
-      color: 'blue',
-      bg: 'bg-blue-50',
-      border: 'border-blue-400',
-      button: 'bg-blue-600 hover:bg-blue-700',
+      headerBg: 'bg-indigo-600',
+      bg: 'bg-indigo-50/70 dark:bg-indigo-950/20',
+      border: 'border-indigo-400 dark:border-indigo-700',
+      button: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+      priceText: 'text-indigo-700 dark:text-indigo-300',
+      featureText: 'text-indigo-900 dark:text-indigo-100',
+      checkmarkText: 'text-indigo-600 dark:text-indigo-400',
       icon: (
-        <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 mb-2">
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" className="text-blue-600"><rect x="7" y="7" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M9 17v2h6v-2" stroke="currentColor" strokeWidth="2"/></svg>
+        <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-900/40 mb-2">
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" className="text-indigo-600 dark:text-indigo-400"><rect x="7" y="7" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M9 17v2h6v-2" stroke="currentColor" strokeWidth="2"/></svg>
         </span>
       ),
       features: [
@@ -229,9 +240,7 @@ export default function PaymentPage() {
       <main className="w-full max-w-md mx-auto p-3 ">
         <div className={`rounded-2xl shadow-xl border-2 ${ui.border} ${ui.bg} bg-white dark:bg-gray-800 p-0 flex flex-col items-center relative w-full max-w-md sm:max-w-lg mx-auto`}>
           {/* Card Header */}
-          <div className={`w-full rounded-t-2xl flex flex-col items-center justify-center py-3 sm:py-4 ${
-            userType === 'labour' ? 'bg-green-600' : userType === 'sub_contractor' ? 'bg-orange-500' : 'bg-blue-600'
-          }`}>
+          <div className={`w-full rounded-t-2xl flex flex-col items-center justify-center py-3 sm:py-4 ${ui.headerBg}`}>
             <span className="uppercase text-white font-extrabold tracking-wider text-lg">
               {userTypeLabel}
             </span>
@@ -240,7 +249,7 @@ export default function PaymentPage() {
             <div className="flex flex-col items-center w-full gap-1 sm:gap-2">
               <div className="mb-1 sm:mb-2">{ui.icon}</div>
               <div className="text-xs text-gray-500 mb-1 sm:mb-2">{fullName}</div>
-              <div className={`text-2xl sm:text-3xl font-extrabold mb-0.5 sm:mb-1 text-${ui.color}-700 dark:text-${ui.color}-400`}>₹{price}</div>
+              <div className={`text-2xl sm:text-3xl font-extrabold mb-0.5 sm:mb-1 ${ui.priceText}`}>₹{price}</div>
               <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 mb-1 sm:mb-2">
                 {t("for_days", { days: duration }, `for ${duration} Days`)}
               </div>
@@ -249,9 +258,9 @@ export default function PaymentPage() {
               </div>
             </div>
             <ul className="w-full mb-2 sm:mb-4 mt-1 sm:mt-2 space-y-1 sm:space-y-2">
-              {(Array.isArray(plan?.features) && plan.features.length > 0 ? plan.features : ui.features).map((feature: string, idx: number) => (
-                <li key={idx} className={`flex items-center gap-2 text-sm text-${ui.color}-800 dark:text-${ui.color}-100`}>
-                  <span className={`text-lg font-bold text-${ui.color}-700 dark:text-${ui.color}-300`}>✓</span>
+              {(Array.isArray(plan?.features) && plan.features.length > 0 ? plan.features : ui.features).map((feature: any, idx: number) => (
+                <li key={idx} className={`flex items-center gap-2 text-sm ${ui.featureText}`}>
+                  <span className={`text-lg font-bold ${ui.checkmarkText}`}>✓</span>
                   <span>{getTranslatedFeature(feature)}</span>
                 </li>
               ))}
@@ -295,7 +304,7 @@ export default function PaymentPage() {
           </div>
         </div>
         <div className="w-full max-w-md mx-auto mt-6 text-xs text-gray-600 dark:text-gray-300 flex flex-col items-center gap-1">
-          <div>Note: {duration} {t("days", "Days")} = {Math.round(duration/30)} {t("months", "Months")} ({t("all_plans_billed_note", `All plans billed for ${duration} days only`)})</div>
+          <div>Note: {duration} {t("days", "Days")} = {Math.round(duration/30)} {t("months", "Months")} ({t("all_plans_billed_note", { duration }, `All plans billed for ${duration} days only`)})</div>
           <div>{t("no_hidden_charges", "All amounts are in Indian Rupees (₹) | No Hidden Charges")}</div>
         </div>
         {/* FAQ Section */}

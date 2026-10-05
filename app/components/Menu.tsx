@@ -98,13 +98,13 @@ export default function Menu() {
           onClick={() => setOpen((v) => !v)}
         >
           <span
-            className={`block w-6 h-0.5 bg-blue-700 mb-1 transition-all ${open ? "rotate-45 translate-y-2" : ""}`}
+            className={`block w-6 h-0.5 bg-orange-600 mb-1 transition-all ${open ? "rotate-45 translate-y-2" : ""}`}
           ></span>
           <span
-            className={`block w-6 h-0.5 bg-blue-700 mb-1 transition-all ${open ? "opacity-0" : ""}`}
+            className={`block w-6 h-0.5 bg-orange-600 mb-1 transition-all ${open ? "opacity-0" : ""}`}
           ></span>
           <span
-            className={`block w-6 h-0.5 bg-blue-700 transition-all ${open ? "-rotate-45 -translate-y-2" : ""}`}
+            className={`block w-6 h-0.5 bg-orange-600 transition-all ${open ? "-rotate-45 -translate-y-2" : ""}`}
           ></span>
         </button>
       </div>
@@ -117,8 +117,8 @@ export default function Menu() {
                 onClick={() => handleNavClick(section)}
                 className={
                   active === section.id
-                    ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1 cursor-pointer"
-                    : "hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer"
+                    ? "text-orange-600 dark:text-orange-400 border-b-2 border-orange-600 dark:border-orange-400 pb-1 cursor-pointer"
+                    : "hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer"
                 }
               >
                 {t(section.labelKey, {}, section.defaultLabel)}
@@ -134,14 +134,14 @@ export default function Menu() {
         {mounted && user ? (
           <button
             onClick={() => router.push(buildUserDashboardPath(user))}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
+            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap shadow-sm shadow-orange-500/20"
           >
             {t("navigation.dashboard", {}, "Dashboard")}
           </button>
         ) : (
           <button
             onClick={() => router.push("/login")}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
+            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-sm transition-colors whitespace-nowrap shadow-sm shadow-orange-500/20"
           >
             {t("navigation.login", {}, "Login")}
           </button>
@@ -156,15 +156,15 @@ export default function Menu() {
       )}
       {/* Mobile menu */}
       {open && (
-        <ul className="absolute top-full left-0 w-full bg-white/95 dark:bg-black/95 flex flex-col gap-4 py-6 px-6 text-blue-700 dark:text-blue-200 font-medium md:hidden animate-fade-in z-50 shadow-lg">
+        <ul className="absolute top-full left-0 w-full bg-white/95 dark:bg-black/95 flex flex-col gap-4 py-6 px-6 text-gray-800 dark:text-gray-200 font-medium md:hidden animate-fade-in z-50 shadow-lg">
           {sections.map((section) => (
             <li key={section.id}>
               <button
                 onClick={() => handleNavClick(section)}
                 className={
                   active === section.id
-                    ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-600 dark:border-blue-300 pb-1 text-left w-full cursor-pointer"
-                    : "hover:text-blue-600 dark:hover:text-blue-300 text-left w-full cursor-pointer"
+                    ? "text-orange-600 dark:text-orange-400 border-b-2 border-orange-600 dark:border-orange-400 pb-1 text-left w-full cursor-pointer"
+                    : "hover:text-orange-600 dark:hover:text-orange-400 text-left w-full cursor-pointer"
                 }
               >
                 {t(section.labelKey, {}, section.defaultLabel)}
@@ -187,7 +187,7 @@ export default function Menu() {
                   router.push(buildUserDashboardPath(user));
                   setOpen(false);
                 }}
-                className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors"
+                className="w-full px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-sm shadow-orange-500/20"
               >
                 {t("navigation.dashboard", {}, "Dashboard")}
               </button>
@@ -197,7 +197,7 @@ export default function Menu() {
                   router.push("/login");
                   setOpen(false);
                 }}
-                className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors"
+                className="w-full px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-sm shadow-orange-500/20"
               >
                 {t("navigation.loginRegister", {}, "Login / Register")}
               </button>

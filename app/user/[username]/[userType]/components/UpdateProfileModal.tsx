@@ -12,8 +12,7 @@ import LocationSelector from "@/app/components/LocationSelector";
 import { LocationData } from "@/lib/use-location";
 import type { AppDispatch, RootState } from "@/store/store";
 import dropdownsData from "@/data/dropdowns.json";
-
-type UserType = "labour" | "contractor";
+import { getSafeUserType, type CanonicalUserType } from "@/lib/user-route";
 
 const {
   teamSize: TEAM_SIZE_OPTIONS,
@@ -88,10 +87,9 @@ interface UpdateProfileModalProps {
 }
 
 export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileModalProps) {
-  const params = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const { user, updatingProfile } = useSelector((state: RootState) => state.auth);
-  const userType = params.userType as UserType;
+  const userType: CanonicalUserType = getSafeUserType(user);
   const [form, setForm] = useState<ProfileFormState>(() => getInitialFormState(user));
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [coverageDropdownOpen, setCoverageDropdownOpen] = useState(false);
@@ -284,7 +282,7 @@ export default function UpdateProfileModal({ isOpen, onClose }: UpdateProfileMod
                   </label>
                 </div>
               </div>
-              {userType === "contractor" && (
+              {(userType === "contractor" || userType === "sub_contractor") && (
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Company Logo</label>
                   <div className="flex items-center gap-3">

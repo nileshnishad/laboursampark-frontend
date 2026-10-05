@@ -23,12 +23,29 @@ function humanizeKey(key: string): string {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
+function isLeafValue(val: any): boolean {
+  return typeof val === "string" || typeof val === "number" || typeof val === "boolean";
+}
+
+function extractLeafFromObject(val: any): string | undefined {
+  if (!val || typeof val !== "object") return undefined;
+  if (typeof val.title === "string") return val.title;
+  if (typeof val.name === "string") return val.name;
+  if (typeof val.label === "string") return val.label;
+  if (typeof val.text === "string") return val.text;
+  return undefined;
+}
+
 function resolveKeyValue(dict: any, key: string): any {
   if (!dict || typeof dict !== "object") return undefined;
 
   // 1. Direct key match (flat key e.g. "welcome_back" or "home.heroHeading")
   if (key in dict) {
-    return dict[key];
+    const val = dict[key];
+    if (isLeafValue(val)) return val;
+    const leaf = extractLeafFromObject(val);
+    if (leaf !== undefined) return leaf;
+    return undefined;
   }
 
   // 2. Nested key path (e.g. "home.aboutSection.title")
@@ -42,7 +59,10 @@ function resolveKeyValue(dict: any, key: string): any {
         return undefined;
       }
     }
-    return current;
+    if (isLeafValue(current)) return current;
+    const leaf = extractLeafFromObject(current);
+    if (leaf !== undefined) return leaf;
+    return undefined;
   }
 
   return undefined;
@@ -68,29 +88,45 @@ export function t(
   // 1. Try specified locale
   let rawValue = resolveKeyValue(currentDict, key);
 
-  // 2. Fallback to English if not found or empty
-  if (rawValue === undefined && locale !== "en") {
+  // 2. Fallback to English if not found or empty or not a leaf
+  if ((rawValue === undefined || rawValue === null || typeof rawValue === "object") && locale !== "en") {
     rawValue = resolveKeyValue(enDict, key);
   }
 
-  // 3. Fallback to provided default text
-  if (rawValue === undefined) {
-    if (fallbackText !== undefined && fallbackText !== null) {
+  // 3. Fallback to provided default text or humanized key
+  if (rawValue === undefined || rawValue === null || typeof rawValue === "object") {
+    if (fallbackText !== undefined && fallbackText !== null && typeof fallbackText === "string") {
       rawValue = fallbackText;
     } else {
       rawValue = humanizeKey(key);
     }
   }
 
-  // Ensure string
-  let result = typeof rawValue === "string" ? rawValue : String(rawValue ?? "");
+  // 4. Ensure string - NEVER stringify an object to "[object Object]"
+  let result = "";
+  if (typeof rawValue === "string") {
+    result = rawValue;
+  } else if (typeof rawValue === "number" || typeof rawValue === "boolean") {
+    result = String(rawValue);
+  } else if (typeof fallbackText === "string") {
+    result = fallbackText;
+  } else {
+    result = humanizeKey(key);
+  }
 
-  // 4. Parameter interpolation: replace {param} or {{param}}
+  // 5. Parameter interpolation: replace {param} or {{param}}
   if (params && typeof params === "object") {
     result = result.replace(/\{+(\w+)\}+/g, (match, paramName) => {
       if (paramName in params) {
         const val = params[paramName];
-        return val !== undefined && val !== null ? String(val) : "";
+        if (val !== undefined && val !== null) {
+          if (typeof val === "object") {
+            // NEVER let an object param produce "[object Object]"
+            return val.title || val.name || val.label || val.id || "";
+          }
+          return String(val);
+        }
+        return "";
       }
       return match;
     });
